@@ -27,6 +27,12 @@ class _CreateProfileState extends State<CreateProfile> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical:5.0, horizontal:10.0),
+                    child: Image(
+                    image:AssetImage('images/step-1-mini.png'), width: 150.0,
+                  ),),
+
                   Text('My Profile', style: TextStyle(fontSize: 28.0,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'SourceSansPro'),),
@@ -135,7 +141,8 @@ class _CreateProfileState extends State<CreateProfile> {
                             child: MaterialButton(
                               minWidth: 80,
                               height: 52,
-                              child: Icon(Icons.arrow_back_ios,size:29.0,)
+                              child: Icon(Icons.arrow_back_ios,size:29.0,),
+                              onPressed: ()=>{},
 
                             )
                         ),
@@ -151,7 +158,8 @@ class _CreateProfileState extends State<CreateProfile> {
                           child: MaterialButton(
                             minWidth: 200,
                             height: 52,
-                            child: Text('SAVE', style: TextStyle(color: Colors.white),)
+                            child: Text('SAVE', style: TextStyle(color: Colors.white),),
+                            onPressed: ()=>{},
                           ),
                         )
                       )
