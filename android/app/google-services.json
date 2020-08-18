@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "861770964898",
+    "firebase_url": "https://job-seeker-app-3d3de.firebaseio.com",
+    "project_id": "job-seeker-app-3d3de",
+    "storage_bucket": "job-seeker-app-3d3de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861770964898:android:0694fedf75da633ea71cfb",
+        "android_client_info": {
+          "package_name": "com.iportalon.job_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "861770964898-4qr2ugde9s8kr7n8tpmvt128m6iv1dgn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iportalon.job_app",
+            "certificate_hash": "63c62813513985feaf2e307e29ddd585e2ea0494"
+          }
+        },
+        {
+          "client_id": "861770964898-mnvlb5r1nsga2q32g8246ie5h681n8mq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF8wK4Nk5RJwtPu0LuXRBUVH4mhJqWqcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "861770964898-mnvlb5r1nsga2q32g8246ie5h681n8mq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
