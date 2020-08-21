@@ -95,7 +95,7 @@ class _SignInState extends State<SignIn> {
                             child: Text(
                               error,
                               style: TextStyle(
-                                color: Colors.red,
+                                color: Colors.redAccent,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -143,12 +143,14 @@ class _SignInState extends State<SignIn> {
                             child: MaterialButton(
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
+
                                   setState(() {
                                     loading = true;
                                   });
                                   dynamic result =
                                       await _auth.signInWithEmailAndPassword(
                                           email, password);
+                                  print(result[0]);
                                   if (result == null) {
                                     setState(() {
                                       error =
