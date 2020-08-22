@@ -20,8 +20,6 @@ class _SignInState extends State<SignIn> {
   String password = '';
   String error = '';
 
-
-
   @override
   Widget build(BuildContext context) {
     return loading
@@ -29,17 +27,14 @@ class _SignInState extends State<SignIn> {
         : SafeArea(
             child: Scaffold(
               backgroundColor: Colors.white,
-
-
               body: Container(
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('images/professional_staff_bg.png'), fit: BoxFit.cover),
-                  ),
-
+                      image: AssetImage('images/professional_staff_bg.png'),
+                      fit: BoxFit.cover),
+                ),
                 padding: EdgeInsets.symmetric(vertical: 20, horizontal: 25.0),
                 child: ListView(
-
                   children: <Widget>[
                     Container(
                       child: Stack(
@@ -95,7 +90,7 @@ class _SignInState extends State<SignIn> {
                             child: Text(
                               error,
                               style: TextStyle(
-                                color: Colors.redAccent,
+                                color: Colors.white,
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -103,8 +98,8 @@ class _SignInState extends State<SignIn> {
                           ),
                           SizedBox(height: 5.0),
                           TextFormField(
-                            decoration:
-                                textInputDecoration.copyWith(labelText: 'Email'),
+                            decoration: textInputDecoration.copyWith(
+                                labelText: 'Email'),
                             validator: (value) =>
                                 value.isEmpty ? 'Please enter an email' : null,
                             onChanged: (value) {
@@ -115,7 +110,9 @@ class _SignInState extends State<SignIn> {
                           ),
                           SizedBox(height: 8.0),
                           TextFormField(
-                            decoration: textInputDecoration.copyWith(labelText: 'Password',),
+                            decoration: textInputDecoration.copyWith(
+                              labelText: 'Password',
+                            ),
                             validator: (value) => value.length < 6
                                 ? 'Please enter 6+ characters long'
                                 : null,
@@ -129,8 +126,12 @@ class _SignInState extends State<SignIn> {
                           Container(
                             alignment: Alignment.centerRight,
                             child: InkWell(
-                              child: Text('Forgot Password?', style: TextStyle(color:Colors.white,),)
-                            ),
+                                child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            )),
                           ),
                           SizedBox(height: 20.0),
                           Material(
@@ -143,19 +144,18 @@ class _SignInState extends State<SignIn> {
                             child: MaterialButton(
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
-
                                   setState(() {
-                                    loading = true;
+                                    //loading = true;
                                   });
                                   dynamic result =
                                       await _auth.signInWithEmailAndPassword(
                                           email, password);
-                                  print(result[0]);
+                                  print(result);
                                   if (result == null) {
                                     setState(() {
                                       error =
                                           'Could not signin with those credentials.';
-                                      loading = false;
+                                      //loading = false;
                                     });
                                   }
                                 }
@@ -177,13 +177,18 @@ class _SignInState extends State<SignIn> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text("You don't have an account?", style:TextStyle(
-                                color: Colors.white,
-                              ),
+                              Text(
+                                "You don't have an account?",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                               FlatButton(
                                 onPressed: () => {widget.toggleView()},
-                                child: Text("Register", style:TextStyle(color:Colors.white),),
+                                child: Text(
+                                  "Register",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ],
                           ),

@@ -11,10 +11,20 @@ class _SelectUserTypeState extends State<SelectUserType> {
   String user_type = '';
   final User _user = User();
   String error = '';
+  var result = '';
+
+  handleUserTypeSelection(String currentUser, String type) async {
+    print(currentUser);
+    setState(() {
+      user_type = type;
+    });
+    result = await _user.createUserType(currentUser, user_type);
+    print("Moving " + result);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final current_user = Provider.of<User>(context);
+    final _user = Provider.of<User>(context);
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -58,9 +68,7 @@ class _SelectUserTypeState extends State<SelectUserType> {
                         Image.asset('images/job_seeker.jpg', fit: BoxFit.cover),
                   ),
                   onTap: () {
-                    setState(() {
-                      user_type = "job_seeker";
-                    });
+                    handleUserTypeSelection(_user.uid, 'job_seeker');
                   },
                 ),
                 InkWell(
@@ -90,9 +98,8 @@ class _SelectUserTypeState extends State<SelectUserType> {
                         Image.asset('images/recruiter.jpg', fit: BoxFit.cover),
                   ),
                   onTap: () {
-                    setState(() {
-                      user_type = "recruiter";
-                    });
+                    print(_user.uid);
+                    handleUserTypeSelection(_user.uid, 'recruiter');
                   },
                 ),
                 SizedBox(
@@ -115,16 +122,12 @@ class _SelectUserTypeState extends State<SelectUserType> {
                         color: Colors.white,
                       ),
                     ),
-                    onPressed: () {
-                      print(current_user.uid);
+                    onPressed: () async {
                       if (user_type == '') {
                         setState(() {
                           error = "Select a User Type";
                         });
                       } else {
-                        dynamic result =
-                            _user.createUserType(current_user.uid, user_type);
-                        print(result);
                         Navigator.pushNamed(context, '/profile');
                       }
                     },

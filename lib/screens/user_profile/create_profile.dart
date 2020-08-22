@@ -83,8 +83,8 @@ class _CreateProfileState extends State<CreateProfile> {
     // End of upload
   }
 
-  handleForwardButton() {
-    print("Move forward");
+  handleForwardButton(context) {
+    Navigator.pushNamed(context, '/careerDetails');
   }
 
   @override
@@ -347,7 +347,7 @@ class _CreateProfileState extends State<CreateProfile> {
                                   ),
                                   onPressed: _btnForwardEnable
                                       ? () {
-                                          handleForwardButton();
+                                          handleForwardButton(context);
                                         }
                                       : null,
                                 )),

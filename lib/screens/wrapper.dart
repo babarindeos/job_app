@@ -19,37 +19,30 @@ class Wrapper extends StatelessWidget {
     // return either authenticate or home
     final user = Provider.of<User>(context);
 
-
     // return either Home or Authenticate widget
     if (user == null) {
       return Authenticate();
     } else {
       // check if user type has been selected
       isNewUser = _user.isNewUser(user.uid);
-      if (isNewUser==null){
-          return SelectUserType();
-      }else {
+
+      if (isNewUser == '') {
+        return SelectUserType();
+      } else {
         //check if user have been created
         isBioDataCreated = _user.isBioDataCreated(user.uid);
-        if (isBioDataCreated==null){
-            return CreateProfile();
-        }else
+        if (isBioDataCreated == null) {
+          return CreateProfile();
+        } else
           // check if Career Details have been created
           isCareerDetailsCreated = _user.isCareerDetailsCreated(user.uid);
-          if (isCareerDetailsCreated==null) {
-            //CareerDetails();
-            return Home();
-          }else {
-            return Home();
-          }
-
+        if (isCareerDetailsCreated == null) {
+          //CareerDetails();
+          return Home();
+        } else {
+          return Home();
         }
-
-
       }
-
     }
-
-
   }
-
+}

@@ -5,7 +5,7 @@ class User {
 
   User({this.uid});
 
-  String createUserType(String uid, String user_type) {
+  Future createUserType(String uid, String userType) async {
     String result;
     try {
       DocumentReference documentReference =
@@ -13,10 +13,10 @@ class User {
 
       Map<String, dynamic> my_type = {
         "user_id": uid,
-        "type": user_type,
+        "type": userType,
       };
 
-      documentReference.setData(my_type).whenComplete(() {
+      await documentReference.setData(my_type).whenComplete(() {
         result = "success";
       });
     } catch (e) {
@@ -26,8 +26,4 @@ class User {
 
     return result;
   }
-
-
-
-
 }

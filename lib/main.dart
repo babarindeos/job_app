@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/screens/user_profile/select_user_type.dart';
 import 'package:job_app/screens/wrapper.dart';
@@ -21,6 +22,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/profile': (context) => CreateProfile(),
           '/userType': (context) => SelectUserType(),
+          '/careerDetails': (context) => CareerDetails()
         },
       ),
     );
