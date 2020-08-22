@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/services.dart/auth.dart';
 import 'package:job_app/shared/constants.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
 import 'package:path/path.dart';
+import 'package:image/image.dart' as Im;
+import 'package:uuid/uuid.dart';
+
+final StorageReference storageRef = FirebaseStorage.instance.ref();
 
 class CreateProfile extends StatefulWidget {
   @override
@@ -17,10 +24,15 @@ class CreateProfile extends StatefulWidget {
 }
 
 class _CreateProfileState extends State<CreateProfile> {
-  File _image;
+  File _image, file;
   String gender_option = '';
   bool loading = false;
   bool _btnForwardEnable = false;
+  bool isUploading = false;
+  String postId = Uuid().v4();
+  String _userId = '';
+  String mediaUrl;
+
   final _formKey = GlobalKey<FormState>();
   // call Profile Class
   final Profile _profile = Profile();
@@ -38,7 +50,51 @@ class _CreateProfileState extends State<CreateProfile> {
 
     setState(() {
       _image = image;
+      file = image;
       print('Image Path $_image');
+    });
+  }
+
+  Future<String> uploadImage(imageFile) async {
+    print("In Upload Image module");
+    StorageUploadTask uploadTask =
+        storageRef.child("avatar_$_userId.jpg").putFile(imageFile);
+    StorageTaskSnapshot storageSnap = await uploadTask.onComplete;
+    String downloadUrl = await storageSnap.ref.getDownloadURL();
+    return downloadUrl;
+  }
+
+  createPostInFirestore() {}
+
+  // Upload Avatar
+  uploadAvatar(String userId) async {
+    _userId = userId;
+    print(_userId);
+    setState(() {
+      isUploading = true;
+    });
+    await compressImage();
+    mediaUrl = await uploadImage(file);
+    _profile.avatarUrl = mediaUrl;
+    print(mediaUrl);
+
+    setState(() {
+      isUploading = false;
+    });
+  }
+
+  // comppress image
+  compressImage() async {
+    print('Compress Image module');
+    final tempDir = await getTemporaryDirectory();
+    final path = tempDir.path;
+    Im.Image imageFile = Im.decodeImage(file.readAsBytesSync());
+    final compressImageFile = File('$path/img_$postId.jpg')
+      ..writeAsBytesSync(Im.encodeJpg(imageFile, quality: 85));
+
+    setState(() {
+      file = compressImageFile;
+      print("Image has been compressed");
     });
   }
 
@@ -46,29 +102,12 @@ class _CreateProfileState extends State<CreateProfile> {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
 
-    // uploading the image to firestore
-    Future uploadAvatar(BuildContext context) async {
-      if (_image != null) {
-        final user = Provider.of<User>(context);
-
-        String fileName = basename(_image.path);
-        StorageReference firebaseStorageRef =
-            FirebaseStorage.instance.ref().child(user.uid);
-        StorageUploadTask uploadTask = firebaseStorageRef.putFile(_image);
-        StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
-        setState(() {
-          print("Profile pciture uploaded");
-          Scaffold.of(context).showSnackBar(
-              SnackBar(content: Text('Profile Picture Uploaded.')));
-        });
-      }
-    }
-
     // TODO: implement build
     return SafeArea(
       child: Scaffold(
         body: ListView(
           children: <Widget>[
+            isUploading ? LinearProgressIndicator() : Text(""),
             Container(
               alignment: Alignment.center,
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
@@ -285,7 +324,7 @@ class _CreateProfileState extends State<CreateProfile> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 onPressed: () async {
-                                  uploadAvatar(context);
+                                  uploadAvatar(user.uid);
                                   if (_formKey.currentState.validate()) {
                                     setState(() {
                                       loading = true;
