@@ -77,8 +77,9 @@ class Profile {
     return avatarUrl;
   }
 
-  Future updateProfile(String uid) async {
+  Future updateProfile(String uid, String mediaUrl) async {
     try {
+      avatarUrl = mediaUrl;
       return await BioDataReference.document(uid).setData({
         'gender': gender,
         'name': name,
@@ -87,7 +88,9 @@ class Profile {
         'country': country,
         'phone': phone,
         'avatar': avatarUrl,
-      }).whenComplete(() => {print('$name BioData has been updated.')});
+      }).whenComplete(() {
+        return ('$name BioData has been updated.');
+      });
     } catch (e) {
       print(e.toString());
       return null;
