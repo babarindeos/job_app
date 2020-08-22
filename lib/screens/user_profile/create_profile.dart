@@ -292,7 +292,9 @@ class _CreateProfileState extends State<CreateProfile> {
                                     Icons.arrow_back_ios,
                                     size: 29.0,
                                   ),
-                                  onPressed: () => {},
+                                  onPressed: () {
+                                    Navigator.pushNamed(context, '/userType');
+                                  },
                                 )),
                           ),
                           Container(

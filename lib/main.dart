@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
+import 'package:job_app/screens/user_profile/select_user_type.dart';
 import 'package:job_app/screens/wrapper.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         home: Wrapper(),
         routes: {
-          '/profile' : (context) => CreateProfile(),
+          '/profile': (context) => CreateProfile(),
+          '/userType': (context) => SelectUserType(),
         },
       ),
     );
