@@ -35,12 +35,55 @@ class _CreateProfileState extends State<CreateProfile> {
   String mediaUrl = '';
   String _processResult;
   String result;
+  String retrieveOutcome;
+  String imageUrl;
+  String imageSource;
+
+  String name, age, state, country, phone, gender, avatar;
 
   final _formKey = GlobalKey<FormState>();
   // call Profile Class
   final Profile _profile = Profile();
   final Storage _storage = Storage();
 
+  @override
+  void initState() {
+    super.initState();
+    retrieveUserBioData();
+  }
+
+  Future<void> retrieveUserBioData() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic user = await auth.currentUser().then((value) => value.uid);
+
+    print(user.toString());
+
+    DocumentReference documentRef =
+        Firestore.instance.collection('BioData').document(user);
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        setState(() {
+          _nameController.text = (dataSnapshot.data['name']);
+          _ageController.text = (dataSnapshot.data['age']);
+          _stateController.text = (dataSnapshot.data['state']);
+          _countryController.text = (dataSnapshot.data['country']);
+          _phoneController.text = (dataSnapshot.data['phone']);
+          gender_option = (dataSnapshot.data['gender']);
+          imageUrl = (dataSnapshot.data['avatar']);
+          imageSource = "url";
+
+          retrieveOutcome = 'success';
+          _btnForwardEnable = true;
+        });
+      } else {
+        retrieveOutcome = 'error';
+        _btnForwardEnable = false;
+      }
+    });
+  }
+
+//---------------------------------------------------------------
+// Radio buttons selection function
   void _handleGenderSelected(String value) {
     setState(() {
       gender_option = value;
@@ -48,19 +91,37 @@ class _CreateProfileState extends State<CreateProfile> {
     });
   }
 
-  // getting the Image
+//---------------------------------------------------------------
+  // getting the Image - Image picker function to location and load image
   Future getImage() async {
     dynamic image = await ImagePicker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = image;
       _storage.pFile = image;
+      imageSource = 'file';
       print('Image Path $_image');
     });
   }
+  //-----------------------------------------------------------------
+
+  Widget showUploadedImage() {
+    if (imageSource == 'file') {
+      return Image.file(_image, fit: BoxFit.fill);
+    } else {
+      print(imageUrl);
+      return Image.network(imageUrl, fit: BoxFit.fill);
+    }
+    return Image(
+      image: AssetImage('images/profile_avatar.png'),
+    );
+  }
+
+  //-------------------------------------------------------------------
 
   createPostInFirestore() {}
 
+//-------------------------------------------------------------------
   Future processForm(String uid) async {
     // Set isUploading for LinearProgress indicator
     setState(() {
@@ -73,6 +134,13 @@ class _CreateProfileState extends State<CreateProfile> {
     }
 
     print(mediaUrl);
+    // update the fields
+    _profile.uName = _nameController.text;
+    _profile.uAge = _ageController.text;
+    _profile.uState = _stateController.text;
+    _profile.uCountry = _countryController.text;
+    _profile.uPhone = _phoneController.text;
+
     result = await _profile.updateProfile(uid, mediaUrl);
 
     // End upload
@@ -83,9 +151,22 @@ class _CreateProfileState extends State<CreateProfile> {
     // End of upload
   }
 
+//---------------------------------------------------------------------
+
+  // Next button navigation
   handleForwardButton(context) {
     Navigator.pushNamed(context, '/careerDetails');
   }
+
+//----------------------------------------------------------------------------
+  // Textfield Controllers
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _ageController = TextEditingController();
+  TextEditingController _stateController = TextEditingController();
+  TextEditingController _countryController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
+
+//--------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +215,8 @@ class _CreateProfileState extends State<CreateProfile> {
                                   child: SizedBox(
                                     width: 100,
                                     height: 180,
-                                    child: (_image != null)
-                                        ? Image.file(_image, fit: BoxFit.fill)
+                                    child: (imageSource != null)
+                                        ? showUploadedImage()
                                         : Image(
                                             image: AssetImage(
                                                 'images/profile_avatar.png'),
@@ -194,13 +275,11 @@ class _CreateProfileState extends State<CreateProfile> {
                             child: Container(
                               padding: EdgeInsets.only(right: 5.0),
                               child: TextFormField(
+                                controller: _nameController,
                                 validator: (value) =>
                                     value.isEmpty ? 'Name required' : null,
                                 decoration: profileTextInputDecoration.copyWith(
                                     labelText: 'Name'),
-                                onChanged: (String name) {
-                                  _profile.uName = name;
-                                },
                               ),
                             ),
                           ),
@@ -208,12 +287,14 @@ class _CreateProfileState extends State<CreateProfile> {
                             flex: 2,
                             child: Container(
                               child: TextFormField(
+                                controller: _ageController,
                                 keyboardType: TextInputType.number,
                                 validator: (value) =>
                                     value.isEmpty ? 'Age required' : null,
                                 decoration: profileTextInputDecoration.copyWith(
                                     labelText: 'Age'),
                                 onChanged: (String age) {
+                                  age = _ageController.text;
                                   _profile.uAge = age;
                                 },
                               ),
@@ -229,12 +310,14 @@ class _CreateProfileState extends State<CreateProfile> {
                               child: Container(
                                 padding: EdgeInsets.only(right: 5.0),
                                 child: TextFormField(
+                                  controller: _stateController,
                                   keyboardType: TextInputType.text,
                                   validator: (value) =>
                                       value.isEmpty ? 'State required' : null,
                                   decoration: profileTextInputDecoration
                                       .copyWith(labelText: 'State'),
                                   onChanged: (String state) {
+                                    state = _stateController.text;
                                     _profile.uState = state;
                                   },
                                 ),
@@ -243,12 +326,14 @@ class _CreateProfileState extends State<CreateProfile> {
                             flex: 2,
                             child: Container(
                               child: TextFormField(
+                                controller: _countryController,
                                 keyboardType: TextInputType.text,
                                 validator: (value) =>
                                     value.isEmpty ? 'Country required' : null,
                                 decoration: profileTextInputDecoration.copyWith(
                                     labelText: 'Country'),
                                 onChanged: (String country) {
+                                  country = _countryController.text;
                                   _profile.uCountry = country;
                                 },
                               ),
@@ -262,12 +347,14 @@ class _CreateProfileState extends State<CreateProfile> {
                           Expanded(
                               child: Container(
                                   child: TextFormField(
+                            controller: _phoneController,
                             keyboardType: TextInputType.phone,
                             validator: (value) =>
                                 value.isEmpty ? 'Phone required' : null,
                             decoration: profileTextInputDecoration.copyWith(
                                 labelText: 'Phone Number'),
                             onChanged: (String phone) {
+                              phone = _phoneController.text;
                               _profile.phone = phone;
                             },
                           )))

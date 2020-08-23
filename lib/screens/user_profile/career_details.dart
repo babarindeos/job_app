@@ -15,6 +15,12 @@ class CareerDetails extends StatefulWidget {
 }
 
 class _CareerDetailsState extends State<CareerDetails> {
+  bool isbtnForwardEnable = false;
+
+  TextEditingController _fieldController = TextEditingController();
+  TextEditingController _experienceController = TextEditingController();
+  TextEditingController _bioController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -53,11 +59,11 @@ class _CareerDetailsState extends State<CareerDetails> {
                           child: Container(
                             padding: EdgeInsets.only(right: 5.0),
                             child: TextFormField(
+                              controller: _fieldController,
                               validator: (value) =>
-                                  value.isEmpty ? 'Name required' : null,
+                                  value.isEmpty ? 'Field is required' : null,
                               decoration: profileTextInputDecoration.copyWith(
                                   labelText: 'Field'),
-                              onChanged: (String fieldf) {},
                             ),
                           ),
                         ),
@@ -65,12 +71,13 @@ class _CareerDetailsState extends State<CareerDetails> {
                           flex: 2,
                           child: Container(
                             child: TextFormField(
+                              controller: _experienceController,
                               keyboardType: TextInputType.number,
-                              validator: (value) =>
-                                  value.isEmpty ? 'Age required' : null,
+                              validator: (value) => value.isEmpty
+                                  ? 'Experience is required'
+                                  : null,
                               decoration: profileTextInputDecoration.copyWith(
                                   labelText: 'Experience'),
-                              onChanged: (String experience) {},
                             ),
                           ),
                         )
@@ -84,13 +91,13 @@ class _CareerDetailsState extends State<CareerDetails> {
                             child: Container(
                               padding: EdgeInsets.only(right: 0.0),
                               child: TextFormField(
+                                controller: _bioController,
                                 keyboardType: TextInputType.text,
                                 maxLines: 2,
                                 validator: (value) =>
-                                    value.isEmpty ? 'State required' : null,
+                                    value.isEmpty ? 'Bio is required' : null,
                                 decoration: profileTextInputDecoration.copyWith(
                                     labelText: 'Bio'),
-                                onChanged: (String state) {},
                               ),
                             )),
                       ],
@@ -304,7 +311,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                                   size: 29.0,
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/userType');
+                                  Navigator.pushNamed(context, '/profile');
                                 },
                               )),
                         ),
@@ -326,25 +333,29 @@ class _CareerDetailsState extends State<CareerDetails> {
                                   'SAVE',
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                onPressed: () => {},
+                                onPressed: () async {
+                                  
+                                },
                               ),
                             )),
                         Container(
                           child: Material(
-                              color: Colors.grey[200],
-                              shadowColor: Colors.lightGreen,
-                              elevation: 7.0,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              child: MaterialButton(
-                                  minWidth: 70,
-                                  height: 52,
-                                  child: Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 29.0,
-                                  ),
-                                  onPressed: () => {})),
+                            color: Colors.grey[200],
+                            shadowColor: Colors.lightGreen,
+                            elevation: 7.0,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(5.0),
+                            ),
+                            child: MaterialButton(
+                                minWidth: 70,
+                                height: 52,
+                                child: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 29.0,
+                                ),
+                                onPressed:
+                                    isbtnForwardEnable ? () => {} : null),
+                          ),
                         ),
                       ],
                     )
