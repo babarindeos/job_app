@@ -9,6 +9,13 @@ class AuthService {
     return user != null ? User(uid: user.uid) : null;
   }
 
+  Future<String> getloggedInUser() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic user = await auth.currentUser().then((value) => value.uid);
+
+    return user.toString();
+  }
+
   // auth change user stream
   Stream<User> get user {
     return _auth.onAuthStateChanged.map(_userFromFireBaseUser);
@@ -50,6 +57,14 @@ class AuthService {
       print(e.toString());
       return null;
     }
+  }
+
+  // get current User Id
+  Future<String> getCurrentUser() async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    final String uid = user.uid.toString();
+    print(uid);
+    return uid;
   }
 
   // sign out

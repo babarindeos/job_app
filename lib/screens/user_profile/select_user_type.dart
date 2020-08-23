@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/services.dart/auth.dart';
 import 'package:provider/provider.dart';
 
 class SelectUserType extends StatefulWidget {
@@ -8,23 +11,69 @@ class SelectUserType extends StatefulWidget {
 }
 
 class _SelectUserTypeState extends State<SelectUserType> {
-  String user_type = '';
-  final User _user = User();
+  dynamic user_type = '';
+  String loggedInUserId;
   String error = '';
   var result = '';
 
+  final User _user = User();
+  AuthService _auth = AuthService();
+
+  Future<void> getloggedInUserId() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic user = await auth.currentUser().then((value) => value.uid);
+
+    loggedInUserId = user.toString();
+    print("In getLogged " + loggedInUserId);
+    //getUserType(loggedInUserId);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    print("Initial State");
+    getloggedInUserId();
+    getUserType();
+  }
+
+  Future<void> getUserType() async {
+    dynamic result;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic uid = await auth.currentUser().then((value) => value.uid);
+
+    print("In getUserType " + uid);
+    try {
+      DocumentReference documentRef =
+          Firestore.instance.collection('UserType').document(uid);
+
+      await documentRef.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          result = (dataSnapshot.data['type']);
+          setState(() {
+            user_type = result;
+          });
+        } else {
+          user_type = null;
+        }
+      });
+    } catch (e) {
+      user_type = null;
+    }
+  }
+
   handleUserTypeSelection(String currentUser, String type) async {
-    print(currentUser);
+    //print(currentUser);
     setState(() {
       user_type = type;
     });
     result = await _user.createUserType(currentUser, user_type);
-    print("Moving " + result);
   }
 
   @override
   Widget build(BuildContext context) {
     final _user = Provider.of<User>(context);
+
     return SafeArea(
       child: Scaffold(
         body: Container(

@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:job_app/services.dart/auth.dart';
 
 class User {
   final String uid;
+  String userType;
 
-  User({this.uid});
+  User({this.uid, this.userType});
 
   Future createUserType(String uid, String userType) async {
     String result;
@@ -25,5 +29,30 @@ class User {
     }
 
     return result;
+  }
+
+  Future<String> getUserType() async {
+    dynamic result;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic uid = await auth.currentUser().then((value) => value.uid);
+
+    print("In getUserType " + uid);
+    try {
+      DocumentReference documentRef =
+          Firestore.instance.collection('UserType').document(uid);
+
+      await documentRef.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          result = (dataSnapshot.data['type']);
+          print(result);
+          return result;
+        } else {
+          return null;
+        }
+      });
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:job_app/shared/constants.dart';
-import 'package:flutter/widgets.dart';
+//import 'package:flutter/widgets.dart';
 
 class formKeys {
   static final frmKey1 = const Key('__R1KEY1__');
@@ -84,7 +85,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                               padding: EdgeInsets.only(right: 0.0),
                               child: TextFormField(
                                 keyboardType: TextInputType.text,
-                                maxLines: 3,
+                                maxLines: 2,
                                 validator: (value) =>
                                     value.isEmpty ? 'State required' : null,
                                 decoration: profileTextInputDecoration.copyWith(
@@ -102,60 +103,188 @@ class _CareerDetailsState extends State<CareerDetails> {
                             child: Text('CV',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14.0,
+                                  fontSize: 17.0,
                                 )),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 5.0),
+                    SizedBox(height: 2.0),
                     Card(
                       elevation: 5.0,
                       child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        padding: EdgeInsets.all(0.0),
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: Text('Upload Resume',
-                                  style: TextStyle(
-                                      color: Colors.blue.shade700,
-                                      fontWeight: FontWeight.bold)),
+                            Container(
+                              padding: EdgeInsets.all(7.0),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                bottom: BorderSide(
+                                  width: 1.0,
+                                  color: Colors.grey.shade300,
+                                ),
+                              )),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text('Upload Resume',
+                                        style: TextStyle(
+                                            color: Colors.blue.shade700,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Icon(Icons.file_upload,
+                                        color: Colors.grey.shade700),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Icon(Icons.file_upload,
-                                  color: Colors.grey.shade700),
+                            Container(
+                              padding: EdgeInsets.all(7.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text('Video CV',
+                                        style: TextStyle(
+                                            color: Colors.blue.shade700,
+                                            fontWeight: FontWeight.bold)),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Icon(Icons.chevron_right,
+                                        color: Colors.grey.shade700),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
+                    SizedBox(height: 10.0),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            child: Text('Social Media',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                )),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 1.0),
                     Card(
-                      elevation: 6.0,
+                      elevation: 5.0,
                       child: Container(
-                        padding: EdgeInsets.all(10.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        padding: EdgeInsets.all(1.0),
+                        child: Column(
                           children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: Text('Video CV',
-                                  style: TextStyle(
-                                      color: Colors.blue.shade700,
-                                      fontWeight: FontWeight.bold)),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          FontAwesomeIcons.facebookF,
+                                          size: 15.0,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        SizedBox(width: 3.0),
+                                        Text(
+                                          'Facebook',
+                                          style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(FontAwesomeIcons.instagramSquare,
+                                            size: 15.0,
+                                            color: Colors.grey.shade600),
+                                        SizedBox(width: 3.0),
+                                        Text(
+                                          'Instagram',
+                                          style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            Expanded(
-                              flex: 1,
-                              child: Icon(Icons.chevron_right,
-                                  color: Colors.grey.shade700),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      children: <Widget>[
+                                        Icon(FontAwesomeIcons.linkedin,
+                                            size: 15.0,
+                                            color: Colors.grey.shade600),
+                                        SizedBox(width: 3.0),
+                                        Text('LinkedIn',
+                                            style: TextStyle(
+                                                color: Colors.grey.shade700,
+                                                fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Icon(FontAwesomeIcons.snapchatSquare,
+                                            color: Colors.grey.shade700,
+                                            size: 15.0),
+                                        SizedBox(width: 3.0),
+                                        Text(
+                                          'Snapchat',
+                                          style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    SizedBox(height: 15.0),
+                    SizedBox(height: 10.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[

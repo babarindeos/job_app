@@ -13,34 +13,52 @@ class Wrapper extends StatelessWidget {
   dynamic isBioDataCreated;
   dynamic isCareerDetailsCreated;
 
+  dynamic checkIfNewUserTypeExist(String userId) async {
+    String result = await _user.isNewUser(userId);
+    return result;
+  }
+
+  dynamic checkIfBioDataExist(String userId) async {
+    String result = await _user.isBioDataCreated(userId);
+    return result;
+  }
+
+  String checkIfCareerDetailsExist(String userId) {
+    String result = _user.isCareerDetailsCreated(userId);
+    return result;
+  }
+
   final Verifier _user = Verifier();
   @override
   Widget build(BuildContext context) {
     // return either authenticate or home
     final user = Provider.of<User>(context);
+    //print(user.uid);
 
-    // return either Home or Authenticate widget
     if (user == null) {
       return Authenticate();
     } else {
       // check if user type has been selected
-      isNewUser = _user.isNewUser(user.uid);
 
-      if (isNewUser == '') {
+      isNewUser = checkIfNewUserTypeExist(user.uid);
+      //print(isNewUser);
+      if (isNewUser == null) {
         return SelectUserType();
       } else {
         //check if user have been created
-        isBioDataCreated = _user.isBioDataCreated(user.uid);
+        isBioDataCreated = checkIfBioDataExist(user.uid);
+        print(isBioDataCreated);
         if (isBioDataCreated == null) {
           return CreateProfile();
-        } else
-          // check if Career Details have been created
-          isCareerDetailsCreated = _user.isCareerDetailsCreated(user.uid);
-        if (isCareerDetailsCreated == null) {
-          //CareerDetails();
-          return Home();
         } else {
-          return Home();
+          // check if Career Details has been created
+          isCareerDetailsCreated = checkIfCareerDetailsExist(user.uid);
+          print(isCareerDetailsCreated);
+          if (isCareerDetailsCreated == null) {
+            return CareerDetails();
+          } else {
+            return Home();
+          }
         }
       }
     }
