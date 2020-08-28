@@ -41,5 +41,14 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    
+	<key>NSCameraUsageDescription</key>
+	<string>Share images with other users</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Share images with other users</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Share audio with other users</string>
+
+
 </dict>
 </plist>

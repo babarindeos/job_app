@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/storage.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:path_provider/path_provider.dart';
@@ -50,6 +51,11 @@ class _CreateProfileState extends State<CreateProfile> {
   void initState() {
     super.initState();
     retrieveUserBioData();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> retrieveUserBioData() async {
@@ -168,6 +174,17 @@ class _CreateProfileState extends State<CreateProfile> {
 
 //--------------------------------------------------------------------------
 
+  void moveToCareerDetails(BuildContext ctx) {
+    Navigator.of(ctx).push(
+      MaterialPageRoute(
+        builder: (_) {
+          return CareerDetails();
+        },
+      ),
+    );
+  }
+
+//--------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -433,9 +450,10 @@ class _CreateProfileState extends State<CreateProfile> {
                                     size: 29.0,
                                   ),
                                   onPressed: _btnForwardEnable
-                                      ? () {
-                                          handleForwardButton(context);
-                                        }
+                                      ? () => {
+                                            //handleForwardButton(context);
+                                            moveToCareerDetails(context)
+                                          }
                                       : null,
                                 )),
                           ),

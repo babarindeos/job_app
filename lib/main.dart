@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/screens/user_profile/select_user_type.dart';
@@ -18,10 +19,15 @@ class MyApp extends StatelessWidget {
     return StreamProvider<User>.value(
       value: AuthService().user,
       child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.deepPurple,
+          accentColor: Colors.teal,
+        ),
         home: Wrapper(),
         routes: {
-          '/profile': (context) => CreateProfile(),
-          '/userType': (context) => SelectUserType(),
+          '/signIn': (BuildContext context) => SignIn(),
+          '/profile': (BuildContext context) => CreateProfile(),
+          '/userType': (BuildContext context) => SelectUserType(),
           '/careerDetails': (context) => CareerDetails()
         },
       ),
