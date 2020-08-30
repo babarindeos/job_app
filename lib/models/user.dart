@@ -9,7 +9,7 @@ class User {
 
   User({this.uid, this.userType});
 
-  Future createUserType(String uid, String userType) async {
+  createUserType(String uid, String userType) async {
     String result;
     try {
       DocumentReference documentReference =
@@ -44,6 +44,32 @@ class User {
       await documentRef.get().then((dataSnapshot) {
         if (dataSnapshot.exists) {
           result = (dataSnapshot.data['type']);
+          print(result);
+          return result;
+        } else {
+          return null;
+        }
+      });
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+  Future<String> isCareerDetailsCreated() async {
+    dynamic result;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    dynamic uid = await auth.currentUser().then((value) => value.uid);
+
+    print("In Career Details " + uid);
+    try {
+      DocumentReference documentRef =
+          Firestore.instance.collection('CareerDetails').document(uid);
+
+      await documentRef.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          result = (dataSnapshot.data['field']);
+
           print(result);
           return result;
         } else {

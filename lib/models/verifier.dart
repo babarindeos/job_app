@@ -16,20 +16,16 @@ class Verifier {
 
       documentReference.get().then((dataSnapshot) {
         if (dataSnapshot.exists) {
-          iUserType = 'success';
-          print(iUserType);
           result = (dataSnapshot.data['type']);
-          print("In isUserTypeSelected - UserType has been Selected");
-
+          print("In isUserTypeSelected Method - UserType has been Selected");
           return result;
         } else {
-          iUserType = 'fail';
-          print("In isUserTypeSelected - UserType has not been Selected");
+          print(
+              "In isUserTypeSelected Method - UserType has not been Selected");
           return null;
         }
       });
     } catch (e) {
-      iUserType = 'fail';
       print("In isUserTypeSelected - Error caught..." + e.toString());
       return null;
     }

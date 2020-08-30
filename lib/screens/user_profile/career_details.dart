@@ -458,7 +458,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                                       onPressed: isbtnForwardEnabled
                                           ? () {
                                               Navigator.pushNamed(
-                                                  context, "MoreProfileInfo");
+                                                  context, '/additionalInfo');
                                             }
                                           : null),
                                 ),

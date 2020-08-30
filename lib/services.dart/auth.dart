@@ -55,6 +55,9 @@ class AuthService {
       return _userFromFireBaseUser(user);
     } catch (e) {
       print(e.toString());
+      print(e.toString());
+      var resultOutCome = ['failed', e.toString()];
+      print(resultOutCome[1]);
       return null;
     }
   }
