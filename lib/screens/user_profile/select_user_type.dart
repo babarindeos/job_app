@@ -53,6 +53,7 @@ class _SelectUserTypeState extends State<SelectUserType> {
           setState(() {
             user_type = result;
           });
+          showUserSelection(user_type);
         } else {
           user_type = null;
         }
@@ -64,10 +65,22 @@ class _SelectUserTypeState extends State<SelectUserType> {
 
   handleUserTypeSelection(String currentUser, String type) async {
     //print(currentUser);
+
     setState(() {
       user_type = type;
     });
+    showUserSelection(user_type);
     result = await _user.createUserType(currentUser, user_type);
+  }
+
+  showUserSelection(String userType) {
+    setState(() {
+      if (user_type == 'job_seeker') {
+        error = "You are a Job Seeker";
+      } else {
+        error = "You are a Recruiter";
+      }
+    });
   }
 
   @override

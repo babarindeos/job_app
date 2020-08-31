@@ -43,7 +43,7 @@ class Wrapper extends StatelessWidget {
       return Authenticate();
     } else {
       // check if user type has been selected
-
+      //return Home();
       isUserTypeSelected = checkIfNewUserTypeExist(user.uid);
       //print("Returned result from isUserTypeSelected : " + isUserTypeSelected);
       if (isUserTypeSelected == null) {

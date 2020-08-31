@@ -25,3 +25,15 @@ const profileTextInputDecoration = InputDecoration(
     ),
   ),
 );
+
+const searchTextInputDecoration = InputDecoration(
+  enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(
+    color: Colors.blueAccent,
+  )),
+  focusedBorder: OutlineInputBorder(
+    borderSide: BorderSide(
+      color: Colors.blue,
+    ),
+  ),
+);
