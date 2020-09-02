@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/verifier.dart';
 import 'package:job_app/screens/authenticate/authenticate.dart';
 import 'package:job_app/screens/home/home.dart';
@@ -8,31 +9,79 @@ import 'package:job_app/screens/user_profile/select_user_type.dart';
 import 'package:provider/provider.dart';
 import '../models/user.dart';
 
-class Wrapper extends StatelessWidget {
+class Wrapper extends StatefulWidget {
+  @override
+  _WrapperState createState() => _WrapperState();
+}
+
+class _WrapperState extends State<Wrapper> {
   dynamic isUserTypeSelected;
   dynamic isBioDataCreated;
   dynamic isCareerDetailsCreated;
   dynamic outcomeResult;
-
-  dynamic checkIfNewUserTypeExist(String userId) {
-    print("Checking for User Type Selection...");
-    String result = _user.isUserTypeSelected(userId);
-    return result;
-  }
-
-  String checkIfBioDataExist(String userId) {
-    print("Checking for User BioData");
-    String result = _user.isBioDataCreated(userId);
-    return result;
-  }
-
-  String checkIfCareerDetailsExist(String userId) {
-    print("Checking for Career Details");
-    String result = _user.isCareerDetailsCreated(userId);
-    return result;
-  }
+  bool isLoading = true;
+  String loadingStatus = 'Loading...Please Wait';
 
   final Verifier _user = Verifier();
+
+  //---------------------------------------------------------------------------------------
+
+  checkIfNewUserTypeExist(String userId, BuildContext context) async {
+    print("Checking for User Type Selection...");
+
+    String result = await _user.isUserTypeSelected(userId);
+    if (_user.iUserType == null) {
+      Navigator.pushNamed(context, '/userType');
+    } else {
+      checkIfBioDataExist(userId, context);
+    }
+  }
+
+//----------------------------------------------------------------------------------------
+  checkIfBioDataExist(String userId, BuildContext context) async {
+    print("*********************Checking for User BioData");
+    String result = await _user.isBioDataCreated(userId);
+
+    if (_user.iBioData == null) {
+      print('********************************* BioData has not been filled');
+      Navigator.pushNamed(context, '/profile');
+    } else {
+      checkIfCareerDetailsExist(userId, context);
+    }
+  }
+
+  //------------------------------------------------------------------------------------
+
+  checkIfCareerDetailsExist(String userId, BuildContext context) async {
+    print("Checking for Career Details");
+    String result = await _user.isCareerDetailsCreated(userId);
+    if (_user.iCareerDetails == null) {
+    } else {
+      Navigator.pushNamed(context, '/home');
+    }
+  }
+
+  Widget showLoadingHandler() {
+    Widget loader;
+    loader = Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SpinKitDoubleBounce(
+            color: Colors.blue,
+            size: 150.0,
+          ),
+          SizedBox(height: 10.0),
+          Text(
+            loadingStatus,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          )
+        ],
+      ),
+    );
+    return loader;
+  }
+
   @override
   Widget build(BuildContext context) {
     // return either authenticate or home
@@ -43,29 +92,17 @@ class Wrapper extends StatelessWidget {
       return Authenticate();
     } else {
       // check if user type has been selected
-      //return Home();
-      isUserTypeSelected = checkIfNewUserTypeExist(user.uid);
-      //print("Returned result from isUserTypeSelected : " + isUserTypeSelected);
-      if (isUserTypeSelected == null) {
-        print("User Type is not Selected.");
-        return SelectUserType();
-      } else {
-        //check if user have been created
-        isBioDataCreated = checkIfBioDataExist(user.uid);
-
-        if (isBioDataCreated == null) {
-          return CreateProfile();
-        } else {
-          // check if Career Details has been created
-          isCareerDetailsCreated = checkIfCareerDetailsExist(user.uid);
-          print(isCareerDetailsCreated);
-          if (isCareerDetailsCreated == null) {
-            return CareerDetails();
-          } else {
-            return Home();
-          }
-        }
-      }
+      return SelectUserType();
+      isUserTypeSelected = checkIfNewUserTypeExist(user.uid, context);
+      print("Result has been obtained");
+      print("Opening home page now...");
+      return SafeArea(
+        child: Scaffold(
+          body: Center(
+            child: isLoading ? showLoadingHandler() : Text(''),
+          ),
+        ),
+      );
     }
   }
 }

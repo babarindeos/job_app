@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/storage.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/recruiter/about_organisation.dart';
 import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:job_app/shared/constants.dart';
@@ -20,16 +21,15 @@ import 'package:uuid/uuid.dart';
 
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 
-class CreateProfile extends StatefulWidget {
+class RecruiterProfile extends StatefulWidget {
   @override
-  _CreateProfileState createState() => _CreateProfileState();
+  _RecruiterProfileState createState() => _RecruiterProfileState();
 }
 
-class _CreateProfileState extends State<CreateProfile> {
+class _RecruiterProfileState extends State<RecruiterProfile> {
   File _image, file;
-  bool fileUploadFlag = false;
   String gender_option = '';
-  bool isloading = true;
+  bool loading = false;
   bool _btnForwardEnable = false;
   bool isUploading = false;
   String postId = Uuid().v4();
@@ -54,19 +54,12 @@ class _CreateProfileState extends State<CreateProfile> {
     retrieveUserBioData();
   }
 
-  //-----------------------------------------------------------------------------
-
   @override
   void dispose() {
-    _formKey.currentState?.dispose();
     super.dispose();
   }
 
-  //-----------------------------------------------------------------------------
-
   Future<void> retrieveUserBioData() async {
-    print('************* RETRIEVING DATA ');
-
     FirebaseAuth auth = FirebaseAuth.instance;
     dynamic user = await auth.currentUser().then((value) => value.uid);
 
@@ -85,18 +78,13 @@ class _CreateProfileState extends State<CreateProfile> {
           gender_option = (dataSnapshot.data['gender']);
           imageUrl = (dataSnapshot.data['avatar']);
           imageSource = "url";
-          //mediaUrl = imageUrl;
-          print("******** image URL  :" + imageUrl.toString());
 
           retrieveOutcome = 'success';
           _btnForwardEnable = true;
-          isloading = false;
         });
       } else {
-        setState(() {
-          retrieveOutcome = 'error';
-          _btnForwardEnable = false;
-        });
+        retrieveOutcome = 'error';
+        _btnForwardEnable = false;
       }
     });
   }
@@ -119,29 +107,21 @@ class _CreateProfileState extends State<CreateProfile> {
       _image = image;
       _storage.pFile = image;
       imageSource = 'file';
-      fileUploadFlag = true;
-
       print('Image Path $_image');
     });
   }
   //-----------------------------------------------------------------
 
   Widget showUploadedImage() {
-    print("************************ IMAGE SOURCE " + imageSource);
     if (imageSource == 'file') {
       return Image.file(_image, fit: BoxFit.fill);
-    } else if (imageSource == 'url' && imageUrl != null) {
-      print("File Image ******************" + imageUrl);
-      mediaUrl = imageUrl;
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-      );
-    } else if (imageSource == '' || imageUrl == null) {
-      return Image(
-        image: AssetImage('images/profile_avatar.png'),
-      );
+    } else {
+      print(imageUrl);
+      return Image.network(imageUrl, fit: BoxFit.fill);
     }
+    return Image(
+      image: AssetImage('images/profile_avatar.png'),
+    );
   }
 
   //-------------------------------------------------------------------
@@ -152,16 +132,12 @@ class _CreateProfileState extends State<CreateProfile> {
   Future processForm(String uid) async {
     // Set isUploading for LinearProgress indicator
     setState(() {
-      isloading = true;
+      isUploading = true;
     });
 
     // called storage class: uploadAvatar method
-    if (_image != null && fileUploadFlag == true) {
+    if (_image != null) {
       mediaUrl = await _storage.uploadAvatar(uid, 'avatar');
-    } else if (fileUploadFlag == false && imageSource == 'url') {
-      mediaUrl = imageUrl;
-    } else {
-      mediaUrl = null;
     }
 
     print(mediaUrl);
@@ -176,7 +152,7 @@ class _CreateProfileState extends State<CreateProfile> {
 
     // End upload
     setState(() {
-      isloading = false;
+      isUploading = false;
       _btnForwardEnable = true;
     });
     // End of upload
@@ -199,15 +175,14 @@ class _CreateProfileState extends State<CreateProfile> {
 
 //--------------------------------------------------------------------------
 
-  void moveToCareerDetails(BuildContext ctx) {
-    // Navigator.of(ctx).push(
-    //   MaterialPageRoute(
-    //     builder: (_) {
-    //       return CareerDetails();
-    //     },
-    //   ),
-    // );
-    Navigator.pushReplacementNamed(ctx, '/careerDetails');
+  void moveToAboutOrganisation(BuildContext ctx) {
+    Navigator.of(ctx).push(
+      MaterialPageRoute(
+        builder: (_) {
+          return AboutOrganisation();
+        },
+      ),
+    );
   }
 
 //--------------------------------------------------------------------------
@@ -221,7 +196,7 @@ class _CreateProfileState extends State<CreateProfile> {
         body: Builder(builder: (BuildContext context) {
           return ListView(
             children: <Widget>[
-              isloading ? LinearProgressIndicator() : Text(''),
+              isUploading ? LinearProgressIndicator() : Text(""),
               Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
@@ -478,7 +453,7 @@ class _CreateProfileState extends State<CreateProfile> {
                                   onPressed: _btnForwardEnable
                                       ? () => {
                                             //handleForwardButton(context);
-                                            moveToCareerDetails(context)
+                                            moveToAboutOrganisation(context)
                                           }
                                       : null,
                                 )),

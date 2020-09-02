@@ -80,20 +80,62 @@ class Profile {
   Future updateProfile(String uid, String mediaUrl) async {
     try {
       avatarUrl = mediaUrl;
-      return await BioDataReference.document(uid).setData({
+      Map profile = Map<String, dynamic>();
+
+      print("************************AVATAR URL: " + avatarUrl.toString());
+
+      //Map without Changed Avatar i.e Avatar is blank
+      Map<String, dynamic> profileWithoutAvatar = {
         'gender': gender,
         'name': name,
         'age': age,
         'state': state,
         'country': country,
         'phone': phone,
-        'avatar': avatarUrl,
-      }).whenComplete(() {
-        return ('$name BioData has been updated.');
+      };
+
+      //Map with Changed Avatar i.e avatarUrl is not blank
+      Map<String, dynamic> profileWithAvatar = {
+        'gender': gender,
+        'name': name,
+        'age': age,
+        'state': state,
+        'country': country,
+        'phone': phone,
+        'avatar': avatarUrl
+      };
+
+      if (avatarUrl == '') {
+        profile = profileWithoutAvatar;
+      } else {
+        profile = profileWithAvatar;
+      }
+
+      return await BioDataReference.document(uid)
+          .setData(profile)
+          .whenComplete(() {
+        return ('$name BioData has been Updated.');
       });
+
+      //   return await BioDataReference.document(uid).setData({
+      //     'gender': gender,
+      //     'name': name,
+      //     'age': age,
+      //     'state': state,
+      //     'country': country,
+      //     'phone': phone,
+      //     'avatar': avatarUrl,
+      //   }).whenComplete(() {
+      //     return ('$name BioData has been updated.');
+      //   });
+      // } catch (e) {
+      //   print(e.toString());
+      //   return null;
+      // }
+
     } catch (e) {
       print(e.toString());
       return null;
-    }
+    } // end of try and catch
   }
 }

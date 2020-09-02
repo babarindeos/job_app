@@ -12,6 +12,7 @@ class Career {
   String _instagram;
   String _linkedIn;
   String _snapchat;
+  String updateStatus;
 
   Career(
       {String field,
@@ -20,7 +21,8 @@ class Career {
       String facebook,
       String instagram,
       String linkedIn,
-      String snapchat})
+      String snapchat,
+      this.updateStatus})
       : _field = field,
         _experience = experience,
         _bio = bio,
@@ -86,7 +88,7 @@ class Career {
   }
 
 // ------------------------------------------------------------------------------------------
-  Future<String> updateCareerDetails(String uid) async {
+  Future updateCareerDetails(String uid) async {
     try {
       DocumentReference documentReference =
           Firestore.instance.collection("CareerDetails").document(uid);
@@ -96,10 +98,13 @@ class Career {
         "experience": this.uExperience,
         "bio": this.uBio
       };
-      documentReference
-          .setData(career)
-          .whenComplete(() => "Career Details has been Updated.");
+      return await documentReference.setData(career).whenComplete(() {
+        this.updateStatus = 'success';
+        print("Updated Career Details");
+        return "Career Details has been Updated.";
+      });
     } catch (e) {
+      this.updateStatus = 'fail';
       print(e.toString());
       return null;
     }

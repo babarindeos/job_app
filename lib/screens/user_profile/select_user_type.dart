@@ -11,6 +11,7 @@ class SelectUserType extends StatefulWidget {
 }
 
 class _SelectUserTypeState extends State<SelectUserType> {
+  bool isloading = true;
   dynamic user_type = '';
   String loggedInUserId;
   String error = '';
@@ -80,6 +81,7 @@ class _SelectUserTypeState extends State<SelectUserType> {
       } else {
         error = "You are a Recruiter";
       }
+      isloading = false;
     });
   }
 
@@ -90,10 +92,12 @@ class _SelectUserTypeState extends State<SelectUserType> {
     return SafeArea(
       child: Scaffold(
         body: Container(
-            margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+            margin: EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
             alignment: Alignment.center,
             child: Column(
               children: <Widget>[
+                isloading ? LinearProgressIndicator() : Text(''),
+                SizedBox(height: 3.0),
                 Text(
                   'SELECT USER TYPE',
                   style: TextStyle(
@@ -105,7 +109,7 @@ class _SelectUserTypeState extends State<SelectUserType> {
                 InkWell(
                   child: Container(
                     width: 150,
-                    margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                    margin: EdgeInsets.only(top: 6.0, bottom: 6.0),
                     decoration: BoxDecoration(
                       color: user_type == 'job_seeker'
                           ? Colors.green
@@ -190,7 +194,11 @@ class _SelectUserTypeState extends State<SelectUserType> {
                           error = "Select a User Type";
                         });
                       } else {
-                        Navigator.pushNamed(context, '/profile');
+                        if (user_type == 'job_seeker') {
+                          Navigator.pushNamed(context, '/profile');
+                        } else {
+                          Navigator.pushNamed(context, '/recruiterProfile');
+                        }
                       }
                     },
                     minWidth: 300,
