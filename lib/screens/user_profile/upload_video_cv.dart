@@ -35,14 +35,25 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
   String uploadFileUrl = '';
   String errorFlag = '';
   File videoFile;
+
 //-------------------------------------------------------------------------------
   Career _career = Career();
 
 //------------------------------------------------------------------------------
 
-  Future getPdfAndUpload() async {
+
+
+
+
+
+
+
+
+//-------------------------------------------------------------------------------
+
+  Future getVideoAndUpload(BuildContext context) async {
     setState(() {
-      statusMsg = "Please Wait, Uploading CV...";
+      statusMsg = "Please Wait, Uploading Video CV...";
     });
 
     var rng = new Random();
@@ -53,66 +64,85 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
       print(randomName);
     }
     File file;
-    file = await FilePicker.getFile(
-      type: FileType.custom,
-    );
-    String fileName = '${randomName}.pdf';
-    savePdf(file.readAsBytesSync(), fileName);
+    //file = await FilePicker.getFile(type: FileType.custom, allowedExtensions: ['mp4']);
+    String fileName = '${randomName}.mp4';
+    print("**************** File name: " + fileName);
+    saveVideo(videoFile, fileName, context);
   }
 
   //------------------------------------------------------------------------------
 
   _video() async {
-    File theVid = await ImagePicker.pickVideo(source: ImageSource.gallery);
-    if (theVid != null) {
-      setState(() {
-        videoFile = theVid;
-      });
+    try {
+      File theVid = await ImagePicker.pickVideo(source: ImageSource.gallery);
+      if (this.mounted) {
+        if (theVid != null) {
+          setState(() {
+            videoFile = theVid;
+          });
+        }
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
   //--------------------------------------------------------------------------------
 
   _record() async {
-    File theVid = await ImagePicker.pickVideo(source: ImageSource.camera);
-    if (theVid != null) {
-      setState(() {
-        videoFile = theVid;
-      });
+    try {
+      File theVid = await ImagePicker.pickVideo(source: ImageSource.camera);
+      if (this.mounted) {
+        if (theVid != null) {
+          setState(() {
+            videoFile = theVid;
+          });
+        }
+      }
+    } catch (e) {
+      print(e.toString());
     }
   }
 
   //--------------------------------------------------------------------------------
 
-  savePdf(List<int> asset, String name) async {
+  saveVideo(File asset, String name, BuildContext context) async {
+    print('*************************** Put Filename : ');
     StorageReference reference = FirebaseStorage.instance.ref().child(name);
-    StorageUploadTask uploadTask = reference.putData(asset);
+    StorageUploadTask uploadTask =
+        reference.putFile(asset, StorageMetadata(contentType: 'video/mp4'));
     String url = await (await uploadTask.onComplete).ref.getDownloadURL();
     uploadFileUrl = url;
-    documentFileUpload(url);
+    documentFileUpload(url, context);
   }
 
   //------------------------------------------------------------------------------
-  void documentFileUpload(String str) {
+  void documentFileUpload(String str, BuildContext context) {
     var data = {
       'url': str,
     };
 
     DocumentReference documentReference =
-        Firestore.instance.collection('Pdf_CV').document(_userId);
+        Firestore.instance.collection('Video_CV').document(_userId);
     documentReference.setData(data).whenComplete(() {
-      print("Your PDF CV has been Uploaded.");
-      setState(() {
-        statusMsg = "Your PDF CV has been Uploaded.";
-        isLoading = false;
-        errorFlag = '0';
-      });
+      print("Your Video CV has been Uploaded.");
+      if (this.mounted) {
+        setState(() {
+          statusMsg = "Your Video CV has been Uploaded.";
+          isLoading = false;
+          errorFlag = '0';
+        });
+        showInSnackBar(statusMsg, context);
+      }
     }).catchError(() {
-      print("An error occurred Uploading the file.");
-      setState(() {
-        statusMsg = "An error occurred Uploading the file.";
-        errorFlag = '1';
-      });
+      print("An error occurred Uploading the Video.");
+      if (this.mounted) {
+        setState(() {
+          statusMsg = "An error occurred Uploading the Video.";
+          errorFlag = '1';
+          showInSnackBar(statusMsg, context);
+        });
+      }
     });
   }
 
@@ -128,22 +158,6 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
 
   //-------------------------------------------------------------------------
 
-  TextEditingController _facebookController = TextEditingController();
-  TextEditingController _instagramController = TextEditingController();
-  TextEditingController _linkedInController = TextEditingController();
-  TextEditingController _snapchatController = TextEditingController();
-
-  //-------------------------------------------------------------------------
-  Future<String> updateSocialMedia(String userId) async {
-    _career.uFacebook = _facebookController.text;
-    _career.uInstagram = _instagramController.text;
-    _career.uLinkedIn = _linkedInController.text;
-    _career.uSnapchat = _snapchatController.text;
-
-    resultUpdate = await _career.updateSocialMedia(userId);
-    return resultUpdate;
-  }
-
   //------------------------------------------------------------------------
 
   void showPDFViewer(BuildContext context) {
@@ -155,7 +169,6 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
   }
 
   ///------------------------------------------------------------------------
-  ///
 
   @override
   void dispose() {
@@ -163,6 +176,21 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
     //chewieController.dispose();
     super.dispose();
   }
+  //--------------------------------------------------------------------------
+
+  //-----------------------------------------------------------------------------------------
+  // Snackbar function
+  void showInSnackBar(String value, BuildContext context) {
+    Scaffold.of(context).showSnackBar(SnackBar(
+      content: Text(value,
+          style: TextStyle(
+            color: Colors.white,
+          )),
+      //backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Colors.black,
+    ));
+  }
+  // -----------------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -170,184 +198,191 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
     _userId = user.uid;
     return SafeArea(
       child: Scaffold(
-        body: ListView(
-          children: <Widget>[
-            //isLoading ? LinearProgressIndicator() : Text(''),
-            Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      child: Image(
-                        image: AssetImage('images/step-2-mini.png'),
-                        width: 150.0,
+        body: Builder(builder: (BuildContext context) {
+          return ListView(
+            children: <Widget>[
+              isLoading ? LinearProgressIndicator() : Text(''),
+              Container(
+                alignment: Alignment.center,
+                padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 10.0),
+                        child: Image(
+                          image: AssetImage('images/step-2-mini.png'),
+                          width: 150.0,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'Career Details',
-                      style: TextStyle(
-                          fontSize: 28.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'SourceSansPro'),
-                    ),
-                    Text(
-                      'Upload Video CV',
-                      style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'SourceSansPro'),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 1.0),
-                      height: 250,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          isLoading
-                              ? SpinKitCircle(
-                                  color: Colors.blueAccent,
-                                  size: 20.0,
-                                )
-                              : Text(''),
-                          Container(
-                            color: Colors.black,
-                            height:
-                                MediaQuery.of(context).size.height * (40 / 100),
-                            width:
-                                MediaQuery.of(context).size.width * (100 / 100),
-                            child: videoFile == null
-                                ? Center(
-                                    child: Icon(Icons.videocam,
-                                        color: Colors.white, size: 80.0),
-                                  )
-                                : FittedBox(
-                                    fit: BoxFit.contain,
-                                    child: mounted
-                                        ? Chewie(
-                                            controller: ChewieController(
-                                              videoPlayerController:
-                                                  VideoPlayerController.file(
-                                                      videoFile),
-                                              aspectRatio: 5 / 4,
-                                              autoPlay: true,
-                                              looping: true,
-                                            ),
-                                          )
-                                        : Container(),
-                                  ),
-                          ),
-                        ],
+                      Text(
+                        'Career Details',
+                        style: TextStyle(
+                            fontSize: 28.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'SourceSansPro'),
                       ),
-                    ),
-                    Container(
+                      Text(
+                        'Upload Video CV',
+                        style: TextStyle(
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'SourceSansPro'),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 1.0),
+                        height: 260,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            SizedBox(height: 5.0),
+                            isLoading ? Text(statusMsg) : Text(''),
+                            SizedBox(
+                              height: 5.0,
+                            ),
+                            Container(
+                              color: Colors.black,
+                              height: MediaQuery.of(context).size.height *
+                                  (40 / 100),
+                              width: MediaQuery.of(context).size.width *
+                                  (100 / 100),
+                              child: videoFile == null
+                                  ? Center(
+                                      child: Icon(Icons.videocam,
+                                          color: Colors.white, size: 80.0),
+                                    )
+                                  : FittedBox(
+                                      fit: BoxFit.contain,
+                                      child: mounted
+                                          ? Chewie(
+                                              controller: ChewieController(
+                                                videoPlayerController:
+                                                    VideoPlayerController.file(
+                                                        videoFile),
+                                                aspectRatio: 5 / 4,
+                                                autoPlay: true,
+                                                looping: false,
+                                              ),
+                                            )
+                                          : Container(),
+                                    ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
                         alignment: Alignment.topCenter,
                         margin: EdgeInsets.only(top: 1.0, bottom: 1.0),
                         child: videoFile == null
                             ? null
-                            : RaisedButton(
-                                color: Colors.green,
-                                child: Text('SAVE',
-                                    style: TextStyle(color: Colors.white)),
-                                onPressed: () {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                })),
-                    SizedBox(
-                      height: 3.0,
-                    ),
-                    Container(
-                        alignment: Alignment.center,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              child: Material(
-                                color: Colors.grey.shade300,
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                                child: MaterialButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  minWidth: 50,
-                                  height: 52,
-                                  child: Icon(
-                                    Icons.chevron_left,
-                                    size: 29.0,
-                                  ),
-                                ),
+                            : ButtonTheme(
+                                minWidth: 150.0,
+                                height: 40.0,
+                                child: RaisedButton(
+                                    color: Colors.green,
+                                    child: Text('SAVE',
+                                        style: TextStyle(color: Colors.white)),
+                                    onPressed: () {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+                                      getVideoAndUpload(context);
+                                    }),
                               ),
-                            ),
-                            Container(
-                              width: 90.5,
-                              alignment: Alignment.center,
-                              margin: EdgeInsets.only(left: 5.0),
-                              child: Material(
-                                color: Colors.blue,
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                                child: MaterialButton(
-                                  onPressed: () async {
-                                    _video();
-                                  },
-                                  child: Text(
-                                    'UPLOAD                                                                                                                           ',
-                                    style: TextStyle(
-                                      color: Colors.white,
+                      ),
+                      SizedBox(
+                        height: 3.0,
+                      ),
+                      Container(
+                          alignment: Alignment.center,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                child: Material(
+                                  color: Colors.grey.shade300,
+                                  shadowColor: Colors.lightGreen,
+                                  elevation: 7.0,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0),
+                                  ),
+                                  child: MaterialButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    minWidth: 50,
+                                    height: 52,
+                                    child: Icon(
+                                      Icons.chevron_left,
+                                      size: 29.0,
                                     ),
                                   ),
-                                  minWidth: 70,
-                                  height: 52,
                                 ),
                               ),
-                            ),
-                            Container(
-                              width: 90.0,
-                              margin: EdgeInsets.only(left: 5.0),
-                              alignment: Alignment.center,
-                              child: Material(
-                                color: Colors.green,
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(5.0)),
-                                child: MaterialButton(
-                                  onPressed: () async {
-                                    _record();
-                                  },
-                                  child: Text(
-                                    'RECORD                                                                                                                          ',
-                                    style: TextStyle(
-                                      color: Colors.white,
+                              Container(
+                                width: 90.5,
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(left: 5.0),
+                                child: Material(
+                                  color: Colors.blue,
+                                  shadowColor: Colors.lightGreen,
+                                  elevation: 7.0,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0)),
+                                  child: MaterialButton(
+                                    onPressed: () async {
+                                      _video();
+                                    },
+                                    child: Text(
+                                      'UPLOAD                                                                                                                           ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                    minWidth: 70,
+                                    height: 52,
                                   ),
-                                  minWidth: 70,
-                                  height: 52,
                                 ),
                               ),
-                            ),
-                          ],
-                        ))
-                  ],
+                              Container(
+                                width: 90.0,
+                                margin: EdgeInsets.only(left: 5.0),
+                                alignment: Alignment.center,
+                                child: Material(
+                                  color: Colors.green,
+                                  shadowColor: Colors.lightGreen,
+                                  elevation: 7.0,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0)),
+                                  child: MaterialButton(
+                                    onPressed: () async {
+                                      _record();
+                                    },
+                                    child: Text(
+                                      'RECORD                                                                                                                          ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    minWidth: 70,
+                                    height: 52,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ))
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
-        ),
+              )
+            ],
+          );
+        }),
       ),
     );
   }

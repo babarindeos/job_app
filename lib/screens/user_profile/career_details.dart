@@ -58,6 +58,8 @@ class _CareerDetailsState extends State<CareerDetails> {
           _fieldController.text = (dataSnapshot.data['field']);
           _experienceController.text = (dataSnapshot.data['experience']);
           _bioController.text = (dataSnapshot.data['bio']);
+
+          isbtnForwardEnabled = true;
         });
       }
     });

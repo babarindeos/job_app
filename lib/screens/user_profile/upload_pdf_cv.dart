@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -31,6 +32,7 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
   String statusMsg = '';
   String uploadFileUrl = '';
   String errorFlag = '';
+  String opStatus = '';
 
 //-------------------------------------------------------------------------------
   Career _career = Career();
@@ -49,19 +51,27 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
       statusMsg = "Please Wait, Uploading CV...";
     });
 
-    var rng = new Random();
-    String randomName = "";
-    for (var i = 0; i < 20; i++) {
-      print(rng.nextInt(100));
-      randomName += rng.nextInt(100).toString();
-      print(randomName);
+    try {
+      var rng = new Random();
+      String randomName = "";
+      for (var i = 0; i < 20; i++) {
+        print(rng.nextInt(100));
+        randomName += rng.nextInt(100).toString();
+        print(randomName);
+      }
+      File file;
+      file = await FilePicker.getFile(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+      String fileName = '${randomName}.pdf';
+      savePdf(file.readAsBytesSync(), fileName);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        statusMsg = '';
+      });
     }
-    File file;
-    file = await FilePicker.getFile(
-      type: FileType.custom,
-    );
-    String fileName = '${randomName}.pdf';
-    savePdf(file.readAsBytesSync(), fileName);
   }
 
   //------------------------------------------------------------------------------
@@ -103,12 +113,45 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      isLoading = true;
+    });
+    print("Retrieve Uploaded PDF CV");
+    retrieveUploadedPDFCV();
     //isLoading = true;
     //getUserSocialMedia();
     //isLoading = false;
   }
 
-  //-------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
+  // check and retrieve uploaded CV
+
+  Future<void> retrieveUploadedPDFCV() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    dynamic user = await _auth.currentUser().then((value) => value.uid);
+
+    DocumentReference documentRef =
+        Firestore.instance.collection("Pdf_CV").document(user);
+
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        setState(() {
+          uploadFileUrl = (dataSnapshot.data['url']);
+          print(uploadFileUrl.toString());
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          opStatus = 'You are yet to Upload a PDF CV';
+          isLoading = false;
+        });
+      }
+    });
+  }
+
+  //----------------------------------------------------------------------------
 
   TextEditingController _facebookController = TextEditingController();
   TextEditingController _instagramController = TextEditingController();
@@ -179,7 +222,7 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
                           fontFamily: 'SourceSansPro'),
                     ),
                     Container(
-                      height: 100,
+                      height: 120,
                       child: isLoading
                           ? SpinKitCircle(
                               color: Colors.blueAccent,
@@ -191,7 +234,7 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
                         alignment: Alignment.center,
                         margin: EdgeInsets.only(top: 5.0, bottom: 10.0),
                         child: uploadFileUrl == ''
-                            ? null
+                            ? Text(opStatus)
                             : IconButton(
                                 icon: FaIcon(
                                   FontAwesomeIcons.filePdf,
@@ -238,6 +281,7 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
                             ),
                             Container(
                               width: 135.0,
+                              alignment: Alignment.center,
                               margin: EdgeInsets.only(left: 5.0),
                               child: Material(
                                 color: Colors.green,
