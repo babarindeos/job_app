@@ -125,11 +125,16 @@ class Career {
         "snapchat": this.uSnapchat
       };
 
-      await documentReference.updateData(socialMedia).whenComplete(() {
+      print(socialMedia.toString());
+
+      await documentReference.setData(socialMedia).whenComplete(() {
+        print("Success");
+        updateStatus = "Your Social Media Profile has been Updated.";
         return "success";
       });
     } catch (e) {
-      print(e.toString());
+      print("*****************ERROR ***************** : " + e.toString());
+      updateStatus = e.toString();
       return null;
     }
   }
@@ -143,6 +148,7 @@ class Career {
     dynamic result;
     FirebaseAuth auth = FirebaseAuth.instance;
     dynamic uid = await auth.currentUser().then((value) => value.uid);
+    print(uid.toString());
 
     DocumentReference documentReference =
         Firestore.instance.collection('SocialMedia').document(uid);
@@ -161,5 +167,24 @@ class Career {
     });
   }
 
+  Future<String> updateAddInfoBio(String userId) async {
+    try {
+      DocumentReference documentRef =
+          Firestore.instance.collection("Addition_Info_Bio").document(userId);
+
+      Map<String, dynamic> bioData = {"bio": this.uBio};
+
+      await documentRef.setData(bioData).whenComplete(() {
+        this.updateStatus = "Your Bio has been Updated.";
+      });
+    } catch (e) {
+      this.updateStatus = e.toString();
+      print(e.toString());
+    }
+  }
+
+  void onError() {
+    this.updateStatus = 'An error has occured. Check your Internet Connection.';
+  }
 // ----------------------------------------------------------------------------------------------
-}
+} //end of class

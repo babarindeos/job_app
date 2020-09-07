@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/user_profile/additional_info_bio.dart';
+import 'package:job_app/screens/user_profile/additional_info_portfolio.dart';
 import 'package:provider/provider.dart';
 
 class FormKeys {
@@ -19,8 +23,11 @@ class AdditionalInfo extends StatefulWidget {
 
 class _AdditionalInfoState extends State<AdditionalInfo> {
   bool isloading = false;
+  String _fullNames = '';
+  dynamic _currentUser;
+  String _profession = '';
 
-//---------------------------------------------------------------------------
+//------------------------------------------------------------------------------
   Widget showLoader() {
     return Center(
       child: SpinKitDoubleBounce(
@@ -29,8 +36,70 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
       ),
     );
   }
-//-----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
+  Future<void> getCurrentUser() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    _currentUser = await _auth.currentUser().then((value) => value.uid);
+    print(_currentUser.toString());
+
+    retrieveUserBio();
+    retrieveUserProfession();
+  }
+//------------------------------------------------------------------------------
+
+  Future<void> retrieveUserBio() async {
+    // Get User Bio
+    DocumentReference documentRef =
+        Firestore.instance.collection("BioData").document(_currentUser);
+
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        setState(() {
+          _fullNames = (dataSnapshot).data['name'];
+          print(_fullNames);
+        });
+      } else {
+        setState(() {
+          _fullNames = '';
+        });
+      }
+    });
+  }
+
+//------------------------------------------------------------------------------
+
+  Future<void> retrieveUserProfession() async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("CareerDetails").document(_currentUser);
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        setState(() {
+          _profession = (dataSnapshot).data['field'];
+          isloading = false;
+        });
+      } else {
+        setState(() {
+          _profession = '';
+          isloading = false;
+        });
+      }
+    });
+  }
+
+//------------------------------------------------------------------------------
+  @override
+  void initState() {
+    // TODO: implement initState
+    print(
+        "******************************Retrieve User Bio-Data ***************************");
+    isloading = true;
+    getCurrentUser();
+
+    super.initState();
+  }
+
+//------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
@@ -80,19 +149,26 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: <Widget>[
                                         Text(
-                                          'John Smith',
+                                          _fullNames,
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 22.0,
                                             fontFamily: 'Pacifico-Regular',
                                           ),
                                         ),
-                                        Text('Senior PHP Developer')
+                                        Text(_profession)
                                       ],
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdditionalInfoBio()),
+                                      );
+                                    },
                                     child: Container(
                                       padding: EdgeInsets.all(7.0),
                                       decoration: BoxDecoration(
@@ -138,7 +214,14 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdditionalInfoPortfolio()),
+                                      );
+                                    },
                                     child: Container(
                                       padding: EdgeInsets.only(
                                           top: 5.0, bottom: 5.0),
@@ -363,7 +446,9 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                             Icons.chevron_left,
                             size: 40.0,
                           ),
-                          onPressed: () => {},
+                          onPressed: () {
+                            Navigator.pop(context, '/careerDetails');
+                          },
                           minWidth: 70.0,
                           height: 52.0),
                     ),

@@ -179,7 +179,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                                       ? 'Field is required'
                                       : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Field'),
+                                      .copyWith(labelText: 'Profession'),
                                 ),
                               ),
                             ),
@@ -213,8 +213,10 @@ class _CareerDetailsState extends State<CareerDetails> {
                                     validator: (value) => value.isEmpty
                                         ? 'Bio is required'
                                         : null,
-                                    decoration: profileTextInputDecoration
-                                        .copyWith(labelText: 'Bio'),
+                                    decoration:
+                                        profileTextInputDecoration.copyWith(
+                                            labelText:
+                                                'Career Interests & Specialty'),
                                   ),
                                 )),
                           ],

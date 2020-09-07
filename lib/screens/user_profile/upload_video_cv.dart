@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:chewie/chewie.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -35,26 +36,61 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
   String uploadFileUrl = '';
   String errorFlag = '';
   File videoFile;
+  String videoURL;
+  String videoSource;
 
 //-------------------------------------------------------------------------------
   Career _career = Career();
 
-//------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
 
+//-------------------------------------------------------------------------------
 
+  @override
+  void initState() {
+    isLoading = true;
+    retrieveVideoCV();
+    super.initState();
 
+    //getUserSocialMedia();
+    //isLoading = false;
+  }
 
+//-------------------------------------------------------------------------------
 
+  Future<void> retrieveVideoCV() async {
+    try {
+      FirebaseAuth _auth = FirebaseAuth.instance;
+      dynamic user = await _auth.currentUser().then((value) => value.uid);
 
+      DocumentReference documentRef =
+          Firestore.instance.collection('Video_CV').document(user);
 
-
+      await documentRef.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          if (this.mounted) {
+            setState(() {
+              videoURL = (dataSnapshot).data['url'];
+              videoSource = 'network';
+              isLoading = false;
+              print(videoURL);
+            });
+          }
+        }
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
 //-------------------------------------------------------------------------------
 
   Future getVideoAndUpload(BuildContext context) async {
-    setState(() {
-      statusMsg = "Please Wait, Uploading Video CV...";
-    });
+    if (this.mounted) {
+      setState(() {
+        statusMsg = "Please Wait, Uploading Video CV...";
+      });
+    }
 
     var rng = new Random();
     String randomName = "";
@@ -79,6 +115,7 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
         if (theVid != null) {
           setState(() {
             videoFile = theVid;
+            videoSource = 'file';
           });
         }
       }
@@ -96,6 +133,7 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
         if (theVid != null) {
           setState(() {
             videoFile = theVid;
+            videoSource = 'file';
           });
         }
       }
@@ -145,18 +183,6 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
       }
     });
   }
-
-  //-----------------------------------------------------------------------------
-
-  @override
-  void initState() {
-    super.initState();
-    //isLoading = true;
-    //getUserSocialMedia();
-    //isLoading = false;
-  }
-
-  //-------------------------------------------------------------------------
 
   //------------------------------------------------------------------------
 
@@ -250,7 +276,7 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
                                   (40 / 100),
                               width: MediaQuery.of(context).size.width *
                                   (100 / 100),
-                              child: videoFile == null
+                              child: videoSource == null
                                   ? Center(
                                       child: Icon(Icons.videocam,
                                           color: Colors.white, size: 80.0),
@@ -261,8 +287,11 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
                                           ? Chewie(
                                               controller: ChewieController(
                                                 videoPlayerController:
-                                                    VideoPlayerController.file(
-                                                        videoFile),
+                                                    videoSource == 'file'
+                                                        ? VideoPlayerController
+                                                            .file(videoFile)
+                                                        : VideoPlayerController
+                                                            .network(videoURL),
                                                 aspectRatio: 5 / 4,
                                                 autoPlay: true,
                                                 looping: false,
