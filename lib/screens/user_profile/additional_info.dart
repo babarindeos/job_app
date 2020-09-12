@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/user_profile/additional_info_bio.dart';
-import 'package:job_app/screens/user_profile/additional_info_portfolio.dart';
+import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio.dart';
 import 'package:provider/provider.dart';
+
+import 'education/education.dart';
 
 class FormKeys {
   static final frmKey1 = GlobalKey<FormState>();
@@ -308,7 +310,14 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Education(),
+                                        ),
+                                      );
+                                    },
                                     child: Container(
                                       padding: EdgeInsets.only(
                                           top: 5.0, bottom: 5.0),

@@ -6,15 +6,13 @@ import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class AdditionalInfoPortfolioAdd extends StatefulWidget {
-  AdditionalInfoPortfolioAdd({Key key}) : super(key: key);
+class EducationAdd extends StatefulWidget {
+  EducationAdd({Key key}) : super(key: key);
   @override
-  _AdditionalInfoPortfolioAddState createState() =>
-      _AdditionalInfoPortfolioAddState();
+  _EducationAddState createState() => _EducationAddState();
 }
 
-class _AdditionalInfoPortfolioAddState
-    extends State<AdditionalInfoPortfolioAdd> {
+class _EducationAddState extends State<EducationAdd> {
   bool isloading = false;
   String year;
   String title;
@@ -31,7 +29,7 @@ class _AdditionalInfoPortfolioAddState
 
   //---------------------------------------------------------------------------------------
 
-  Future<void> addPortfolio(userId, context) async {
+  void addPortfolio(userId, context) async {
     var uuid = Uuid();
     var docId = uuid.v4();
     year = _yearController.text;
@@ -40,26 +38,28 @@ class _AdditionalInfoPortfolioAddState
 
     try {
       DocumentReference documentRef =
-          Firestore.instance.collection("Portfolio").document(docId);
+          Firestore.instance.collection("Portfolio").document();
       Map<String, dynamic> portfolioData = {
+        'Id': docId,
+        'owner': userId,
         'year': year,
         'title': title,
         'description': description
       };
       await documentRef.setData(portfolioData).whenComplete(() {
-        print("Am done");
-
-        setState(() {
-          processOutcome = 'New portfolio has been added.';
-          print("done");
-          isloading = false;
-        });
+        processOutcome = 'New portfolio has been added.';
+        _yearController.clear();
+        _titleController.clear();
+        _descriptionController.clear();
       });
     } catch (e) {
+      processOutcome = e.toString();
       print(e.toString());
     }
-
-    //showInSnackBar(processOutcome, context);
+    setState(() {
+      isloading = false;
+    });
+    showInSnackBar(processOutcome, context);
   } // end of addPortfolio
 
 //---------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class _AdditionalInfoPortfolioAddState
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 6),
       ),
     );
   }
@@ -114,57 +114,70 @@ class _AdditionalInfoPortfolioAddState
                                 fontFamily: 'SourceSansPro'),
                           ),
                           Text(
-                            'Add Portfolio',
+                            'Add Education',
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SourceSansPro'),
                           ),
-                          SizedBox(height: 10.0),
                           SizedBox(height: 20.0),
                           Row(
                             children: <Widget>[
                               Expanded(
-                                flex: 1,
+                                flex: 2,
                                 child: TextFormField(
                                   controller: _yearController,
                                   validator: (value) =>
                                       value.isEmpty ? 'Year is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Year'),
-                                  maxLength: 4,
+                                      .copyWith(labelText: 'Date Started'),
+                                  //maxLength: 4,
                                 ),
                               ),
-                              SizedBox(width: 1.0),
+                              SizedBox(width: 3.0),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: TextFormField(
                                   controller: _titleController,
                                   validator: (value) => value.isEmpty
                                       ? 'Title is required'
                                       : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Title'),
+                                      .copyWith(labelText: 'Date Ended'),
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(100),
                                   ],
-                                  maxLength: 100,
+                                  //maxLength: 100,
                                 ),
                               )
                             ],
                           ),
                           SizedBox(
-                            height: 10.0,
+                            height: 6.0,
                           ),
+                          TextFormField(
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Institution'),
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Course of Study'),
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Level e.g. BSc, MSc, PhD.'),
+                          ),
+                          SizedBox(height: 6.0),
                           TextFormField(
                             controller: _descriptionController,
                             validator: (value) => value.isEmpty
                                 ? 'Description is required'
                                 : null,
-                            maxLines: 7,
                             keyboardType: TextInputType.text,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Description'),
+                                labelText: 'Class of Degree'),
                           ),
                           SizedBox(
                             height: 15.0,
