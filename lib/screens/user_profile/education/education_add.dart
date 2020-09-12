@@ -23,9 +23,12 @@ class _EducationAddState extends State<EducationAdd> {
 
   //----------------------------------------------------------------------------------------
 
-  TextEditingController _yearController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _dateStartedController = TextEditingController();
+  TextEditingController _dateEndedController = TextEditingController();
+  TextEditingController _institutionController = TextEditingController();
+  TextEditingController _courseOfStudyController = TextEditingController();
+  TextEditingController _levelController = TextEditingController();
+  TextEditingController _classOfDegreeController = TextEditingController();
 
   //---------------------------------------------------------------------------------------
 
@@ -126,11 +129,14 @@ class _EducationAddState extends State<EducationAdd> {
                               Expanded(
                                 flex: 2,
                                 child: TextFormField(
-                                  controller: _yearController,
+                                  controller: _dateStartedController,
                                   validator: (value) =>
-                                      value.isEmpty ? 'Year is required' : null,
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
                                       .copyWith(labelText: 'Date Started'),
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(20)
+                                  ],
                                   //maxLength: 4,
                                 ),
                               ),
@@ -138,14 +144,13 @@ class _EducationAddState extends State<EducationAdd> {
                               Expanded(
                                 flex: 2,
                                 child: TextFormField(
-                                  controller: _titleController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
+                                  controller: _dateEndedController,
+                                  validator: (value) =>
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
                                       .copyWith(labelText: 'Date Ended'),
                                   inputFormatters: [
-                                    LengthLimitingTextInputFormatter(100),
+                                    LengthLimitingTextInputFormatter(20),
                                   ],
                                   //maxLength: 100,
                                 ),
@@ -156,28 +161,48 @@ class _EducationAddState extends State<EducationAdd> {
                             height: 6.0,
                           ),
                           TextFormField(
+                            controller: _institutionController,
+                            validator: (value) => value.isEmpty
+                                ? 'Institution is required'
+                                : null,
                             decoration: profileTextInputDecoration.copyWith(
                                 labelText: 'Institution'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
                           ),
                           SizedBox(height: 6.0),
                           TextFormField(
+                            controller: _courseOfStudyController,
+                            validator: (value) => value.isEmpty
+                                ? 'Course of Study is required'
+                                : null,
                             decoration: profileTextInputDecoration.copyWith(
                                 labelText: 'Course of Study'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
                           ),
                           SizedBox(height: 6.0),
                           TextFormField(
+                            controller: _levelController,
+                            validator: (value) =>
+                                value.isEmpty ? 'Level is required' : null,
                             decoration: profileTextInputDecoration.copyWith(
                                 labelText: 'Level e.g. BSc, MSc, PhD.'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
                           ),
                           SizedBox(height: 6.0),
                           TextFormField(
-                            controller: _descriptionController,
-                            validator: (value) => value.isEmpty
-                                ? 'Description is required'
-                                : null,
+                            controller: _classOfDegreeController,
                             keyboardType: TextInputType.text,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Class of Degree'),
+                                labelText: 'Class of Degree (optional)'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
