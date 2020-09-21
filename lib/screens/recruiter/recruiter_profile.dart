@@ -29,7 +29,7 @@ class RecruiterProfile extends StatefulWidget {
 class _RecruiterProfileState extends State<RecruiterProfile> {
   File _image, file;
   String gender_option = '';
-  bool loading = false;
+  bool isloading = false;
   bool _btnForwardEnable = false;
   bool isUploading = false;
   String postId = Uuid().v4();
@@ -50,6 +50,7 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
 
   @override
   void initState() {
+    isloading = true;
     super.initState();
     retrieveUserBioData();
   }
@@ -80,10 +81,12 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
           imageSource = "url";
 
           retrieveOutcome = 'success';
+          isloading = false;
           _btnForwardEnable = true;
         });
       } else {
         retrieveOutcome = 'error';
+        isloading = false;
         _btnForwardEnable = false;
       }
     });
@@ -113,12 +116,13 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
   //-----------------------------------------------------------------
 
   Widget showUploadedImage() {
-    if (imageSource == 'file') {
+    if (imageSource == 'file' && imageUrl != null) {
       return Image.file(_image, fit: BoxFit.fill);
-    } else {
+    } else if (imageSource == 'url' && imageUrl != null) {
       print(imageUrl);
       return Image.network(imageUrl, fit: BoxFit.fill);
     }
+
     return Image(
       image: AssetImage('images/profile_avatar.png'),
     );
@@ -196,7 +200,7 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
         body: Builder(builder: (BuildContext context) {
           return ListView(
             children: <Widget>[
-              isUploading ? LinearProgressIndicator() : Text(""),
+              isloading ? LinearProgressIndicator() : Container(),
               Container(
                 alignment: Alignment.center,
                 padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
@@ -227,7 +231,10 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             CircleAvatar(
-                                radius: 50.0,
+                              radius: 50.0,
+                              backgroundColor: Colors.blue,
+                              child: CircleAvatar(
+                                radius: 49,
                                 backgroundColor: Colors.white,
                                 child: ClipOval(
                                   child: SizedBox(
@@ -240,7 +247,9 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
                                                 'images/profile_avatar.png'),
                                           ),
                                   ),
-                                )),
+                                ),
+                              ),
+                            ),
                             Padding(
                               padding: EdgeInsets.only(
                                 top: 20.0,

@@ -80,6 +80,10 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
       });
     } catch (e) {
       print(e.toString());
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 

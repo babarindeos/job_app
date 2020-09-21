@@ -6,6 +6,8 @@ import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/home/home.dart';
 import 'package:job_app/screens/loginModule.dart';
 import 'package:job_app/screens/recruiter/about_organisation.dart';
+import 'package:job_app/screens/recruiter/additional_company_info.dart';
+import 'package:job_app/screens/recruiter/recruiterHome.dart';
 import 'package:job_app/screens/recruiter/recruiter_profile.dart';
 import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
@@ -41,7 +43,10 @@ class MyApp extends StatelessWidget {
           '/userType': (BuildContext context) => SelectUserType(),
           '/careerDetails': (BuildContext context) => CareerDetails(),
           '/additionalInfo': (BuildContext context) => AdditionalInfo(),
+          '/additionalCompanyInfo': (BuildContext context) =>
+              AdditionalCompanyInfo(),
           '/home': (BuildContext context) => Home(),
+          '/recruiterHome': (BuildContext context) => RecruiterHome(),
           '/recruiterProfile': (BuildContext context) => RecruiterProfile(),
           '/aboutOrganisation': (BuildContext context) => AboutOrganisation(),
         },

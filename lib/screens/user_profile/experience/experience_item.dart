@@ -1,43 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:job_app/models/portfolio.dart';
-import 'package:job_app/screens/user_profile/portfolio/portfolio_details.dart';
+import 'package:job_app/models/education.dart';
+import 'package:job_app/models/experience.dart';
+import 'package:job_app/screens/user_profile/experience/experience_details.dart';
 
-class PortfolioItem extends StatefulWidget {
-  final String id;
-  final String itemId;
-  final String description;
+class ExperienceItem extends StatefulWidget {
+  final String uuid;
+  final String docId;
   final String owner;
-  final String title;
-  final String year;
+  final String fromDate;
+  final String toDate;
+  final String organisation;
+  final String position;
+  final String duties;
   final DocumentSnapshot documentSnapshot;
 
-  PortfolioItem(
-      {@required this.id,
-      @required this.itemId,
-      @required this.description,
+  ExperienceItem(
+      {@required this.docId,
+      @required this.uuid,
       @required this.owner,
-      @required this.title,
-      @required this.year,
+      @required this.fromDate,
+      @required this.toDate,
+      @required this.organisation,
+      @required this.position,
+      @required this.duties,
       @required this.documentSnapshot});
 
   @override
-  _PortfolioItemState createState() => _PortfolioItemState();
+  _ExperienceItemState createState() => _ExperienceItemState();
 }
 
-class _PortfolioItemState extends State<PortfolioItem> {
-  Portfolio data;
+class _ExperienceItemState extends State<ExperienceItem> {
+  Experience data;
 
-  void deletePortfolio(String docId) async {
+  void deleteEducation(String docId) async {
     DocumentReference docRef =
-        Firestore.instance.collection('Portfolio').document(docId);
+        Firestore.instance.collection('Education').document(docId);
     await docRef.delete().then((value) {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 0.0),
       decoration: BoxDecoration(
           border: Border(
               bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
@@ -50,7 +55,7 @@ class _PortfolioItemState extends State<PortfolioItem> {
               flex: 1,
               child: GestureDetector(
                 onTap: () async {
-                  deletePortfolio(widget.id);
+                  deleteEducation(widget.docId);
                 },
                 child: Container(
                   height: 50,
@@ -72,14 +77,14 @@ class _PortfolioItemState extends State<PortfolioItem> {
                     Padding(
                         padding: const EdgeInsets.only(left: 5.0),
                         child: Text(
-                          widget.title,
+                          widget.fromDate + " - " + widget.toDate,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         )),
                     Padding(
-                      padding: const EdgeInsets.only(left: 5.0),
-                      child: Text(widget.year),
+                      padding: const EdgeInsets.only(left: 5.0, top: 3.0),
+                      child: Text(widget.organisation),
                     ),
                   ],
                 ),
@@ -89,20 +94,22 @@ class _PortfolioItemState extends State<PortfolioItem> {
               flex: 1,
               child: FlatButton(
                   onPressed: () {
-                    data = Portfolio(
-                        id: widget.id,
-                        itemId: widget.itemId,
-                        description: widget.description,
-                        owner: widget.owner,
-                        title: widget.title,
-                        year: widget.year,
-                        documentSnapshot: widget.documentSnapshot);
+                    data = Experience(
+                      docId: widget.docId,
+                      uuid: widget.uuid,
+                      owner: widget.owner,
+                      fromDate: widget.fromDate,
+                      toDate: widget.toDate,
+                      organisation: widget.organisation,
+                      position: widget.position,
+                      duties: widget.duties,
+                    );
 
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                PortfolioDetails(data: data)));
+                                ExperienceDetails(data: data)));
                   },
                   child: Icon(Icons.chevron_right)),
             ),

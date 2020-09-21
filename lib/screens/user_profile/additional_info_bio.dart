@@ -77,10 +77,11 @@ class _AdditionalInfoBioState extends State<AdditionalInfoBio> {
       if (dataSnapshot.exists) {
         _bioController.text = (dataSnapshot).data['bio'];
         print(dataSnapshot.data['bio']);
-        setState(() {
-          isloading = false;
-        });
       }
+    });
+
+    setState(() {
+      isloading = false;
     });
   }
 

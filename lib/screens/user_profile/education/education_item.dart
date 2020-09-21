@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:job_app/models/portfolio.dart';
-import 'package:job_app/screens/user_profile/portfolio/portfolio_details.dart';
+import 'package:job_app/models/education.dart';
+
+import 'education_details.dart';
 
 class EducationItem extends StatefulWidget {
-  final String id;
-  final String itemId;
-  final String description;
+  final String uuid;
+  final String docId;
   final String owner;
-  final String title;
-  final String year;
+  final String dateStarted;
+  final String dateEnded;
+  final String institution;
+  final String courseOfStudy;
+  final String level;
+  final String classOfDegree;
   final DocumentSnapshot documentSnapshot;
 
   EducationItem(
-      {@required this.id,
-      @required this.itemId,
-      @required this.description,
+      {@required this.docId,
+      @required this.uuid,
       @required this.owner,
-      @required this.title,
-      @required this.year,
+      @required this.dateStarted,
+      @required this.dateEnded,
+      @required this.institution,
+      @required this.courseOfStudy,
+      @required this.level,
+      @required this.classOfDegree,
       @required this.documentSnapshot});
 
   @override
@@ -26,11 +33,11 @@ class EducationItem extends StatefulWidget {
 }
 
 class _EducationItemState extends State<EducationItem> {
-  Portfolio data;
+  Education data;
 
-  void deletePortfolio(String docId) async {
+  void deleteEducation(String docId) async {
     DocumentReference docRef =
-        Firestore.instance.collection('Portfolio').document(docId);
+        Firestore.instance.collection('Education').document(docId);
     await docRef.delete().then((value) {});
   }
 
@@ -50,7 +57,7 @@ class _EducationItemState extends State<EducationItem> {
               flex: 1,
               child: GestureDetector(
                 onTap: () async {
-                  deletePortfolio(widget.id);
+                  deleteEducation(widget.docId);
                 },
                 child: Container(
                   height: 50,
@@ -70,16 +77,17 @@ class _EducationItemState extends State<EducationItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                        padding: const EdgeInsets.only(left: 5.0),
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        )),
+                      padding: const EdgeInsets.only(left: 5.0),
+                      child: Text(
+                        widget.dateStarted + " - " + widget.dateEnded,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 5.0),
-                      child: Text(widget.year),
+                      child: Text(widget.institution),
                     ),
                   ],
                 ),
@@ -89,20 +97,22 @@ class _EducationItemState extends State<EducationItem> {
               flex: 1,
               child: FlatButton(
                   onPressed: () {
-                    data = Portfolio(
-                        id: widget.id,
-                        itemId: widget.itemId,
-                        description: widget.description,
+                    data = Education(
+                        docId: widget.docId,
+                        uuid: widget.uuid,
                         owner: widget.owner,
-                        title: widget.title,
-                        year: widget.year,
-                        documentSnapshot: widget.documentSnapshot);
+                        dateStarted: widget.dateStarted,
+                        dateEnded: widget.dateEnded,
+                        institution: widget.institution,
+                        courseOfStudy: widget.courseOfStudy,
+                        level: widget.level,
+                        classOfDegree: widget.classOfDegree);
 
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                PortfolioDetails(data: data)));
+                                EducationDetails(data: data)));
                   },
                   child: Icon(Icons.chevron_right)),
             ),
@@ -111,18 +121,4 @@ class _EducationItemState extends State<EducationItem> {
       ),
     );
   }
-}
-
-class Data {
-  String id, itemId, description, owner, title, year;
-  DocumentSnapshot documentSnapshot;
-
-  Data(
-      {this.id,
-      this.itemId,
-      this.description,
-      this.owner,
-      this.title,
-      this.year,
-      this.documentSnapshot});
 }

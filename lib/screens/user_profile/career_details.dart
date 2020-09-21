@@ -18,7 +18,8 @@ class FormKeys {
   static final frmKey3 = const Key('__R1KEY3__');
 }
 
-final GlobalKey<FormState> _formKeyCareer = new GlobalKey<FormState>();
+//final GlobalKey<FormState> _formKeyCareer = new GlobalKey<FormState>();
+final _formKeyCareer = GlobalKey<FormState>();
 
 class CareerDetails extends StatefulWidget {
   @override
@@ -95,6 +96,7 @@ class _CareerDetailsState extends State<CareerDetails> {
     //print("**************** result " + _career.updateStatus);
     setState(() {
       isloading = false;
+      isbtnForwardEnabled = true;
     });
   }
 
@@ -199,7 +201,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                             )
                           ],
                         ),
-                        SizedBox(height: 3.0),
+                        SizedBox(height: 5.0),
                         Row(
                           children: <Widget>[
                             Expanded(
@@ -208,10 +210,10 @@ class _CareerDetailsState extends State<CareerDetails> {
                                   padding: EdgeInsets.only(right: 0.0),
                                   child: TextFormField(
                                     controller: _bioController,
-                                    keyboardType: TextInputType.text,
+                                    keyboardType: TextInputType.multiline,
                                     maxLines: 2,
                                     validator: (value) => value.isEmpty
-                                        ? 'Bio is required'
+                                        ? 'Career Interests is required'
                                         : null,
                                     decoration:
                                         profileTextInputDecoration.copyWith(
@@ -221,7 +223,7 @@ class _CareerDetailsState extends State<CareerDetails> {
                                 )),
                           ],
                         ),
-                        SizedBox(height: 10.0),
+                        SizedBox(height: 8.0),
                         Row(
                           children: <Widget>[
                             Expanded(

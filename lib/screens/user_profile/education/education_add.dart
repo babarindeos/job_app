@@ -14,9 +14,9 @@ class EducationAdd extends StatefulWidget {
 
 class _EducationAddState extends State<EducationAdd> {
   bool isloading = false;
-  String year;
-  String title;
-  String description;
+  String dateStarted, dateEnded;
+  String institution, courseOfStudy;
+  String level, classOfDegree;
   dynamic processOutcome;
 
   final _formKey = GlobalKey<FormState>();
@@ -32,28 +32,38 @@ class _EducationAddState extends State<EducationAdd> {
 
   //---------------------------------------------------------------------------------------
 
-  void addPortfolio(userId, context) async {
+  void addEducation(userId, context) async {
     var uuid = Uuid();
     var docId = uuid.v4();
-    year = _yearController.text;
-    title = _titleController.text;
-    description = _descriptionController.text;
+    dateStarted = _dateStartedController.text;
+    dateEnded = _dateEndedController.text;
+    institution = _institutionController.text;
+    courseOfStudy = _courseOfStudyController.text;
+    level = _levelController.text;
+    classOfDegree = _classOfDegreeController.text;
 
     try {
       DocumentReference documentRef =
-          Firestore.instance.collection("Portfolio").document();
-      Map<String, dynamic> portfolioData = {
-        'Id': docId,
+          Firestore.instance.collection("Education").document();
+      Map<String, dynamic> educationData = {
+        'id': docId,
         'owner': userId,
-        'year': year,
-        'title': title,
-        'description': description
+        'date_started': dateStarted,
+        'date_ended': dateEnded,
+        'institution': institution,
+        'course_of_study': courseOfStudy,
+        'level': level,
+        'class_of_degree': classOfDegree
       };
-      await documentRef.setData(portfolioData).whenComplete(() {
-        processOutcome = 'New portfolio has been added.';
-        _yearController.clear();
-        _titleController.clear();
-        _descriptionController.clear();
+
+      await documentRef.setData(educationData).whenComplete(() {
+        processOutcome = 'New education has been added.';
+        _dateStartedController.clear();
+        _dateEndedController.clear();
+        _institutionController.clear();
+        _courseOfStudyController.clear();
+        _levelController.clear();
+        _classOfDegreeController.clear();
       });
     } catch (e) {
       processOutcome = e.toString();
@@ -246,7 +256,7 @@ class _EducationAddState extends State<EducationAdd> {
                                           isloading = true;
                                         });
 
-                                        addPortfolio(user.uid, context);
+                                        addEducation(user.uid, context);
                                       }
                                     },
                                     child: Text(

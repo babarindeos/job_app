@@ -1,19 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/models/user.dart';
-import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio_add.dart';
-import 'package:job_app/screens/user_profile/portfolio/portfolio_item.dart';
-import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 
-class AdditionalInfoPortfolio extends StatefulWidget {
-  AdditionalInfoPortfolio({Key key}) : super(key: key);
+import 'education_add.dart';
+import 'education_item.dart';
+
+class Education extends StatefulWidget {
+  Education({Key key}) : super(key: key);
   @override
-  _AdditionalInfoPortfolioState createState() =>
-      _AdditionalInfoPortfolioState();
+  _EducationState createState() => _EducationState();
 }
 
-class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
+class _EducationState extends State<Education> {
   bool isloading = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -21,7 +20,6 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<User>(context);
-
     return SafeArea(
       child: Scaffold(
         body: Builder(
@@ -78,7 +76,7 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Portfolios',
+                                      'Education',
                                       style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
@@ -86,16 +84,13 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
                                     ),
                                   ),
                                 ),
-                                Expanded(
-                                  child: Text(""),
-                                )
                               ],
                             ),
                           ),
                           SizedBox(height: 1.0),
                           StreamBuilder(
                             stream: Firestore.instance
-                                .collection("Portfolio")
+                                .collection("Education")
                                 .where("owner",
                                     isEqualTo: currentUser.uid.toString())
                                 .snapshots(),
@@ -110,15 +105,19 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
                                       itemBuilder: (context, index) {
                                         DocumentSnapshot data =
                                             snapshot.data.documents[index];
-                                        return PortfolioItem(
-                                          documentSnapshot: data,
-                                          id: data.documentID,
-                                          itemId: data['Id'],
-                                          description: data['description'],
-                                          owner: data['owner'],
-                                          title: data['title'],
-                                          year: data['year'],
-                                        );
+                                        return EducationItem(
+                                            documentSnapshot: data,
+                                            docId: data.documentID,
+                                            uuid: data['id'],
+                                            owner: data['owner'],
+                                            dateStarted: data['date_started'],
+                                            dateEnded: data['date_ended'],
+                                            institution: data['institution'],
+                                            courseOfStudy:
+                                                data['course_of_study'],
+                                            level: data['level'],
+                                            classOfDegree:
+                                                data['class_of_degree']);
                                       });
                             },
                           ),
@@ -134,10 +133,8 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AdditionalInfoPortfolioAdd()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EducationAdd()));
           },
           child: Icon(Icons.add),
         ),

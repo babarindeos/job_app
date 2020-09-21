@@ -2,13 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:job_app/models/education.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/user_profile/additional_info_bio.dart';
 import 'package:job_app/screens/user_profile/experience/additional_info_experience.dart';
 import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio.dart';
 import 'package:provider/provider.dart';
-
-import 'education/additional_info_education.dart';
 
 class FormKeys {
   static final frmKey1 = GlobalKey<FormState>();
@@ -19,14 +18,14 @@ class FormKeys {
 final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
-class AdditionalInfo extends StatefulWidget {
+class AdditionalCompanyInfo extends StatefulWidget {
   @override
-  _AdditionalInfoState createState() => _AdditionalInfoState();
+  _AdditionalCompanyInfoState createState() => _AdditionalCompanyInfoState();
 }
 
-class _AdditionalInfoState extends State<AdditionalInfo> {
+class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
   bool isloading = false;
-  String _fullNames = '';
+  String _companyName = '';
   dynamic _currentUser;
   String _profession = '';
 
@@ -46,25 +45,25 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
     _currentUser = await _auth.currentUser().then((value) => value.uid);
     print(_currentUser.toString());
 
-    retrieveUserBio();
+    retrieveCompanyInfo();
     retrieveUserProfession();
   }
 //------------------------------------------------------------------------------
 
-  Future<void> retrieveUserBio() async {
+  Future<void> retrieveCompanyInfo() async {
     // Get User Bio
     DocumentReference documentRef =
-        Firestore.instance.collection("BioData").document(_currentUser);
+        Firestore.instance.collection("Company").document(_currentUser);
 
     await documentRef.get().then((dataSnapshot) {
       if (dataSnapshot.exists) {
         setState(() {
-          _fullNames = (dataSnapshot).data['name'];
-          print(_fullNames);
+          _companyName = (dataSnapshot).data['name'];
+          print(_companyName);
         });
       } else {
         setState(() {
-          _fullNames = '';
+          _companyName = '';
         });
       }
     });
@@ -151,14 +150,14 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: <Widget>[
                                   Text(
-                                    _fullNames,
+                                    _companyName,
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22.0,
                                       fontFamily: 'Pacifico-Regular',
                                     ),
                                   ),
-                                  Text(_profession)
+                                  Text('')
                                 ],
                               ),
                             ),
@@ -198,7 +197,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       Expanded(
                                         flex: 4,
                                         child: Text(
-                                          'Bio',
+                                          'About',
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold,
@@ -247,7 +246,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       Expanded(
                                         flex: 4,
                                         child: Text(
-                                          'Portfolio',
+                                          'Contact',
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold,
@@ -289,103 +288,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       Expanded(
                                         flex: 4,
                                         child: Text(
-                                          'Projects',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.chevron_right,
-                                            color: Colors.grey.shade700),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Education(),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                  bottom: BorderSide(
-                                    width: 1.0,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                )),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.account_balance,
-                                            color: Colors.blue.shade700),
-                                      ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          'Education',
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16.0),
-                                        ),
-                                      ),
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.chevron_right,
-                                            color: Colors.grey.shade700),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Experience()));
-                              },
-                              child: Container(
-                                padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                  bottom: BorderSide(
-                                    width: 1.0,
-                                    color: Colors.grey.shade300,
-                                  ),
-                                )),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Expanded(
-                                        flex: 1,
-                                        child: Icon(Icons.public,
-                                            color: Colors.blue.shade700),
-                                      ),
-                                      Expanded(
-                                        flex: 4,
-                                        child: Text(
-                                          'Experience',
+                                          'Social Media',
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold,
@@ -420,14 +323,17 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                     child: CircleAvatar(
                       radius: 40.0,
                       backgroundColor: Colors.blue,
-                      child: ClipOval(
-                        child: SizedBox(
-                          width: 100,
-                          height: 180,
-                          child: Image(
-                            fit: BoxFit.cover,
-                            image: AssetImage(
-                              'images/henry_smith.jpg',
+                      child: CircleAvatar(
+                        radius: 39.0,
+                        child: ClipOval(
+                          child: SizedBox(
+                            width: 100,
+                            height: 180,
+                            child: Image(
+                              fit: BoxFit.cover,
+                              image: AssetImage(
+                                'images/company_logo.jpg',
+                              ),
                             ),
                           ),
                         ),
@@ -456,7 +362,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                       size: 40.0,
                     ),
                     onPressed: () {
-                      Navigator.pop(context, '/careerDetails');
+                      Navigator.pop(context);
                     },
                     minWidth: 70.0,
                     height: 52.0),
@@ -473,7 +379,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                 ),
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/home');
+                    Navigator.pushNamed(context, '/recruiterHome');
                   },
                   child: Text(
                     'SKIP',

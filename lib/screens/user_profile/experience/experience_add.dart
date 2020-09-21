@@ -6,53 +6,60 @@ import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class AdditionalInfoPortfolioAdd extends StatefulWidget {
-  AdditionalInfoPortfolioAdd({Key key}) : super(key: key);
+class ExperienceAdd extends StatefulWidget {
+  ExperienceAdd({Key key}) : super(key: key);
   @override
-  _AdditionalInfoPortfolioAddState createState() =>
-      _AdditionalInfoPortfolioAddState();
+  _ExperienceAddState createState() => _ExperienceAddState();
 }
 
-class _AdditionalInfoPortfolioAddState
-    extends State<AdditionalInfoPortfolioAdd> {
+class _ExperienceAddState extends State<ExperienceAdd> {
   bool isloading = false;
-  String year;
-  String title;
-  String description;
+  String fromDate, toDate;
+  String organisation, position;
+  String duties;
   dynamic processOutcome;
 
   final _formKey = GlobalKey<FormState>();
 
   //----------------------------------------------------------------------------------------
 
-  TextEditingController _yearController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _fromDateController = TextEditingController();
+  TextEditingController _toDateController = TextEditingController();
+  TextEditingController _organisationController = TextEditingController();
+  TextEditingController _positionController = TextEditingController();
+  TextEditingController _dutiesController = TextEditingController();
 
   //---------------------------------------------------------------------------------------
 
-  void addPortfolio(userId, context) async {
-    var uuid = Uuid();
-    var docId = uuid.v4();
-    year = _yearController.text;
-    title = _titleController.text;
-    description = _descriptionController.text;
+  void addEducation(userId, context) async {
+    var uuidFactory = Uuid();
+    var uuid = uuidFactory.v4();
+    fromDate = _fromDateController.text;
+    toDate = _toDateController.text;
+    organisation = _organisationController.text;
+    position = _positionController.text;
+    duties = _dutiesController.text;
 
     try {
       DocumentReference documentRef =
-          Firestore.instance.collection("Portfolio").document();
-      Map<String, dynamic> portfolioData = {
-        'id': docId,
+          Firestore.instance.collection("Experience").document();
+      Map<String, dynamic> experienceData = {
+        'uuid': uuid,
         'owner': userId,
-        'year': year,
-        'title': title,
-        'description': description
+        'from_date': fromDate,
+        'to_date': toDate,
+        'organisation': organisation,
+        'position': position,
+        'duties': duties,
       };
-      await documentRef.setData(portfolioData).whenComplete(() {
-        processOutcome = 'New portfolio has been added.';
-        _yearController.clear();
-        _titleController.clear();
-        _descriptionController.clear();
+
+      await documentRef.setData(experienceData).whenComplete(() {
+        processOutcome = 'New experience has been saved.';
+        _fromDateController.clear();
+        _toDateController.clear();
+        _organisationController.clear();
+        _positionController.clear();
+        _dutiesController.clear();
       });
     } catch (e) {
       processOutcome = e.toString();
@@ -116,57 +123,82 @@ class _AdditionalInfoPortfolioAddState
                                 fontFamily: 'SourceSansPro'),
                           ),
                           Text(
-                            'Add Portfolio',
+                            'Add Experience',
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SourceSansPro'),
                           ),
-                          SizedBox(height: 10.0),
                           SizedBox(height: 20.0),
                           Row(
                             children: <Widget>[
                               Expanded(
-                                flex: 1,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _yearController,
+                                  controller: _fromDateController,
                                   validator: (value) =>
-                                      value.isEmpty ? 'Year is required' : null,
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Year'),
-                                  maxLength: 4,
+                                      .copyWith(labelText: 'From Date'),
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(20)
+                                  ],
+                                  //maxLength: 4,
                                 ),
                               ),
-                              SizedBox(width: 1.0),
+                              SizedBox(width: 3.0),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _titleController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
+                                  controller: _toDateController,
+                                  validator: (value) =>
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Title'),
+                                      .copyWith(labelText: 'To Date'),
                                   inputFormatters: [
-                                    LengthLimitingTextInputFormatter(100),
+                                    LengthLimitingTextInputFormatter(20),
                                   ],
-                                  maxLength: 100,
+                                  //maxLength: 100,
                                 ),
                               )
                             ],
                           ),
                           SizedBox(
-                            height: 10.0,
+                            height: 6.0,
                           ),
                           TextFormField(
-                            controller: _descriptionController,
+                            controller: _organisationController,
                             validator: (value) => value.isEmpty
-                                ? 'Description is required'
+                                ? 'Organisation is required'
                                 : null,
-                            maxLines: 7,
-                            keyboardType: TextInputType.text,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Description'),
+                                labelText: 'Organisation'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _positionController,
+                            validator: (value) =>
+                                value.isEmpty ? 'Position is required' : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Position'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _dutiesController,
+                            maxLines: 4,
+                            validator: (value) =>
+                                value.isEmpty ? 'Duties is required' : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Duties & Responsibilities'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -210,7 +242,7 @@ class _AdditionalInfoPortfolioAddState
                                           isloading = true;
                                         });
 
-                                        addPortfolio(user.uid, context);
+                                        addEducation(user.uid, context);
                                       }
                                     },
                                     child: Text(

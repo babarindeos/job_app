@@ -1,58 +1,67 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:job_app/models/education.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-class AdditionalInfoPortfolioAdd extends StatefulWidget {
-  AdditionalInfoPortfolioAdd({Key key}) : super(key: key);
+class EducationEdit extends StatefulWidget {
+  final Education data;
+  EducationEdit({this.data});
   @override
-  _AdditionalInfoPortfolioAddState createState() =>
-      _AdditionalInfoPortfolioAddState();
+  _EducationEditState createState() => _EducationEditState();
 }
 
-class _AdditionalInfoPortfolioAddState
-    extends State<AdditionalInfoPortfolioAdd> {
+class _EducationEditState extends State<EducationEdit> {
   bool isloading = false;
-  String year;
-  String title;
-  String description;
+  String dateStarted, dateEnded;
+  String institution, courseOfStudy;
+  String level, classOfDegree;
+  String docId, uuid, owner;
   dynamic processOutcome;
 
   final _formKey = GlobalKey<FormState>();
 
   //----------------------------------------------------------------------------------------
 
-  TextEditingController _yearController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _dateStartedController = TextEditingController();
+  TextEditingController _dateEndedController = TextEditingController();
+  TextEditingController _institutionController = TextEditingController();
+  TextEditingController _courseOfStudyController = TextEditingController();
+  TextEditingController _levelController = TextEditingController();
+  TextEditingController _classOfDegreeController = TextEditingController();
 
   //---------------------------------------------------------------------------------------
 
-  void addPortfolio(userId, context) async {
-    var uuid = Uuid();
-    var docId = uuid.v4();
-    year = _yearController.text;
-    title = _titleController.text;
-    description = _descriptionController.text;
+  void updateEducation(userId, context) async {
+    uuid = widget.data.uuid;
+    docId = widget.data.docId;
+    owner = widget.data.owner;
+    dateStarted = _dateStartedController.text;
+    dateEnded = _dateEndedController.text;
+    institution = _institutionController.text;
+    courseOfStudy = _courseOfStudyController.text;
+    level = _levelController.text;
+    classOfDegree = _classOfDegreeController.text;
 
     try {
       DocumentReference documentRef =
-          Firestore.instance.collection("Portfolio").document();
-      Map<String, dynamic> portfolioData = {
-        'id': docId,
+          Firestore.instance.collection("Education").document(docId);
+      Map<String, dynamic> educationData = {
+        'id': uuid,
         'owner': userId,
-        'year': year,
-        'title': title,
-        'description': description
+        'date_started': dateStarted,
+        'date_ended': dateEnded,
+        'institution': institution,
+        'course_of_study': courseOfStudy,
+        'level': level,
+        'class_of_degree': classOfDegree
       };
-      await documentRef.setData(portfolioData).whenComplete(() {
-        processOutcome = 'New portfolio has been added.';
-        _yearController.clear();
-        _titleController.clear();
-        _descriptionController.clear();
+
+      await documentRef.updateData(educationData).whenComplete(() {
+        processOutcome = 'Education information has been Updated.';
       });
     } catch (e) {
       processOutcome = e.toString();
@@ -77,6 +86,26 @@ class _AdditionalInfoPortfolioAddState
         duration: Duration(seconds: 6),
       ),
     );
+  }
+
+//------------------------------------------------------------------------------------------
+
+  void retrieveEducationItem() {
+    _dateStartedController.text = widget.data.dateStarted;
+    _dateEndedController.text = widget.data.dateEnded;
+    _institutionController.text = widget.data.institution;
+    _courseOfStudyController.text = widget.data.courseOfStudy;
+    _levelController.text = widget.data.level;
+    _classOfDegreeController.text = widget.data.classOfDegree;
+  }
+
+//--------------------------------------------------------------------------------------------
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    retrieveEducationItem();
+    super.initState();
   }
 
 //------------------------------------------------------------------------------------------
@@ -116,57 +145,92 @@ class _AdditionalInfoPortfolioAddState
                                 fontFamily: 'SourceSansPro'),
                           ),
                           Text(
-                            'Add Portfolio',
+                            'Add Education',
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SourceSansPro'),
                           ),
-                          SizedBox(height: 10.0),
                           SizedBox(height: 20.0),
                           Row(
                             children: <Widget>[
                               Expanded(
-                                flex: 1,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _yearController,
+                                  controller: _dateStartedController,
                                   validator: (value) =>
-                                      value.isEmpty ? 'Year is required' : null,
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Year'),
-                                  maxLength: 4,
+                                      .copyWith(labelText: 'Date Started'),
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(20)
+                                  ],
+                                  //maxLength: 4,
                                 ),
                               ),
-                              SizedBox(width: 1.0),
+                              SizedBox(width: 3.0),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _titleController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
+                                  controller: _dateEndedController,
+                                  validator: (value) =>
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Title'),
+                                      .copyWith(labelText: 'Date Ended'),
                                   inputFormatters: [
-                                    LengthLimitingTextInputFormatter(100),
+                                    LengthLimitingTextInputFormatter(20),
                                   ],
-                                  maxLength: 100,
+                                  //maxLength: 100,
                                 ),
                               )
                             ],
                           ),
                           SizedBox(
-                            height: 10.0,
+                            height: 6.0,
                           ),
                           TextFormField(
-                            controller: _descriptionController,
+                            controller: _institutionController,
                             validator: (value) => value.isEmpty
-                                ? 'Description is required'
+                                ? 'Institution is required'
                                 : null,
-                            maxLines: 7,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Institution'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _courseOfStudyController,
+                            validator: (value) => value.isEmpty
+                                ? 'Course of Study is required'
+                                : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Course of Study'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _levelController,
+                            validator: (value) =>
+                                value.isEmpty ? 'Level is required' : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Level e.g. BSc, MSc, PhD.'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _classOfDegreeController,
                             keyboardType: TextInputType.text,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Description'),
+                                labelText: 'Class of Degree (optional)'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -210,11 +274,11 @@ class _AdditionalInfoPortfolioAddState
                                           isloading = true;
                                         });
 
-                                        addPortfolio(user.uid, context);
+                                        updateEducation(user.uid, context);
                                       }
                                     },
                                     child: Text(
-                                      'SAVE',
+                                      'UPDATE',
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 16.0),
                                     ),

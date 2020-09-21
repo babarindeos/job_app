@@ -55,6 +55,7 @@ dependencies:
   #camera: 
   #fluttertoast: 
   chewie: 
+  custom_navigator: ^0.3.0
 
 
 

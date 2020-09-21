@@ -1,21 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/models/user.dart';
-import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio_add.dart';
-import 'package:job_app/screens/user_profile/portfolio/portfolio_item.dart';
+import 'package:job_app/screens/user_profile/education/education_add.dart';
+import 'package:job_app/screens/user_profile/education/education_item.dart';
+import 'package:job_app/screens/user_profile/experience/experience_add.dart';
+import 'package:job_app/screens/user_profile/experience/experience_item.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 
-import 'education_add.dart';
-import 'education_item.dart';
-
-class Education extends StatefulWidget {
-  Education({Key key}) : super(key: key);
+class Experience extends StatefulWidget {
   @override
-  _EducationState createState() => _EducationState();
+  _ExperienceState createState() => _ExperienceState();
 }
 
-class _EducationState extends State<Education> {
+class _ExperienceState extends State<Experience> {
   bool isloading = false;
 
   final _formKey = GlobalKey<FormState>();
@@ -79,7 +77,7 @@ class _EducationState extends State<Education> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Education',
+                                      'Experience',
                                       style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
@@ -93,10 +91,10 @@ class _EducationState extends State<Education> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 1.0),
+                          SizedBox(height: 10.0),
                           StreamBuilder(
                             stream: Firestore.instance
-                                .collection("Education")
+                                .collection("Experience")
                                 .where("owner",
                                     isEqualTo: currentUser.uid.toString())
                                 .snapshots(),
@@ -111,14 +109,16 @@ class _EducationState extends State<Education> {
                                       itemBuilder: (context, index) {
                                         DocumentSnapshot data =
                                             snapshot.data.documents[index];
-                                        return EducationItem(
+                                        return ExperienceItem(
                                           documentSnapshot: data,
-                                          id: data.documentID,
-                                          itemId: data['Id'],
-                                          description: data['description'],
+                                          docId: data.documentID,
+                                          uuid: data['uuid'],
                                           owner: data['owner'],
-                                          title: data['title'],
-                                          year: data['year'],
+                                          fromDate: data['from_date'],
+                                          toDate: data['to_date'],
+                                          organisation: data['organisation'],
+                                          position: data['position'],
+                                          duties: data['duties'],
                                         );
                                       });
                             },
@@ -136,7 +136,7 @@ class _EducationState extends State<Education> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EducationAdd()));
+                MaterialPageRoute(builder: (context) => ExperienceAdd()));
           },
           child: Icon(Icons.add),
         ),
