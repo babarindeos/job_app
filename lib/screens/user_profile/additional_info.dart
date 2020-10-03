@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/home/home.dart';
 import 'package:job_app/screens/user_profile/additional_info_bio.dart';
 import 'package:job_app/screens/user_profile/experience/additional_info_experience.dart';
 import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio.dart';
@@ -473,7 +474,12 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                 ),
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/home');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Home(),
+                      ),
+                    );
                   },
                   child: Text(
                     'SKIP',

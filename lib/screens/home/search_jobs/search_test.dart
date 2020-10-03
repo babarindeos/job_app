@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:job_app/screens/home/search_jobs/search_job_item.dart';
 import 'package:job_app/shared/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SearchJobs extends StatefulWidget {
+class SearchTest extends StatefulWidget {
   @override
-  _SearchJobsState createState() => _SearchJobsState();
+  _SearchTestState createState() => _SearchTestState();
 }
 
-class _SearchJobsState extends State<SearchJobs> {
+class _SearchTestState extends State<SearchTest> {
+  @override
   @override
   Widget build(BuildContext context) {
     return SafeArea(

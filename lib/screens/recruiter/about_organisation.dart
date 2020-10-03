@@ -283,6 +283,7 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                       ],
                     ),
                     SizedBox(height: 5.0),
+                    /*
                     Row(
                       children: <Widget>[
                         Expanded(
@@ -302,7 +303,9 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                             )),
                       ],
                     ),
+                    
                     SizedBox(height: 5.0),
+                    */
                     Container(
                       child: TextFormField(
                         controller: _addressController,

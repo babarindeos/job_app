@@ -379,7 +379,7 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                 ),
                 child: MaterialButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/recruiterHome');
+                    Navigator.pushReplacementNamed(context, '/recruiterHome');
                   },
                   child: Text(
                     'SKIP',

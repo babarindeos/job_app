@@ -446,26 +446,27 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
                               )),
                           Container(
                             child: Material(
-                                color: Colors.grey[200],
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
+                              color: Colors.grey[200],
+                              shadowColor: Colors.lightGreen,
+                              elevation: 7.0,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(5.0),
+                              ),
+                              child: MaterialButton(
+                                minWidth: 70,
+                                height: 52,
+                                child: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 29.0,
                                 ),
-                                child: MaterialButton(
-                                  minWidth: 70,
-                                  height: 52,
-                                  child: Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 29.0,
-                                  ),
-                                  onPressed: _btnForwardEnable
-                                      ? () => {
-                                            //handleForwardButton(context);
-                                            moveToAboutOrganisation(context)
-                                          }
-                                      : null,
-                                )),
+                                onPressed: _btnForwardEnable
+                                    ? () => {
+                                          //handleForwardButton(context);
+                                          moveToAboutOrganisation(context)
+                                        }
+                                    : null,
+                              ),
+                            ),
                           ),
                         ],
                       )

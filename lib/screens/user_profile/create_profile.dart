@@ -252,20 +252,21 @@ class _CreateProfileState extends State<CreateProfile> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             CircleAvatar(
-                                radius: 50.0,
-                                backgroundColor: Colors.white,
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 100,
-                                    height: 180,
-                                    child: (imageSource != null)
-                                        ? showUploadedImage()
-                                        : Image(
-                                            image: AssetImage(
-                                                'images/profile_avatar.png'),
-                                          ),
-                                  ),
-                                )),
+                              radius: 50.0,
+                              backgroundColor: Colors.white,
+                              child: ClipOval(
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 180,
+                                  child: (imageSource != null)
+                                      ? showUploadedImage()
+                                      : Image(
+                                          image: AssetImage(
+                                              'images/profile_avatar.png'),
+                                        ),
+                                ),
+                              ),
+                            ),
                             Padding(
                               padding: EdgeInsets.only(
                                 top: 20.0,
