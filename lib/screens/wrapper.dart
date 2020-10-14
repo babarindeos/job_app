@@ -39,14 +39,18 @@ class _WrapperState extends State<Wrapper> {
 
 //----------------------------------------------------------------------------------------
   checkIfBioDataExist(String userId, BuildContext context) async {
-    print("*********************Checking for User BioData");
+    print("*********************Checking for User BioData " + _user.iUserType);
     String result = await _user.isBioDataCreated(userId);
 
     if (_user.iBioData == null) {
       print('********************************* BioData has not been filled');
       Navigator.pushNamed(context, '/profile');
     } else {
-      checkIfCareerDetailsExist(userId, context);
+      if (_user.iUserType == 'job_seeker') {
+        checkIfCareerDetailsExist(userId, context);
+      } else {
+        checkIfCompanyExist(userId, context);
+      }
     }
   }
 
@@ -56,10 +60,27 @@ class _WrapperState extends State<Wrapper> {
     print("Checking for Career Details");
     String result = await _user.isCareerDetailsCreated(userId);
     if (_user.iCareerDetails == null) {
+      Navigator.pushNamed(context, '/careerDetails');
     } else {
-      Navigator.pushNamed(context, '/home');
+      //Navigator.pushNamed(context, '/home');
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/home', ModalRoute.withName('/login'));
     }
   }
+
+  //------------------------------------------------------------------------------------
+  checkIfCompanyExist(String userid, BuildContext context) async {
+    print("Checking for Company Info");
+    String result = await _user.isCompanyCreated(userid);
+    if (_user.iCompany == null) {
+      Navigator.pushNamed(context, '/aboutOrganisation');
+    } else {
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/recruiterHome', ModalRoute.withName('/login'));
+    }
+  }
+
+  //------------------------------------------------------------------------------------
 
   Widget showLoadingHandler() {
     Widget loader;
@@ -92,7 +113,7 @@ class _WrapperState extends State<Wrapper> {
       return Authenticate();
     } else {
       // check if user type has been selected
-      return SelectUserType();
+      //return SelectUserType();
       isUserTypeSelected = checkIfNewUserTypeExist(user.uid, context);
       print("Result has been obtained");
       print("Opening home page now...");

@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:job_app/models/career.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/screens/user_profile/socialmedia_page.dart';
 import 'package:job_app/screens/user_profile/upload_pdf_cv.dart';
 import 'package:job_app/screens/user_profile/upload_video_cv.dart';
@@ -22,6 +23,8 @@ class FormKeys {
 final _formKeyCareer = GlobalKey<FormState>();
 
 class CareerDetails extends StatefulWidget {
+  String userType;
+  CareerDetails({this.userType});
   @override
   _CareerDetailsState createState() => _CareerDetailsState();
 }
@@ -30,15 +33,17 @@ class _CareerDetailsState extends State<CareerDetails> {
   bool isLoading = true;
   Career _career = Career();
   bool isloading = false;
+  bool isfetching = false;
   bool isbtnForwardEnabled = false;
+  String userType;
 
   //----------------------------------------------------------------------------------------
 
   @override
   void initState() {
     super.initState();
-    isloading = true;
-    print("Retrieve Career Details");
+    isfetching = true;
+    print("Retrieve Career Details --- ${widget.userType}");
     retrieveCareerDetails();
   }
 
@@ -61,12 +66,14 @@ class _CareerDetailsState extends State<CareerDetails> {
           _bioController.text = (dataSnapshot.data['bio']);
 
           isbtnForwardEnabled = true;
+          isfetching = false;
         });
       }
     });
 
     setState(() {
       isloading = false;
+      isfetching = false;
     });
   }
 
@@ -131,406 +138,457 @@ class _CareerDetailsState extends State<CareerDetails> {
     );
   }
 
-//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+
+  void moveToProfile(BuildContext context) {
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => CreateProfile(
+    //       user_type: widget.userType,
+    //     ),
+    //   ),
+    // );
+
+    print("*********************** Passing User Type: ${userType}");
+    Navigator.popAndPushNamed(
+      context,
+      '/profile',
+      arguments: userType,
+    );
+  }
+
+//----------------------------------------------------------------------------------------------
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    super.dispose();
+  }
+
+  ///---------------------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
+    String args = ModalRoute.of(context).settings.arguments;
+    userType = args;
+
     return SafeArea(
       child: Scaffold(
         body: Builder(
           builder: (BuildContext context) {
-            return ListView(
-              children: <Widget>[
-                isloading ? LinearProgressIndicator() : Text(''),
-                Container(
-                  alignment: Alignment.center,
-                  padding:
-                      EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
-                  child: Form(
-                    key: _formKeyCareer,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10.0),
-                          child: Image(
-                            image: AssetImage('images/step-2-mini.png'),
-                            width: 150.0,
-                          ),
-                        ),
-                        Text(
-                          'Career Details',
-                          style: TextStyle(
-                              fontSize: 28.0,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'SourceSansPro'),
-                        ),
-                        SizedBox(height: 10.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 3,
-                              child: Container(
-                                padding: EdgeInsets.only(right: 5.0),
-                                child: TextFormField(
-                                  controller: _fieldController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Field is required'
-                                      : null,
-                                  decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Profession'),
+            return isfetching
+                ? Center(child: CircularProgressIndicator())
+                : ListView(
+                    children: <Widget>[
+                      isloading ? LinearProgressIndicator() : Text(''),
+                      Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 1.0, horizontal: 20.0),
+                        child: Form(
+                          key: _formKeyCareer,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5.0, horizontal: 10.0),
+                                child: Image(
+                                  image: AssetImage('images/step-2-mini.png'),
+                                  width: 150.0,
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              flex: 2,
-                              child: Container(
-                                child: TextFormField(
-                                  controller: _experienceController,
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Experience is required'
-                                      : null,
-                                  decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Experience'),
-                                ),
+                              Text(
+                                'Career Details',
+                                style: TextStyle(
+                                    fontSize: 28.0,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'SourceSansPro'),
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 5.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                                flex: 4,
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 0.0),
-                                  child: TextFormField(
-                                    controller: _bioController,
-                                    keyboardType: TextInputType.multiline,
-                                    maxLines: 2,
-                                    validator: (value) => value.isEmpty
-                                        ? 'Career Interests is required'
-                                        : null,
-                                    decoration:
-                                        profileTextInputDecoration.copyWith(
-                                            labelText:
-                                                'Career Interests & Specialty'),
-                                  ),
-                                )),
-                          ],
-                        ),
-                        SizedBox(height: 8.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                child: Text('CV',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17.0,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 2.0),
-                        Card(
-                          elevation: 5.0,
-                          child: Container(
-                            padding: EdgeInsets.all(0.0),
-                            child: Column(
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                UploadPdfCV()));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(7.0),
-                                    decoration: BoxDecoration(
-                                        border: Border(
-                                      bottom: BorderSide(
-                                        width: 1.0,
-                                        color: Colors.grey.shade300,
-                                      ),
-                                    )),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Expanded(
-                                          flex: 3,
-                                          child: Text('Upload Resume',
-                                              style: TextStyle(
-                                                  color: Colors.blue.shade700,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Icon(Icons.file_upload,
-                                              color: Colors.grey.shade700),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                UploadVideoCV()));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(7.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Expanded(
-                                          flex: 3,
-                                          child: Text('Video CV',
-                                              style: TextStyle(
-                                                  color: Colors.blue.shade700,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        Expanded(
-                                          flex: 1,
-                                          child: Icon(Icons.chevron_right,
-                                              color: Colors.grey.shade700),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 10.0),
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                child: Text('Social Media',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18.0,
-                                    )),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 1.0),
-                        InkWell(
-                          onTap: () {
-                            loadSocialMediaPage(context);
-                          },
-                          child: Card(
-                            elevation: 5.0,
-                            child: Container(
-                              padding: EdgeInsets.all(1.0),
-                              child: Column(
+                              SizedBox(height: 10.0),
+                              Row(
                                 children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Expanded(
-                                          flex: 2,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                FontAwesomeIcons.facebookF,
-                                                size: 15.0,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                              SizedBox(width: 3.0),
-                                              Text(
-                                                'Facebook',
-                                                style: TextStyle(
-                                                    color: Colors.grey.shade600,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Icon(
-                                                  FontAwesomeIcons
-                                                      .instagramSquare,
-                                                  size: 15.0,
-                                                  color: Colors.grey.shade600),
-                                              SizedBox(width: 3.0),
-                                              Text(
-                                                'Instagram',
-                                                style: TextStyle(
-                                                    color: Colors.grey.shade600,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      padding: EdgeInsets.only(right: 5.0),
+                                      child: TextFormField(
+                                        controller: _fieldController,
+                                        validator: (value) => value.isEmpty
+                                            ? 'Field is required'
+                                            : null,
+                                        decoration: profileTextInputDecoration
+                                            .copyWith(labelText: 'Profession'),
+                                      ),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Expanded(
-                                          flex: 2,
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(FontAwesomeIcons.linkedin,
-                                                  size: 15.0,
-                                                  color: Colors.grey.shade600),
-                                              SizedBox(width: 3.0),
-                                              Text('LinkedIn',
-                                                  style: TextStyle(
-                                                      color:
-                                                          Colors.grey.shade700,
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                            ],
-                                          ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+                                      child: TextFormField(
+                                        controller: _experienceController,
+                                        keyboardType: TextInputType.number,
+                                        validator: (value) => value.isEmpty
+                                            ? 'Experience is required'
+                                            : null,
+                                        decoration: profileTextInputDecoration
+                                            .copyWith(labelText: 'Experience'),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 5.0),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                      flex: 4,
+                                      child: Container(
+                                        padding: EdgeInsets.only(right: 0.0),
+                                        child: TextFormField(
+                                          controller: _bioController,
+                                          keyboardType: TextInputType.multiline,
+                                          maxLines: 2,
+                                          validator: (value) => value.isEmpty
+                                              ? 'Career Interests is required'
+                                              : null,
+                                          decoration: profileTextInputDecoration
+                                              .copyWith(
+                                                  labelText:
+                                                      'Career Interests & Specialty'),
                                         ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              Icon(
-                                                  FontAwesomeIcons
-                                                      .snapchatSquare,
-                                                  color: Colors.grey.shade700,
-                                                  size: 15.0),
-                                              SizedBox(width: 3.0),
-                                              Text(
-                                                'Snapchat',
-                                                style: TextStyle(
-                                                    color: Colors.grey.shade600,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                      )),
+                                ],
+                              ),
+                              SizedBox(height: 8.0),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Container(
+                                      child: Text('CV',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17.0,
+                                          )),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
+                              SizedBox(height: 2.0),
+                              Card(
+                                elevation: 5.0,
+                                child: Container(
+                                  padding: EdgeInsets.all(0.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UploadPdfCV()));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(7.0),
+                                          decoration: BoxDecoration(
+                                              border: Border(
+                                            bottom: BorderSide(
+                                              width: 1.0,
+                                              color: Colors.grey.shade300,
+                                            ),
+                                          )),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Expanded(
+                                                flex: 3,
+                                                child: Text('Upload Resume',
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .blue.shade700,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Icon(Icons.file_upload,
+                                                    color:
+                                                        Colors.grey.shade700),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      UploadVideoCV()));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.all(7.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Expanded(
+                                                flex: 3,
+                                                child: Text('Video CV',
+                                                    style: TextStyle(
+                                                        color: Colors
+                                                            .blue.shade700,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                              Expanded(
+                                                flex: 1,
+                                                child: Icon(Icons.chevron_right,
+                                                    color:
+                                                        Colors.grey.shade700),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10.0),
+                              Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Container(
+                                      child: Text('Social Media',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18.0,
+                                          )),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 1.0),
+                              InkWell(
+                                onTap: () {
+                                  loadSocialMediaPage(context);
+                                },
+                                child: Card(
+                                  elevation: 5.0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(1.0),
+                                    child: Column(
+                                      children: <Widget>[
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Expanded(
+                                                flex: 2,
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Icon(
+                                                      FontAwesomeIcons
+                                                          .facebookF,
+                                                      size: 15.0,
+                                                      color:
+                                                          Colors.grey.shade600,
+                                                    ),
+                                                    SizedBox(width: 3.0),
+                                                    Text(
+                                                      'Facebook',
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .grey.shade600,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Icon(
+                                                        FontAwesomeIcons
+                                                            .instagramSquare,
+                                                        size: 15.0,
+                                                        color: Colors
+                                                            .grey.shade600),
+                                                    SizedBox(width: 3.0),
+                                                    Text(
+                                                      'Instagram',
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .grey.shade600,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Expanded(
+                                                flex: 2,
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Icon(
+                                                        FontAwesomeIcons
+                                                            .linkedin,
+                                                        size: 15.0,
+                                                        color: Colors
+                                                            .grey.shade600),
+                                                    SizedBox(width: 3.0),
+                                                    Text('LinkedIn',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey.shade700,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold)),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(
+                                                flex: 2,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: <Widget>[
+                                                    Icon(
+                                                        FontAwesomeIcons
+                                                            .snapchatSquare,
+                                                        color: Colors
+                                                            .grey.shade700,
+                                                        size: 15.0),
+                                                    SizedBox(width: 3.0),
+                                                    Text(
+                                                      'Snapchat',
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .grey.shade600,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 10.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Material(
+                                        color: Colors.grey[200],
+                                        shadowColor: Colors.lightGreen,
+                                        elevation: 7.0,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                        child: MaterialButton(
+                                          minWidth: 70,
+                                          height: 52,
+                                          child: Icon(
+                                            Icons.arrow_back_ios,
+                                            size: 29.0,
+                                          ),
+                                          onPressed: () {
+                                            //Navigator.pushNamed(context, '/profile');
+                                            //moveToCareerDetails(context);
+                                            moveToProfile(context);
+                                          },
+                                        )),
+                                  ),
+                                  Container(
+                                      alignment: Alignment.center,
+                                      padding: EdgeInsets.only(
+                                          left: 5.0, right: 5.0),
+                                      width: 135.0,
+                                      child: Material(
+                                        color: Colors.green,
+                                        shadowColor: Colors.lightGreen,
+                                        elevation: 7.0,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                        child: MaterialButton(
+                                          minWidth: 135,
+                                          height: 52,
+                                          child: Text(
+                                            'SAVE',
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          onPressed: () {
+                                            if (_formKeyCareer.currentState
+                                                .validate()) {
+                                              setState(() {
+                                                isloading = true;
+                                              });
+                                              processForm(user.uid, context);
+                                            }
+                                          },
+                                        ),
+                                      )),
+                                  Container(
+                                    child: Material(
+                                      color: Colors.grey[200],
+                                      shadowColor: Colors.lightGreen,
+                                      elevation: 7.0,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                      child: MaterialButton(
+                                          minWidth: 70,
+                                          height: 52,
+                                          child: Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 29.0,
+                                          ),
+                                          onPressed: isbtnForwardEnabled
+                                              ? () {
+                                                  Navigator.pushNamed(context,
+                                                      '/additionalInfo');
+                                                }
+                                              : null),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
                         ),
-                        SizedBox(height: 10.0),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              child: Material(
-                                  color: Colors.grey[200],
-                                  shadowColor: Colors.lightGreen,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  child: MaterialButton(
-                                    minWidth: 70,
-                                    height: 52,
-                                    child: Icon(
-                                      Icons.arrow_back_ios,
-                                      size: 29.0,
-                                    ),
-                                    onPressed: () {
-                                      //Navigator.pushNamed(context, '/profile');
-                                      //moveToCareerDetails(context);
-                                      Navigator.popAndPushNamed(
-                                          context, '/profile');
-                                    },
-                                  )),
-                            ),
-                            Container(
-                                alignment: Alignment.center,
-                                padding: EdgeInsets.only(left: 5.0, right: 5.0),
-                                width: 135.0,
-                                child: Material(
-                                  color: Colors.green,
-                                  shadowColor: Colors.lightGreen,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  child: MaterialButton(
-                                    minWidth: 135,
-                                    height: 52,
-                                    child: Text(
-                                      'SAVE',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    onPressed: () {
-                                      if (_formKeyCareer.currentState
-                                          .validate()) {
-                                        setState(() {
-                                          isloading = true;
-                                        });
-                                        processForm(user.uid, context);
-                                      }
-                                    },
-                                  ),
-                                )),
-                            Container(
-                              child: Material(
-                                color: Colors.grey[200],
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
-                                ),
-                                child: MaterialButton(
-                                    minWidth: 70,
-                                    height: 52,
-                                    child: Icon(
-                                      Icons.arrow_forward_ios,
-                                      size: 29.0,
-                                    ),
-                                    onPressed: isbtnForwardEnabled
-                                        ? () {
-                                            Navigator.pushNamed(
-                                                context, '/additionalInfo');
-                                          }
-                                        : null),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            );
+                      ),
+                    ],
+                  );
           },
         ),
       ),

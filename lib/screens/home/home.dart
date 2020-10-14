@@ -29,23 +29,28 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          items: _items,
-          onTap: (index) {
-            navigatorKey.currentState.maybePop();
-            setState(() => _page = _children[index]);
-            _currentIndex = index;
-          },
-          currentIndex: _currentIndex,
-          type: BottomNavigationBarType.fixed,
-          elevation: 7.0,
-        ),
-        body: CustomNavigator(
-          navigatorKey: navigatorKey,
-          home: _page,
-          pageRoute: PageRoutes.materialPageRoute,
-        ));
+    return WillPopScope(
+      onWillPop: () {
+        print("am here");
+      },
+      child: Scaffold(
+          bottomNavigationBar: BottomNavigationBar(
+            items: _items,
+            onTap: (index) {
+              navigatorKey.currentState.maybePop();
+              setState(() => _page = _children[index]);
+              _currentIndex = index;
+            },
+            currentIndex: _currentIndex,
+            type: BottomNavigationBarType.fixed,
+            elevation: 7.0,
+          ),
+          body: CustomNavigator(
+            navigatorKey: navigatorKey,
+            home: _page,
+            pageRoute: PageRoutes.materialPageRoute,
+          )),
+    );
   }
 
   final _items = [

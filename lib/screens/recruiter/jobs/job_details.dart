@@ -54,16 +54,26 @@ class _JobDetailsState extends State<JobDetails> {
           padding: const EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 5.0),
           children: <Widget>[
             Row(children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: Text('Created ${widget.data.postedFmt}'),
-                ),
+              Text(
+                'Created ',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              Expanded(
-                child: Container(
-                  alignment: Alignment.centerRight,
-                  child: Text('Closes ${widget.data.expiration}'),
-                ),
+              Container(
+                child: Text(widget.data.postedFmt),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Text(
+                      'Closes ',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text('${widget.data.expiration}'),
+                ],
               ),
             ]),
             SizedBox(

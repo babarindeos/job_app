@@ -29,6 +29,8 @@ class FormKeys {
 final _formKey = GlobalKey<FormState>();
 
 class AboutOrganisation extends StatefulWidget {
+  String userType;
+  AboutOrganisation({this.userType});
   @override
   _AboutOrganisationState createState() => _AboutOrganisationState();
 }
@@ -37,6 +39,7 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
   File _image, file;
   Career _career = Career();
   bool isloading = false;
+  bool isfetching = false;
   bool isbtnForwardEnabled = false;
   String imageSource;
   String imageUrl;
@@ -151,9 +154,9 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
         setState(() {
           _companyNameController.text = dataSnapshot.data['name'];
           _sectorController.text = dataSnapshot.data['sector'];
-          _aboutCompanyController.text = dataSnapshot.data['about'];
+          // _aboutCompanyController.text = dataSnapshot.data['about'];
           _addressController.text = dataSnapshot.data['address'];
-          _phoneController.text = dataSnapshot.data['phone'];
+          // _phoneController.text = dataSnapshot.data['phone'];
           _emailController.text = dataSnapshot.data['email'];
 
           isbtnForwardEnabled = true;
@@ -162,7 +165,7 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
     });
 
     setState(() {
-      isloading = false;
+      isfetching = false;
     });
   }
 //-----------------------------------------------------------------------------------------------
@@ -171,9 +174,8 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    setState(() {
-      isloading = true;
-    });
+
+    isfetching = true;
     retrieveCompanyInfo();
   }
 
@@ -184,79 +186,77 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
     final user = Provider.of<User>(context);
     return SafeArea(child: Scaffold(
       body: Builder(builder: (BuildContext context) {
-        return ListView(
-          children: <Widget>[
-            isloading ? LinearProgressIndicator() : Container(),
-            Container(
-              alignment: Alignment.center,
-              padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      child: Image(
-                        image: AssetImage('images/step-2-mini.png'),
-                        width: 150.0,
-                      ),
-                    ),
-                    Text(
-                      'About Company',
-                      style: TextStyle(
-                          fontSize: 28.0,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'SourceSansPro'),
-                    ),
-                    SizedBox(height: 3.0),
-                    Row(
+        return isfetching
+            ? Center(child: CircularProgressIndicator())
+            : ListView(
+                children: <Widget>[
+                  isloading ? LinearProgressIndicator() : Container(),
+                  Container(
+                    alignment: Alignment.center,
+                    padding:
+                        EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          CircleAvatar(
-                            radius: 50.0,
-                            backgroundColor: Colors.blue,
-                            child: CircleAvatar(
-                              radius: 49,
-                              backgroundColor: Colors.white,
-                              child: ClipOval(
-                                child: SizedBox(
-                                  width: 100,
-                                  height: 180,
-                                  child: imageSource != null
-                                      ? showUploadedLogo()
-                                      : Image(
-                                          image: AssetImage(
-                                              'images/company_logo.jpg'),
-                                        ),
-                                ),
-                              ),
+                          Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
+                            child: Image(
+                              image: AssetImage('images/step-2-mini.png'),
+                              width: 150.0,
                             ),
                           ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              top: 20.0,
-                            ),
-                            child: IconButton(
-                                icon: Icon(
-                                  FontAwesomeIcons.camera,
-                                  size: 30.0,
-                                ),
-                                onPressed: () {
-                                  getImage();
-                                }),
+                          Text(
+                            'About Company',
+                            style: TextStyle(
+                                fontSize: 28.0,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'SourceSansPro'),
                           ),
-                        ]),
-                    SizedBox(height: 10.0),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 3,
-                          child: Container(
-                            padding: EdgeInsets.only(right: 5.0),
+                          SizedBox(height: 3.0),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius: 50.0,
+                                  backgroundColor: Colors.blue,
+                                  child: CircleAvatar(
+                                    radius: 49,
+                                    backgroundColor: Colors.white,
+                                    child: ClipOval(
+                                      child: SizedBox(
+                                        width: 100,
+                                        height: 180,
+                                        child: imageSource != null
+                                            ? showUploadedLogo()
+                                            : Image(
+                                                image: AssetImage(
+                                                    'images/company_logo.jpg'),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 20.0,
+                                  ),
+                                  child: IconButton(
+                                      icon: Icon(
+                                        FontAwesomeIcons.camera,
+                                        size: 30.0,
+                                      ),
+                                      onPressed: () {
+                                        getImage();
+                                      }),
+                                ),
+                              ]),
+                          SizedBox(height: 10.0),
+                          Container(
                             child: TextFormField(
                               controller: _companyNameController,
                               validator: (value) => value.isEmpty
@@ -266,10 +266,8 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                                   labelText: 'Company name'),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Container(
+                          SizedBox(height: 5.0),
+                          Container(
                             child: TextFormField(
                               controller: _sectorController,
                               keyboardType: TextInputType.text,
@@ -279,61 +277,18 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                                   labelText: 'Sector'),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 5.0),
-                    /*
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                            flex: 4,
-                            child: Container(
-                              padding: EdgeInsets.only(right: 0.0),
-                              child: TextFormField(
-                                controller: _aboutCompanyController,
-                                keyboardType: TextInputType.text,
-                                maxLines: 2,
-                                validator: (value) => value.isEmpty
-                                    ? 'About Company is required'
-                                    : null,
-                                decoration: profileTextInputDecoration.copyWith(
-                                    labelText: 'About Company'),
-                              ),
-                            )),
-                      ],
-                    ),
-                    
-                    SizedBox(height: 5.0),
-                    */
-                    Container(
-                      child: TextFormField(
-                        controller: _addressController,
-                        validator: (value) =>
-                            value.isEmpty ? 'Address is required' : null,
-                        decoration: profileTextInputDecoration.copyWith(
-                            labelText: 'Address'),
-                      ),
-                    ),
-                    SizedBox(height: 5.0),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            alignment: Alignment.centerLeft,
-                            padding: const EdgeInsets.only(right: 5.0),
+                          SizedBox(height: 5.0),
+                          Container(
                             child: TextFormField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
+                              controller: _addressController,
                               validator: (value) =>
-                                  value.isEmpty ? 'Phone is required' : null,
+                                  value.isEmpty ? 'Address is required' : null,
                               decoration: profileTextInputDecoration.copyWith(
-                                  labelText: 'Phone'),
+                                  labelText: 'Address'),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Container(
+                          SizedBox(height: 5.0),
+                          Container(
                             alignment: Alignment.centerLeft,
                             child: TextFormField(
                               controller: _emailController,
@@ -343,94 +298,92 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                                   labelText: 'Email'),
                             ),
                           ),
-                        )
-                      ],
+                          SizedBox(height: 10.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                child: Material(
+                                    color: Colors.grey[200],
+                                    shadowColor: Colors.lightGreen,
+                                    elevation: 7.0,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                    child: MaterialButton(
+                                      minWidth: 70,
+                                      height: 52,
+                                      child: Icon(
+                                        Icons.arrow_back_ios,
+                                        size: 29.0,
+                                      ),
+                                      onPressed: () {
+                                        Navigator.popAndPushNamed(
+                                            context, '/profile');
+                                        //moveToCareerDetails(context);
+                                      },
+                                    )),
+                              ),
+                              Container(
+                                  alignment: Alignment.center,
+                                  padding:
+                                      EdgeInsets.only(left: 5.0, right: 5.0),
+                                  width: 135.0,
+                                  child: Material(
+                                    color: Colors.green,
+                                    shadowColor: Colors.lightGreen,
+                                    elevation: 7.0,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                    child: MaterialButton(
+                                      minWidth: 135,
+                                      height: 52,
+                                      child: Text(
+                                        'SAVE',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () {
+                                        if (_formKey.currentState.validate()) {
+                                          setState(() {
+                                            isloading = true;
+                                          });
+                                          processForm(user.uid, context);
+                                        }
+                                      },
+                                    ),
+                                  )),
+                              Container(
+                                child: Material(
+                                  color: Colors.grey[200],
+                                  shadowColor: Colors.lightGreen,
+                                  elevation: 7.0,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(5.0),
+                                  ),
+                                  child: MaterialButton(
+                                      minWidth: 70,
+                                      height: 52,
+                                      child: Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 29.0,
+                                      ),
+                                      onPressed: isbtnForwardEnabled
+                                          ? () {
+                                              Navigator.pushNamed(context,
+                                                  '/additionalCompanyInfo');
+                                            }
+                                          : null),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 10.0),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          child: Material(
-                              color: Colors.grey[200],
-                              shadowColor: Colors.lightGreen,
-                              elevation: 7.0,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              child: MaterialButton(
-                                minWidth: 70,
-                                height: 52,
-                                child: Icon(
-                                  Icons.arrow_back_ios,
-                                  size: 29.0,
-                                ),
-                                onPressed: () {
-                                  Navigator.popAndPushNamed(
-                                      context, '/recruiterProfile');
-                                  //moveToCareerDetails(context);
-                                },
-                              )),
-                        ),
-                        Container(
-                            alignment: Alignment.center,
-                            padding: EdgeInsets.only(left: 5.0, right: 5.0),
-                            width: 135.0,
-                            child: Material(
-                              color: Colors.green,
-                              shadowColor: Colors.lightGreen,
-                              elevation: 7.0,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              child: MaterialButton(
-                                minWidth: 135,
-                                height: 52,
-                                child: Text(
-                                  'SAVE',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                                onPressed: () {
-                                  if (_formKey.currentState.validate()) {
-                                    setState(() {
-                                      isloading = true;
-                                    });
-                                    processForm(user.uid, context);
-                                  }
-                                },
-                              ),
-                            )),
-                        Container(
-                          child: Material(
-                            color: Colors.grey[200],
-                            shadowColor: Colors.lightGreen,
-                            elevation: 7.0,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(5.0),
-                            ),
-                            child: MaterialButton(
-                                minWidth: 70,
-                                height: 52,
-                                child: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 29.0,
-                                ),
-                                onPressed: isbtnForwardEnabled
-                                    ? () {
-                                        Navigator.pushNamed(
-                                            context, '/additionalCompanyInfo');
-                                      }
-                                    : null),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+                  ),
+                ],
+              );
       }),
     ));
   }

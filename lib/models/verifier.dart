@@ -6,8 +6,9 @@ class Verifier {
   String iUserType;
   String iBioData;
   String iCareerDetails;
+  String iCompany;
 
-  Verifier({this.iUserType, this.iBioData, this.iCareerDetails});
+  Verifier({this.iUserType, this.iBioData, this.iCareerDetails, this.iCompany});
 //------------------------------------------------------------------------------------------
   Future<String> isUserTypeSelected(String uid) async {
     String result;
@@ -93,4 +94,29 @@ class Verifier {
   }
 
 //-------------------------------------------------------------------------------------------------
+// Check if Company has been filled in
+  Future<String> isCompanyCreated(String uid) async {
+    String result;
+    try {
+      DocumentReference documentReference =
+          Firestore.instance.collection('Company').document(uid);
+      await documentReference.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          result = (dataSnapshot.data['name']);
+          iCompany = result;
+          return result;
+        } else {
+          iCompany = null;
+          return null;
+        }
+      });
+    } catch (e) {
+      print("Company name " + e.toString());
+      iCompany = null;
+      return null;
+    }
+  }
+
+//--------------------------------------------------------------------------------------------------
+
 } // end of class

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:job_app/shared/loading.dart';
+import 'package:job_app/shared/loading2.dart';
 
 class SignIn extends StatefulWidget {
   final Function toggleView;
@@ -23,7 +24,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading
-        ? Loading()
+        ? Loading2()
         : SafeArea(
             child: Scaffold(
               backgroundColor: Colors.white,
@@ -90,7 +91,7 @@ class _SignInState extends State<SignIn> {
                             child: Text(
                               error,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.red[200],
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -145,7 +146,7 @@ class _SignInState extends State<SignIn> {
                               onPressed: () async {
                                 if (_formKey.currentState.validate()) {
                                   setState(() {
-                                    //loading = true;
+                                    loading = true;
                                   });
                                   dynamic result =
                                       await _auth.signInWithEmailAndPassword(
@@ -155,7 +156,7 @@ class _SignInState extends State<SignIn> {
                                     setState(() {
                                       error =
                                           'Could not signin with those credentials.';
-                                      //loading = false;
+                                      loading = false;
                                     });
                                   }
                                 }

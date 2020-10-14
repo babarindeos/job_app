@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:provider/provider.dart';
 
@@ -194,11 +195,22 @@ class _SelectUserTypeState extends State<SelectUserType> {
                           error = "Select a User Type";
                         });
                       } else {
-                        if (user_type == 'job_seeker') {
-                          Navigator.pushNamed(context, '/profile');
-                        } else {
-                          Navigator.pushNamed(context, '/recruiterProfile');
-                        }
+                        // if (user_type == 'job_seeker') {
+                        //   Navigator.pushNamed(context, '/profile');
+                        // } else {
+                        //   Navigator.pushNamed(context, '/recruiterProfile');
+                        // }
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) =>
+                        //             CreateProfile(userType: user_type)));
+
+                        Navigator.pushNamed(
+                          context,
+                          '/profile',
+                          arguments: user_type,
+                        );
                       }
                     },
                     minWidth: 300,

@@ -30,6 +30,7 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
   File _image, file;
   String gender_option = '';
   bool isloading = false;
+  bool isfetching = false;
   bool _btnForwardEnable = false;
   bool isUploading = false;
   String postId = Uuid().v4();
@@ -50,7 +51,7 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
 
   @override
   void initState() {
-    isloading = true;
+    isfetching = true;
     super.initState();
     retrieveUserBioData();
   }
@@ -81,12 +82,12 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
           imageSource = "url";
 
           retrieveOutcome = 'success';
-          isloading = false;
+          isfetching = false;
           _btnForwardEnable = true;
         });
       } else {
         retrieveOutcome = 'error';
-        isloading = false;
+        isfetching = false;
         _btnForwardEnable = false;
       }
     });
@@ -198,284 +199,295 @@ class _RecruiterProfileState extends State<RecruiterProfile> {
     return SafeArea(
       child: Scaffold(
         body: Builder(builder: (BuildContext context) {
-          return ListView(
-            children: <Widget>[
-              isloading ? LinearProgressIndicator() : Container(),
-              Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        child: Image(
-                          image: AssetImage('images/step-1-mini.png'),
-                          width: 150.0,
-                        ),
-                      ),
-                      Text(
-                        'My Profile',
-                        style: TextStyle(
-                            fontSize: 28.0,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'SourceSansPro'),
-                      ),
-                      SizedBox(height: 10.0),
-                      Row(
+          return isfetching
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ListView(
+                  children: <Widget>[
+                    isloading ? LinearProgressIndicator() : Container(),
+                    Container(
+                      alignment: Alignment.center,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            CircleAvatar(
-                              radius: 50.0,
-                              backgroundColor: Colors.blue,
-                              child: CircleAvatar(
-                                radius: 49,
-                                backgroundColor: Colors.white,
-                                child: ClipOval(
-                                  child: SizedBox(
-                                    width: 100,
-                                    height: 180,
-                                    child: (imageSource != null)
-                                        ? showUploadedImage()
-                                        : Image(
-                                            image: AssetImage(
-                                                'images/profile_avatar.png'),
-                                          ),
+                            Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 10.0),
+                              child: Image(
+                                image: AssetImage('images/step-1-mini.png'),
+                                width: 150.0,
+                              ),
+                            ),
+                            Text(
+                              'My Profile',
+                              style: TextStyle(
+                                  fontSize: 28.0,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'SourceSansPro'),
+                            ),
+                            SizedBox(height: 10.0),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    radius: 50.0,
+                                    backgroundColor: Colors.blue,
+                                    child: CircleAvatar(
+                                      radius: 49,
+                                      backgroundColor: Colors.white,
+                                      child: ClipOval(
+                                        child: SizedBox(
+                                          width: 100,
+                                          height: 180,
+                                          child: (imageSource != null)
+                                              ? showUploadedImage()
+                                              : Image(
+                                                  image: AssetImage(
+                                                      'images/profile_avatar.png'),
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 20.0,
+                                    ),
+                                    child: IconButton(
+                                        icon: Icon(
+                                          FontAwesomeIcons.camera,
+                                          size: 30.0,
+                                        ),
+                                        onPressed: () {
+                                          getImage();
+                                        }),
+                                  ),
+                                ]),
+                            SizedBox(height: 10.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  'Gender',
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueAccent,
                                   ),
                                 ),
-                              ),
+                                Radio<String>(
+                                  activeColor: Colors.blue,
+                                  value: 'Male',
+                                  groupValue: gender_option,
+                                  onChanged: _handleGenderSelected,
+                                ),
+                                Text('Male'),
+                                Radio<String>(
+                                  value: 'Female',
+                                  groupValue: gender_option,
+                                  activeColor: Colors.blue,
+                                  onChanged: _handleGenderSelected,
+                                ),
+                                Text('Female'),
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                top: 20.0,
-                              ),
-                              child: IconButton(
-                                  icon: Icon(
-                                    FontAwesomeIcons.camera,
-                                    size: 30.0,
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 3,
+                                  child: Container(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: TextFormField(
+                                      controller: _nameController,
+                                      validator: (value) => value.isEmpty
+                                          ? 'Name required'
+                                          : null,
+                                      decoration: profileTextInputDecoration
+                                          .copyWith(labelText: 'Name'),
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    getImage();
-                                  }),
+                                ),
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    child: TextFormField(
+                                      controller: _ageController,
+                                      keyboardType: TextInputType.number,
+                                      validator: (value) =>
+                                          value.isEmpty ? 'Age required' : null,
+                                      decoration: profileTextInputDecoration
+                                          .copyWith(labelText: 'Age'),
+                                      onChanged: (String age) {
+                                        age = _ageController.text;
+                                        _profile.uAge = age;
+                                      },
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
-                          ]),
-                      SizedBox(height: 10.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text(
-                            'Gender',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueAccent,
+                            SizedBox(height: 3.0),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      padding: EdgeInsets.only(right: 5.0),
+                                      child: TextFormField(
+                                        controller: _stateController,
+                                        keyboardType: TextInputType.text,
+                                        validator: (value) => value.isEmpty
+                                            ? 'State required'
+                                            : null,
+                                        decoration: profileTextInputDecoration
+                                            .copyWith(labelText: 'State'),
+                                        onChanged: (String state) {
+                                          state = _stateController.text;
+                                          _profile.uState = state;
+                                        },
+                                      ),
+                                    )),
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    child: TextFormField(
+                                      controller: _countryController,
+                                      keyboardType: TextInputType.text,
+                                      validator: (value) => value.isEmpty
+                                          ? 'Country required'
+                                          : null,
+                                      decoration: profileTextInputDecoration
+                                          .copyWith(labelText: 'Country'),
+                                      onChanged: (String country) {
+                                        country = _countryController.text;
+                                        _profile.uCountry = country;
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          Radio<String>(
-                            activeColor: Colors.blue,
-                            value: 'Male',
-                            groupValue: gender_option,
-                            onChanged: _handleGenderSelected,
-                          ),
-                          Text('Male'),
-                          Radio<String>(
-                            value: 'Female',
-                            groupValue: gender_option,
-                            activeColor: Colors.blue,
-                            onChanged: _handleGenderSelected,
-                          ),
-                          Text('Female'),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                            flex: 3,
-                            child: Container(
-                              padding: EdgeInsets.only(right: 5.0),
-                              child: TextFormField(
-                                controller: _nameController,
-                                validator: (value) =>
-                                    value.isEmpty ? 'Name required' : null,
-                                decoration: profileTextInputDecoration.copyWith(
-                                    labelText: 'Name'),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              child: TextFormField(
-                                controller: _ageController,
-                                keyboardType: TextInputType.number,
-                                validator: (value) =>
-                                    value.isEmpty ? 'Age required' : null,
-                                decoration: profileTextInputDecoration.copyWith(
-                                    labelText: 'Age'),
-                                onChanged: (String age) {
-                                  age = _ageController.text;
-                                  _profile.uAge = age;
-                                },
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 3.0),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                              flex: 3,
-                              child: Container(
-                                padding: EdgeInsets.only(right: 5.0),
-                                child: TextFormField(
-                                  controller: _stateController,
-                                  keyboardType: TextInputType.text,
+                            SizedBox(height: 5.0),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                    child: Container(
+                                        child: TextFormField(
+                                  controller: _phoneController,
+                                  keyboardType: TextInputType.phone,
                                   validator: (value) =>
-                                      value.isEmpty ? 'State required' : null,
+                                      value.isEmpty ? 'Phone required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'State'),
-                                  onChanged: (String state) {
-                                    state = _stateController.text;
-                                    _profile.uState = state;
+                                      .copyWith(labelText: 'Phone Number'),
+                                  onChanged: (String phone) {
+                                    phone = _phoneController.text;
+                                    _profile.phone = phone;
                                   },
-                                ),
-                              )),
-                          Expanded(
-                            flex: 2,
-                            child: Container(
-                              child: TextFormField(
-                                controller: _countryController,
-                                keyboardType: TextInputType.text,
-                                validator: (value) =>
-                                    value.isEmpty ? 'Country required' : null,
-                                decoration: profileTextInputDecoration.copyWith(
-                                    labelText: 'Country'),
-                                onChanged: (String country) {
-                                  country = _countryController.text;
-                                  _profile.uCountry = country;
-                                },
-                              ),
+                                )))
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 5.0),
-                      Row(
-                        children: <Widget>[
-                          Expanded(
-                              child: Container(
-                                  child: TextFormField(
-                            controller: _phoneController,
-                            keyboardType: TextInputType.phone,
-                            validator: (value) =>
-                                value.isEmpty ? 'Phone required' : null,
-                            decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Phone Number'),
-                            onChanged: (String phone) {
-                              phone = _phoneController.text;
-                              _profile.phone = phone;
-                            },
-                          )))
-                        ],
-                      ),
-                      SizedBox(height: 15.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Container(
-                            child: Material(
-                                color: Colors.grey[200],
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
+                            SizedBox(height: 15.0),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  child: Material(
+                                      color: Colors.grey[200],
+                                      shadowColor: Colors.lightGreen,
+                                      elevation: 7.0,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                      child: MaterialButton(
+                                        minWidth: 70,
+                                        height: 52,
+                                        child: Icon(
+                                          Icons.arrow_back_ios,
+                                          size: 29.0,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pushNamed(
+                                              context, '/userType');
+                                        },
+                                      )),
                                 ),
-                                child: MaterialButton(
-                                  minWidth: 70,
-                                  height: 52,
-                                  child: Icon(
-                                    Icons.arrow_back_ios,
-                                    size: 29.0,
+                                Container(
+                                    alignment: Alignment.center,
+                                    padding:
+                                        EdgeInsets.only(left: 5.0, right: 5.0),
+                                    width: 135.0,
+                                    child: Material(
+                                      color: Colors.green,
+                                      shadowColor: Colors.lightGreen,
+                                      elevation: 7.0,
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0),
+                                      ),
+                                      child: MaterialButton(
+                                        minWidth: 135,
+                                        height: 52,
+                                        child: Text(
+                                          'SAVE',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        onPressed: () async {
+                                          if (_formKey.currentState
+                                              .validate()) {
+                                            processForm(user.uid);
+                                            setState(() {
+                                              Scaffold.of(context)
+                                                  .showSnackBar(SnackBar(
+                                                content: Text(
+                                                    'Your Profile has been Updated.'),
+                                                duration: Duration(seconds: 3),
+                                              ));
+                                            });
+                                          }
+                                        },
+                                      ),
+                                    )),
+                                Container(
+                                  child: Material(
+                                    color: Colors.grey[200],
+                                    shadowColor: Colors.lightGreen,
+                                    elevation: 7.0,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                    child: MaterialButton(
+                                      minWidth: 70,
+                                      height: 52,
+                                      child: Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 29.0,
+                                      ),
+                                      onPressed: _btnForwardEnable
+                                          ? () => {
+                                                //handleForwardButton(context);
+                                                moveToAboutOrganisation(context)
+                                              }
+                                          : null,
+                                    ),
                                   ),
-                                  onPressed: () {
-                                    Navigator.pushNamed(context, '/userType');
-                                  },
-                                )),
-                          ),
-                          Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.only(left: 5.0, right: 5.0),
-                              width: 135.0,
-                              child: Material(
-                                color: Colors.green,
-                                shadowColor: Colors.lightGreen,
-                                elevation: 7.0,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(5.0),
                                 ),
-                                child: MaterialButton(
-                                  minWidth: 135,
-                                  height: 52,
-                                  child: Text(
-                                    'SAVE',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  onPressed: () async {
-                                    if (_formKey.currentState.validate()) {
-                                      processForm(user.uid);
-                                      setState(() {
-                                        Scaffold.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(
-                                              'Your Profile has been Updated.'),
-                                          duration: Duration(seconds: 3),
-                                        ));
-                                      });
-                                    }
-                                  },
-                                ),
-                              )),
-                          Container(
-                            child: Material(
-                              color: Colors.grey[200],
-                              shadowColor: Colors.lightGreen,
-                              elevation: 7.0,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(5.0),
-                              ),
-                              child: MaterialButton(
-                                minWidth: 70,
-                                height: 52,
-                                child: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 29.0,
-                                ),
-                                onPressed: _btnForwardEnable
-                                    ? () => {
-                                          //handleForwardButton(context);
-                                          moveToAboutOrganisation(context)
-                                        }
-                                    : null,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          );
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
         }),
       ),
     );

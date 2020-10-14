@@ -39,13 +39,92 @@ class _JobPostedItemState extends State<JobPostedItem> {
   JobPosted data;
   DateFormat _newformat;
   DateTime posted;
+  String applicationCount = '';
+//------------------------------------------------------------------------------
+  Future<void> _applicationCount(String jobId) async {
+    CollectionReference collRef =
+        Firestore.instance.collection("Job_Applications");
 
+    await collRef
+        .where("job_id", isEqualTo: jobId)
+        .orderBy('date_applied', descending: false)
+        .getDocuments()
+        .then((QuerySnapshot docs) {
+      if (docs.documents.isNotEmpty) {
+        applicationCount = docs.documents.length.toString();
+      }
+    });
+  }
+
+//------------------------------------------------------------------------------
+
+  Future _getApplicationCount() async {
+    return Firestore.instance
+        .collection("Job_Applications")
+        .where("job_id", isEqualTo: widget.docId)
+        .getDocuments();
+  }
+
+//------------------------------------------------------------------------------
+  Widget getApplicationCount() {
+    return Text(applicationCount);
+  }
+
+//------------------------------------------------------------------------------
+  @override
+  void initState() {
+    _applicationCount(widget.docId);
+    super.initState();
+  }
+
+//-----------------------------------------------------------------------------
   Future<void> deletePostItem(String docId) async {
     DocumentReference docReference =
         Firestore.instance.collection('Job_Postings').document(docId);
 
     await docReference.delete().then((value) => {});
   }
+
+  //----------------------------------------------------------------------------
+
+  void confirmDeletePostItem(BuildContext context, String docId) async {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Confirm Delete'),
+            content: Text(
+                'Do you wish to Delete the Job Post? This action is irreversible.'),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Cancel',
+                  style: Theme.of(context).textTheme.caption.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.blue,
+                      ),
+                ),
+              ),
+              FlatButton(
+                  onPressed: () {
+                    deletePostItem(docId);
+                  },
+                  child: Text(
+                    'Delete',
+                    style: Theme.of(context).textTheme.caption.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: Colors.blue,
+                        ),
+                  )),
+            ],
+          );
+        });
+  }
+
+  //----------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -62,63 +141,67 @@ class _JobPostedItemState extends State<JobPostedItem> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Expanded(
+                  Text(
+                    widget.position,
+                    style:
+                        TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5.0),
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.timer,
+                    size: 15.0,
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(right: 5.0, left: 5.0),
                     child: Text(
-                      widget.position,
-                      style: TextStyle(
-                          fontSize: 17.0, fontWeight: FontWeight.bold),
+                      '${widget.postedFmt}  -- ',
+                      style: TextStyle(fontSize: 12.0),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.centerRight,
-                      child: Text(widget.postedFmt,
-                          style: TextStyle(
-                            color: Colors.grey,
-                          )),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      widget.expiration,
+                      style: TextStyle(fontSize: 12.0),
                     ),
                   ),
                 ],
               ),
+              SizedBox(height: 5.0),
               Row(
                 children: <Widget>[
-                  Expanded(
-                    flex: 1,
-                    child: Icon(
-                      Icons.timer,
-                      size: 20.0,
+                  Icon(
+                    Icons.person,
+                    size: 15.0,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+                    child: Text(
+                      'No. of Applicants',
+                      style: TextStyle(fontSize: 12.0),
                     ),
                   ),
                   Expanded(
-                    flex: 2,
-                    child: Text('Closes By'),
-                  ),
-                  Expanded(
-                    flex: 4,
-                    child: Container(
-                        alignment: Alignment.centerRight,
-                        child: Text(widget.expiration)),
-                  )
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    flex: 1,
-                    child: Icon(
-                      Icons.person,
-                      size: 20.0,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Text('No. of Applicants'),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                        alignment: Alignment.centerRight, child: Text('0')),
-                  ),
+                      flex: 3,
+                      child: FutureBuilder(
+                        future: _getApplicationCount(),
+                        builder: (context, AsyncSnapshot snapshot) {
+                          if (snapshot.hasData) {
+                            return Container(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                  snapshot.data.documents.length.toString()),
+                            );
+                          } else {
+                            return Text('0');
+                          }
+                        },
+                      )),
                 ],
               ),
               SizedBox(height: 3.0),
@@ -135,7 +218,7 @@ class _JobPostedItemState extends State<JobPostedItem> {
                         flex: 2,
                         child: InkWell(
                           onTap: () async {
-                            deletePostItem(widget.docId);
+                            confirmDeletePostItem(context, widget.docId);
                           },
                           child: Row(
                             children: <Widget>[

@@ -114,7 +114,7 @@ class Profile {
       return await BioDataReference.document(uid)
           .setData(profile)
           .whenComplete(() {
-        return ('$name BioData has been Updated.');
+        return ('Bio-Data has been Updated.');
       });
 
       //   return await BioDataReference.document(uid).setData({

@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/recruiter/jobs/job_posted_item.dart';
 import 'package:job_app/screens/recruiter/jobs/post_job.dart';
+import 'package:provider/provider.dart';
 
 class JobTracker extends StatefulWidget {
   @override
@@ -11,6 +13,9 @@ class JobTracker extends StatefulWidget {
 class _JobTrackerState extends State<JobTracker> {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+    String user_uid = (user.uid.toString());
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -32,7 +37,10 @@ class _JobTrackerState extends State<JobTracker> {
           ],
         ),
         body: StreamBuilder(
-            stream: Firestore.instance.collection("Job_Postings").snapshots(),
+            stream: Firestore.instance
+                .collection("Job_Postings")
+                .where("owner", isEqualTo: user_uid)
+                .snapshots(),
             builder: (context, snapshot) {
               return !snapshot.hasData
                   ? Center(
