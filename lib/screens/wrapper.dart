@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/verifier.dart';
 import 'package:job_app/screens/authenticate/authenticate.dart';
 import 'package:job_app/screens/home/home.dart';
+import 'package:job_app/screens/splash.dart';
 import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/screens/user_profile/select_user_type.dart';
@@ -110,7 +111,8 @@ class _WrapperState extends State<Wrapper> {
     //print(user.uid);
 
     if (user == null) {
-      return Authenticate();
+      //return Authenticate();
+      return Splash();
     } else {
       // check if user type has been selected
       //return SelectUserType();

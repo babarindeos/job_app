@@ -57,6 +57,7 @@ dependencies:
   chewie: 
   custom_navigator: ^0.3.0
   intl: ^0.16.1
+  tabbar: 0.1.1
 
 
 

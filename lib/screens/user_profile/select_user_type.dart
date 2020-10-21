@@ -62,6 +62,10 @@ class _SelectUserTypeState extends State<SelectUserType> {
       });
     } catch (e) {
       user_type = null;
+    } finally {
+      setState(() {
+        isloading = false;
+      });
     }
   }
 
@@ -190,7 +194,7 @@ class _SelectUserTypeState extends State<SelectUserType> {
                       ),
                     ),
                     onPressed: () async {
-                      if (user_type == '') {
+                      if (user_type == '' || user_type == null) {
                         setState(() {
                           error = "Select a User Type";
                         });

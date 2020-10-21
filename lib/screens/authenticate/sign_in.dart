@@ -91,7 +91,7 @@ class _SignInState extends State<SignIn> {
                             child: Text(
                               error,
                               style: TextStyle(
-                                color: Colors.red[200],
+                                color: Colors.red[100],
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -185,7 +185,11 @@ class _SignInState extends State<SignIn> {
                                 ),
                               ),
                               FlatButton(
-                                onPressed: () => {widget.toggleView()},
+                                onPressed: () {
+                                  //widget.toggleView();
+                                  Navigator.popAndPushNamed(
+                                      context, '/register');
+                                },
                                 child: Text(
                                   "Register",
                                   style: TextStyle(color: Colors.white),

@@ -2,6 +2,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user.dart';
 
 class AuthService {
+  String errmsg;
+
+  AuthService({this.errmsg});
+
+  set aErrMsg(String errMsg) {
+    this.errmsg = errMsg;
+  }
+
+  String get aErrMsg {
+    return this.errmsg;
+  }
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user obj based on FirebaseUser
@@ -54,10 +66,10 @@ class AuthService {
       FirebaseUser user = result.user;
       return _userFromFireBaseUser(user);
     } catch (e) {
-      print(e.toString());
-      print(e.toString());
-      var resultOutCome = ['failed', e.toString()];
-      print(resultOutCome[1]);
+      print("*******************" + e.message.toString());
+      //var resultOutCome = ['failed', e.toString()];
+      //print(resultOutCome[1]);
+      this.aErrMsg = e.message.toString();
       return null;
     }
   }
