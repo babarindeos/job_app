@@ -152,6 +152,25 @@ class _JobEditState extends State<JobEdit> {
         appBar: AppBar(
           centerTitle: true,
           title: Text('Edit Job Post'),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: InkWell(
+                onTap: () {
+                  if (_formKey.currentState.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    _updateJob(companyId.uid, context);
+                  }
+                },
+                child: Icon(
+                  Icons.save,
+                  size: 40.0,
+                ),
+              ),
+            ),
+          ],
         ),
         body: Builder(
           builder: (BuildContext context) {
@@ -243,32 +262,6 @@ class _JobEditState extends State<JobEdit> {
                                 ],
                               ),
                               SizedBox(height: 5.0),
-                              Container(
-                                child: Material(
-                                  color: Colors.green,
-                                  shadowColor: Colors.lightGreen,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  child: MaterialButton(
-                                    onPressed: () async {
-                                      if (_formKey.currentState.validate()) {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        _updateJob(companyId.uid, context);
-                                      }
-                                    },
-                                    minWidth: 100,
-                                    height: 30.0,
-                                    child: Text(
-                                      'Update Job',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ),

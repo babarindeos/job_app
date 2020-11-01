@@ -50,7 +50,15 @@ class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
   Widget build(BuildContext context) {
     //print(widget.userId);
     return Container(
-        padding: const EdgeInsets.fromLTRB(8.0, 3.0, 5.0, 4.0),
+        padding: const EdgeInsets.fromLTRB(8.0, 5.0, 5.0, 9.0),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 1.0,
+              color: Colors.grey[300],
+            ),
+          ),
+        ),
         child: Row(
           children: <Widget>[
             CircleAvatar(
@@ -87,7 +95,10 @@ class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
                       future: _getBioData(widget.userId),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.hasData) {
-                          return Text(snapshot.data.toString());
+                          return Text(
+                            snapshot.data.toString(),
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          );
                         } else {
                           return Center(
                             child: CircularProgressIndicator(),

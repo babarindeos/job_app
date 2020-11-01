@@ -47,7 +47,10 @@ class _JobViewState extends State<JobView> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
-                              child: Text(widget.data.location),
+                              child: Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.35,
+                                  child: Text(widget.data.location)),
                             ),
                           ],
                         ),
@@ -60,7 +63,10 @@ class _JobViewState extends State<JobView> {
                               size: 21.0,
                               color: Colors.blue,
                             ),
-                            Text(widget.data.payment),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              child: Text(widget.data.payment),
+                            ),
                           ],
                         ),
                       )
@@ -78,7 +84,9 @@ class _JobViewState extends State<JobView> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(left: 5.0),
-                        child: Text(widget.data.area),
+                        child: Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Text(widget.data.area)),
                       ),
                     ],
                   ),

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -79,7 +81,49 @@ class _ApplicantEducationItemState extends State<ApplicantEducationItem> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(8.0),
-      child: Text(widget.classOfDegree),
+      child: Column(
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 5.0),
+                child: Icon(
+                  Icons.radio_button_checked,
+                  color: Colors.blue,
+                ),
+              ),
+              Expanded(
+                flex: 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      widget.institution,
+                      style: TextStyle(
+                        fontFamily: 'SourceSansPro',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16.0,
+                      ),
+                    ),
+                    Text(
+                      widget.courseOfStudy +
+                          " (" +
+                          widget.level +
+                          "),  " +
+                          widget.classOfDegree,
+                      style: TextStyle(fontSize: 13.0),
+                    ),
+                    Text(
+                      widget.dateStarted + " -  " + widget.dateEnded,
+                      style: TextStyle(fontSize: 12.0),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

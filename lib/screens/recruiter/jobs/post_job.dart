@@ -145,6 +145,22 @@ class _JobPostState extends State<JobPost> {
         appBar: AppBar(
           centerTitle: true,
           title: Text('Job Posting'),
+          actions: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 17.0),
+              child: InkWell(
+                onTap: () {
+                  if (_formKey.currentState.validate()) {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    _postJob(companyId.uid, context);
+                  }
+                },
+                child: Icon(Icons.send, size: 35.0),
+              ),
+            ),
+          ],
         ),
         body: Builder(
           builder: (BuildContext context) {
@@ -234,33 +250,6 @@ class _JobPostState extends State<JobPost> {
                                     ),
                                   )
                                 ],
-                              ),
-                              SizedBox(height: 5.0),
-                              Container(
-                                child: Material(
-                                  color: Colors.green,
-                                  shadowColor: Colors.lightGreen,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  child: MaterialButton(
-                                    onPressed: () async {
-                                      if (_formKey.currentState.validate()) {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        _postJob(companyId.uid, context);
-                                      }
-                                    },
-                                    minWidth: 100,
-                                    height: 30.0,
-                                    child: Text(
-                                      'Post Job',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
