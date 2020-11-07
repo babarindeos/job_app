@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:chewie/chewie.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
@@ -14,6 +17,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:tabbar/tabbar.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 class ApplicantsInformation extends StatefulWidget {
   String userId, jobId, docId, dateApplied;
@@ -35,9 +39,12 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
   String videoURL;
   bool isLoading;
   String userAvatar;
+  String recruiterAvatar;
+  String recruiterName;
   String userName;
   String companyId;
   String candidateId;
+  String recruiterId;
   String applicationId;
   String jobId;
   dynamic videoPlayerController;
@@ -64,7 +71,26 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
     }
   }
 
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// retrieveRecruiterAvatar
+  Future<void> retrieveRecruiterAvatar() async {
+    final FirebaseUser _recruiter = await FirebaseAuth.instance.currentUser();
+    recruiterId = _recruiter.uid.toString();
+    try {
+      DocumentReference docReference =
+          Firestore.instance.collection("BioData").document(recruiterId);
+      await docReference.get().then((dataSnapshot) {
+        if (dataSnapshot.exists) {
+          setState(() {
+            recruiterAvatar = dataSnapshot['avatar'];
+            recruiterName = dataSnapshot['name'];
+          });
+        }
+      });
+    } catch (e) {}
+  }
+
+//------------------------------------------------------------------------------
 
   Future<void> retrieveVideoCV() async {
     try {
@@ -147,6 +173,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
     retrieveAvatar();
     retrieveVideoCV();
     retrievePDFCV();
+    retrieveRecruiterAvatar();
   }
 
 //------------------------------------------------------------------------------
@@ -185,15 +212,18 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
     // -------------- Not Shortlisted ------------------------------
     if (shortlisted == false) {
       try {
+        var uuid = Uuid();
+        var uid = uuid.v4();
         DocumentReference docRef =
             Firestore.instance.collection("Shortlist").document();
         DateTime now = DateTime.now();
         Map<String, dynamic> data = {
+          "uid": uid,
           "job_id": jobId,
           "application_id": appId,
           "candidate_id": candidateId,
           "company_id": companyId,
-          "date": now.toString()
+          "date": now
         };
 
         await docRef.setData(data).whenComplete(() {
@@ -330,7 +360,6 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
   @override
   Widget build(BuildContext context) {
     final myCompanyId = Provider.of<User>(context).uid;
-    ;
 
     return isLoading
         ? Center(child: CircularProgressIndicator())
@@ -344,8 +373,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                         children: <Widget>[
                           Container(
                             color: Colors.blue,
-                            height:
-                                MediaQuery.of(context).size.height * (35 / 100),
+                            height: MediaQuery.of(context).size.height * 0.45,
                             width:
                                 MediaQuery.of(context).size.width * (100 / 100),
                             child: videoSource == null
@@ -360,7 +388,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                                             controller: ChewieController(
                                               videoPlayerController:
                                                   videoPlayerController,
-                                              aspectRatio: 8 / 5,
+                                              aspectRatio: 7.4 / 5.9,
                                               autoPlay: true,
                                               looping: false,
                                             ),
@@ -375,13 +403,13 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                             height: 280,
                           ),
                           Positioned(
-                            top: 180.0,
+                            top: 195.0,
                             right: 7.0,
                             left: 11.0,
                             child: Container(
                               alignment: Alignment.centerLeft,
                               child: CircleAvatar(
-                                radius: 45.0,
+                                radius: 35.0,
                                 backgroundColor: Colors.blue,
                                 child: ClipOval(
                                   child: SizedBox(
@@ -402,100 +430,91 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                               ),
                             ),
                           ),
-                          Positioned(
-                            top: 205.0,
-                            left: 105.0,
-                            right: 2.0,
+                        ],
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Container(
                             child: FutureBuilder(
                                 future: _getUserBioData(widget.userId),
                                 builder: (BuildContext context,
                                     AsyncSnapshot snapshot) {
                                   if (snapshot.hasData) {
-                                    return Row(children: <Widget>[
-                                      Icon(
-                                        Icons.person,
-                                        color: Colors.blue,
-                                      ),
-                                      SizedBox(
-                                        width: 3.0,
-                                      ),
-                                      snapshot.data.toString().length > 18
-                                          ? Text(
-                                              snapshot.data['name']
-                                                  .toString()
-                                                  .substring(0, 18),
-                                              style: TextStyle(
-                                                  fontFamily: 'SourceSansPro',
-                                                  fontSize: 17.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.blue[700]),
-                                            )
-                                          : Text(
-                                              snapshot.data['name'],
-                                              style: TextStyle(
+                                    return Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: 5.0,
+                                        ),
+                                        Icon(
+                                          Icons.person,
+                                          color: Colors.blue,
+                                        ),
+                                        SizedBox(
+                                          width: 3.0,
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.9,
+                                          padding:
+                                              const EdgeInsets.only(left: 3.0),
+                                          child: Text(
+                                            snapshot.data['name'].toString(),
+                                            style: TextStyle(
                                                 fontFamily: 'SourceSansPro',
                                                 fontSize: 17.0,
                                                 fontWeight: FontWeight.w600,
-                                                color: Colors.blue[700],
-                                              ),
-                                            ),
-                                    ]);
+                                                color: Colors.blue[700]),
+                                          ),
+                                        ),
+                                      ],
+                                    );
                                   } else {
                                     return Text('');
                                   }
                                 }),
                           ),
-                          Positioned(
-                            top: 226.0,
-                            left: 105.0,
-                            right: 2.0,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              child: FutureBuilder(
-                                  future: _getCareerDetails(widget.userId),
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Row(
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.business_center,
-                                            color: Colors.blue,
+                          // Profession
+                          Container(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: FutureBuilder(
+                                future: _getCareerDetails(widget.userId),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot snapshot) {
+                                  if (snapshot.hasData) {
+                                    return Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.business_center,
+                                          color: Colors.blue,
+                                        ),
+                                        SizedBox(width: 3.0),
+                                        Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 3.0),
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.9,
+                                          child: Text(
+                                            snapshot.data['field'].toString(),
+                                            style: TextStyle(
+                                              color: Colors.blue[700],
+                                            ),
                                           ),
-                                          SizedBox(width: 3.0),
-                                          snapshot.data['field']
-                                                      .toString()
-                                                      .length >
-                                                  18
-                                              ? Text(
-                                                  snapshot.data['field']
-                                                          .toString()
-                                                          .substring(0, 16) +
-                                                      '...',
-                                                  style: TextStyle(
-                                                    color: Colors.blue[700],
-                                                  ))
-                                              : Text(
-                                                  snapshot.data['field']
-                                                      .toString(),
-                                                  style: TextStyle(
-                                                      color: Colors.blue[700]),
-                                                ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Text('');
-                                    }
-                                  }),
-                            ),
+                                        )
+                                      ],
+                                    );
+                                  } else {
+                                    return Text('');
+                                  }
+                                }),
                           ),
-                          SizedBox(
-                            height: 20.0,
-                          ),
-                          Positioned(
-                            top: 249.0,
-                            left: 107.0,
-                            right: 2.0,
+
+                          // Location
+                          Container(
+                            padding: const EdgeInsets.only(left: 6.0),
                             child: FutureBuilder(
                                 future: _getUserBioData(widget.userId),
                                 builder: (BuildContext context,
@@ -508,7 +527,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                                           size: 20.0,
                                           color: Colors.blue,
                                         ),
-                                        SizedBox(width: 5.0),
+                                        SizedBox(width: 9.0),
                                         Text(
                                           snapShot.data['state'] +
                                               ', ' +
@@ -523,13 +542,13 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                                     return Text('');
                                   }
                                 }),
-                          )
+                          ),
                         ],
                       ),
                       Container(
                         alignment: Alignment.topCenter,
                         padding:
-                            const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 20.0),
+                            const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 20.0),
                         child: FutureBuilder(
                             future: _getCareerDetails(widget.userId),
                             builder:
@@ -584,8 +603,12 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => Messages(
-                                      companyId: companyId,
-                                      candidateId: candidateId),
+                                      senderId: myCompanyId.toString(),
+                                      candidateId: candidateId,
+                                      candidateName: userName,
+                                      candidateAvatar: userAvatar,
+                                      senderName: recruiterName,
+                                      senderAvatar: recruiterAvatar),
                                 ),
                               );
                             },

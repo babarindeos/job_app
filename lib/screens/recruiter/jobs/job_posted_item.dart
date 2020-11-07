@@ -187,21 +187,22 @@ class _JobPostedItemState extends State<JobPostedItem> {
                     ),
                   ),
                   Expanded(
-                      flex: 3,
-                      child: FutureBuilder(
-                        future: _getApplicationCount(),
-                        builder: (context, AsyncSnapshot snapshot) {
-                          if (snapshot.hasData) {
-                            return Container(
-                              alignment: Alignment.centerRight,
-                              child: Text(
-                                  snapshot.data.documents.length.toString()),
-                            );
-                          } else {
-                            return Text('0');
-                          }
-                        },
-                      )),
+                    flex: 3,
+                    child: FutureBuilder(
+                      future: _getApplicationCount(),
+                      builder: (context, AsyncSnapshot snapshot) {
+                        if (snapshot.hasData) {
+                          return Container(
+                            alignment: Alignment.centerRight,
+                            child:
+                                Text(snapshot.data.documents.length.toString()),
+                          );
+                        } else {
+                          return Text('0');
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 3.0),

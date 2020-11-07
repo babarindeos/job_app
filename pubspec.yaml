@@ -59,6 +59,7 @@ dependencies:
   intl: ^0.16.1
   tabbar: 0.1.1
   url_launcher: ^5.4.11
+  date_format: ^1.0.9
 
 
 

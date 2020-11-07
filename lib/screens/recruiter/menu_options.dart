@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:job_app/screens/interview/candidate_list.dart';
 import 'package:job_app/screens/recruiter/jobs/jobs_tracker.dart';
 
 class MenuOptions extends StatefulWidget {
@@ -119,28 +120,39 @@ class _MenuOptionsState extends State<MenuOptions> {
                                 ),
                               ),
                               SizedBox(width: 10.0),
-                              Container(
-                                alignment: Alignment.center,
-                                width: 130.0,
-                                height: 120.0,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage('images/interviews.jpg'),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CandidateList(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  width: 130.0,
+                                  height: 120.0,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image:
+                                          AssetImage('images/interviews.jpg'),
+                                    ),
+                                    border: Border.all(color: Colors.blue),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 5,
+                                        offset: Offset(
+                                            0, 3), // changes position of shadow
+                                      )
+                                    ],
                                   ),
-                                  border: Border.all(color: Colors.blue),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 5,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    )
-                                  ],
+                                  //child: Text('Manage Interviews'),
                                 ),
-                                //child: Text('Manage Interviews'),
                               ),
                             ],
                           ),
