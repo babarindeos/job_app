@@ -41,6 +41,7 @@ class _ScheduleInterviewState extends State<ScheduleInterview> {
   String strToday;
   String strToday_fmt;
   bool isLoading = false;
+  DateTime _dtDbDate;
 
   String _hour, _minute, _time;
 
@@ -85,6 +86,7 @@ class _ScheduleInterviewState extends State<ScheduleInterview> {
         _strFormattedDate = _newFormat.format(_selectedDate);
         _newFormat = DateFormat("yyyy-MM-dd");
         _strDbDate = _newFormat.format(_selectedDate);
+        _dtDbDate = _selectedDate.toUtc();
       });
       print(_strFormattedDate);
       _scheduleDateController.text = _strFormattedDate;
@@ -109,6 +111,7 @@ class _ScheduleInterviewState extends State<ScheduleInterview> {
         "shortlisted_docid": widget.shortlistedDocId,
         "schedule_date": _scheduleDateController.text,
         "schedule_date_unfmt": _strDbDate,
+        "schedule_date_dtfmt": _dtDbDate,
         "schedule_time": _scheduleTimeController.text,
         "comment": _commentController.text,
         "date_created": DateTime.now()
@@ -227,9 +230,9 @@ class _ScheduleInterviewState extends State<ScheduleInterview> {
                             Container(
                               padding:
                                   const EdgeInsets.only(left: 8.0, top: 6.0),
-                              child: Container(
-                                child:
-                                    Text('Applied Job - ' + widget.jobPosition),
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              child: Text(
+                                'Applied Job - ' + widget.jobPosition,
                               ),
                             )
                           ],

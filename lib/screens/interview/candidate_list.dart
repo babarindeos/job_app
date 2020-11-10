@@ -50,6 +50,7 @@ class _CandidateListState extends State<CandidateList>
       body: TabBarView(
         controller: _tabController,
         children: <Widget>[
+          // Shortlisted Item
           Container(
             child: ListView(
               children: <Widget>[
@@ -97,13 +98,65 @@ class _CandidateListState extends State<CandidateList>
               ],
             ),
           ),
-          Text('Interviews'),
+          // Interview Tab
+          Container(
+            child: ListView(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.only(
+                      top: 8, left: 5.0, right: 5.0, bottom: 10.0),
+                  alignment: Alignment.center,
+                  child: TextFormField(
+                    decoration: searchTextInputDecoration.copyWith(
+                        labelText: 'Search Interview',
+                        prefixIcon: Icon(Icons.search)),
+                  ),
+                ),
+                StreamBuilder(
+                    stream: Firestore.instance
+                        .collection("Interview_Schedule")
+                        .orderBy("schedule_date_dtfmt", descending: true)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return !snapshot.hasData
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : ListView.builder(
+                              reverse: false,
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: snapshot.data.documents.length,
+                              itemBuilder: (context, index) {
+                                DocumentSnapshot data =
+                                    snapshot.data.documents[index];
+                                return ScheduledInterviewItem(
+                                  documentSnapshot: data,
+                                  scheduledInterviewDocId: data.documentID,
+                                  uid: data['uid'],
+                                  applicationDocId: data['application_docid'],
+                                  candidateDocId: data['candidate_docid'],
+                                  companyDocId: data['company_docid'],
+                                  jobDocId: data['job_docid'],
+                                  comment: data['comment'],
+                                  scheduledDate: data['schedule_date'],
+                                  scheduleTime: data['schedule_time'],
+                                  dateCreated: data['date_created'],
+                                );
+                              });
+                    }),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+//-------------------------- ShortlistedItem ------------------------------------
+//------
 class ShortlistedItem extends StatefulWidget {
   String uid, shortlistedDocId, applicationId, candidateId, companyId, jobId;
   Timestamp dateApplied;
@@ -205,13 +258,15 @@ class _ShortlistedItemState extends State<ShortlistedItem> {
               ),
             );
           },
-          child: Text(
-            candidateName,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.blue,
-            ),
-          ),
+          child: candidateName.isEmpty
+              ? LinearProgressIndicator()
+              : Text(
+                  candidateName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue,
+                  ),
+                ),
         ),
         subtitle: Text(jobPositionCaption),
         trailing: GestureDetector(
@@ -232,6 +287,194 @@ class _ShortlistedItemState extends State<ShortlistedItem> {
               );
             },
             child: Icon(Icons.chevron_right)),
+      ),
+    );
+  }
+}
+//---------------------------- End of ShortlistedItem ---------------------------------------
+//-------------------------------------------------------------------------------------------
+
+//---------------------------- ScheduledInterviewItem ---------------------------------------
+// ScheduledInterviewItem -------------------------------------------------------------------
+
+class ScheduledInterviewItem extends StatefulWidget {
+  DocumentSnapshot documentSnapshot;
+  String scheduledInterviewDocId,
+      uid,
+      applicationDocId,
+      candidateDocId,
+      companyDocId,
+      jobDocId,
+      comment,
+      scheduledDate,
+      scheduleTime;
+  Timestamp dateCreated;
+  ScheduledInterviewItem(
+      {this.documentSnapshot,
+      this.scheduledInterviewDocId,
+      this.uid,
+      this.applicationDocId,
+      this.candidateDocId,
+      this.companyDocId,
+      this.jobDocId,
+      this.comment,
+      this.scheduledDate,
+      this.scheduleTime,
+      this.dateCreated});
+  @override
+  _ScheduledInterviewItemState createState() => _ScheduledInterviewItemState();
+}
+
+class _ScheduledInterviewItemState extends State<ScheduledInterviewItem> {
+  String jobTitle = '';
+//--------------- --------------------------------------------------------------
+// _getBioData
+  Future _getBioData(String candidateId) async {
+    return Firestore.instance
+        .collection("BioData")
+        .document(candidateId)
+        .get()
+        .then((value) => value);
+  }
+
+//------------------------------------------------------------------------------
+// _getJob
+  Future<void> _getJobDetails(String jobDocId) async {
+    DocumentReference docReference =
+        Firestore.instance.collection("Job_Postings").document(jobDocId);
+    await docReference.get().then((dataSnapshot) {
+      setState(() {
+        jobTitle = dataSnapshot['position'];
+      });
+    });
+  }
+
+//------------------------------------------------------------------------------
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(2.0, 3.0, 2.0, 3.0),
+      child: Card(
+        elevation: 7.0,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(5.0, 5.0, 5.0, 5.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                widget.scheduledDate + '  -  ' + widget.scheduleTime,
+                style: TextStyle(
+                  fontFamily: 'SourceSansPro',
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                  fontSize: 15.0,
+                ),
+              ),
+              SizedBox(
+                height: 5.0,
+              ),
+              Row(
+                children: <Widget>[
+                  FutureBuilder(
+                    future: _getBioData(widget.candidateDocId),
+                    builder: (context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        return Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    child: CircleAvatar(
+                                      backgroundColor: Colors.blue,
+                                      child: ClipOval(
+                                        child: SizedBox(
+                                          width: 100,
+                                          height: 180,
+                                          child: snapshot.data['avatar'] == null
+                                              ? Image(
+                                                  fit: BoxFit.cover,
+                                                  image: AssetImage(
+                                                      'images/profile_avatar.jpg'),
+                                                )
+                                              : Image.network(
+                                                  snapshot.data['avatar'],
+                                                  fit: BoxFit.cover,
+                                                ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.7,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            10.0, 3.0, 3.0, 1.0),
+                                        child: Text(
+                                          snapshot.data['name'].toString(),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      FutureBuilder(
+                                          future:
+                                              _getJobDetails(widget.jobDocId),
+                                          builder: (context,
+                                              AsyncSnapshot snapshot) {
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                10.0,
+                                                3.0,
+                                                3.0,
+                                                5.0,
+                                              ),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7,
+                                              child: Text(
+                                                'Job - ' + jobTitle.toString(),
+                                              ),
+                                            );
+                                          }),
+                                    ],
+                                  ),
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    child: IconButton(
+                                        icon: Icon(Icons.chevron_right),
+                                        onPressed: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>),),
+                                        }),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

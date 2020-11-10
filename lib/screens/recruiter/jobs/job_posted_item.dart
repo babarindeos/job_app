@@ -198,7 +198,7 @@ class _JobPostedItemState extends State<JobPostedItem> {
                                 Text(snapshot.data.documents.length.toString()),
                           );
                         } else {
-                          return Text('0');
+                          return Text('');
                         }
                       },
                     ),

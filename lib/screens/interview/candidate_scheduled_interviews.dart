@@ -85,6 +85,7 @@ class _CandidateSheduledInterviewsState
                       Container(
                         padding: const EdgeInsets.only(left: 8.0, top: 6.0),
                         child: Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
                           child: Text('Applied Job - ' + widget.jobPosition),
                         ),
                       )
@@ -210,9 +211,10 @@ class _CandidateScheduledInterviewsItemState
                         Icon(
                           Icons.calendar_today,
                         ),
-                        SizedBox(width: 3.0),
+                        SizedBox(width: 5.0),
                         Text(
                           widget.scheduleDate,
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -227,6 +229,9 @@ class _CandidateScheduledInterviewsItemState
                         ),
                         Text(
                           widget.scheduleTime,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -242,7 +247,7 @@ class _CandidateScheduledInterviewsItemState
                           height: 0.0,
                         ),
                   SizedBox(
-                    width: 3.0,
+                    width: 5.0,
                   ),
                   widget.comment.isNotEmpty
                       ? Expanded(
