@@ -57,119 +57,47 @@ class _MenuOptionsState extends State<MenuOptions> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        print("am here");
-      },
-      child: SafeArea(
-        child: Scaffold(
-          body: isfetching
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Container(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
-                  alignment: Alignment.center,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Welcome ${displayUsername}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18.0),
-                      ),
-                      Text(displayCompanyName),
-                      SizedBox(height: 55.0),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => JobTracker()),
-                                  );
-                                },
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 130.0,
-                                  height: 120.0,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: AssetImage(
-                                          'images/jobs_tracker1.jpg'),
-                                    ),
-                                    border: Border.all(color: Colors.blue),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 5,
-                                        blurRadius: 5,
-                                        offset: Offset(
-                                            0, 3), // changes position of shadow
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 10.0),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => CandidateList(),
-                                    ),
-                                  );
-                                },
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  width: 130.0,
-                                  height: 120.0,
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image:
-                                          AssetImage('images/interviews.jpg'),
-                                    ),
-                                    border: Border.all(color: Colors.blue),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        spreadRadius: 5,
-                                        blurRadius: 5,
-                                        offset: Offset(
-                                            0, 3), // changes position of shadow
-                                      )
-                                    ],
-                                  ),
-                                  //child: Text('Manage Interviews'),
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
+    return SafeArea(
+      child: Scaffold(
+        body: isfetching
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Container(
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
+                alignment: Alignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Welcome ${displayUsername}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18.0),
+                    ),
+                    Text(displayCompanyName),
+                    SizedBox(height: 55.0),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => JobTracker()),
+                                );
+                              },
+                              child: Container(
                                 alignment: Alignment.center,
                                 width: 130.0,
                                 height: 120.0,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                    image: AssetImage('images/manage_cvs.jpg'),
-                                    fit: BoxFit.cover,
+                                    image:
+                                        AssetImage('images/jobs_tracker1.jpg'),
                                   ),
                                   border: Border.all(color: Colors.blue),
                                   borderRadius:
@@ -184,17 +112,26 @@ class _MenuOptionsState extends State<MenuOptions> {
                                     )
                                   ],
                                 ),
-                                //child: Text('Manage CVs'),
                               ),
-                              SizedBox(width: 10.0),
-                              Container(
+                            ),
+                            SizedBox(width: 10.0),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CandidateList(),
+                                  ),
+                                );
+                              },
+                              child: Container(
                                 alignment: Alignment.center,
                                 width: 130.0,
                                 height: 120.0,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
-                                      image: AssetImage('images/search.jpg'),
-                                      fit: BoxFit.cover),
+                                    image: AssetImage('images/interviews.jpg'),
+                                  ),
                                   border: Border.all(color: Colors.blue),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20.0)),
@@ -210,14 +147,70 @@ class _MenuOptionsState extends State<MenuOptions> {
                                 ),
                                 //child: Text('Manage Interviews'),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              alignment: Alignment.center,
+                              width: 130.0,
+                              height: 120.0,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage('images/manage_cvs.jpg'),
+                                  fit: BoxFit.cover,
+                                ),
+                                border: Border.all(color: Colors.blue),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 5,
+                                    offset: Offset(
+                                        0, 3), // changes position of shadow
+                                  )
+                                ],
+                              ),
+                              //child: Text('Manage CVs'),
+                            ),
+                            SizedBox(width: 10.0),
+                            Container(
+                              alignment: Alignment.center,
+                              width: 130.0,
+                              height: 120.0,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage('images/search.jpg'),
+                                    fit: BoxFit.cover),
+                                border: Border.all(color: Colors.blue),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 5,
+                                    offset: Offset(
+                                        0, 3), // changes position of shadow
+                                  )
+                                ],
+                              ),
+                              //child: Text('Manage Interviews'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-        ),
+              ),
       ),
     );
   }

@@ -454,7 +454,7 @@ class _ScheduledInterviewItemState extends State<ScheduledInterviewItem> {
                                     child: IconButton(
                                         icon: Icon(Icons.chevron_right),
                                         onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>),),
+                                          //Navigator.push(context, MaterialPageRoute(builder: (context)=>),),
                                         }),
                                   ),
                                 ],

@@ -141,10 +141,13 @@ class _JobPostedItemState extends State<JobPostedItem> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Text(
-                    widget.position,
-                    style:
-                        TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: Text(
+                      widget.position,
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),

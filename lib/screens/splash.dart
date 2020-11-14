@@ -12,13 +12,14 @@ class _SplashState extends State<Splash> {
         body: Container(
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-            Theme.of(context).accentColor.withOpacity(0.9),
-            Theme.of(context).primaryColor,
-          ])),
+        gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Theme.of(context).accentColor.withOpacity(0.9),
+              Theme.of(context).primaryColor,
+            ]),
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

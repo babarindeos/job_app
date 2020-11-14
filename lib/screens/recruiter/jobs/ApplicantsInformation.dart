@@ -120,7 +120,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
   }
 
 //------------------------------------------------------------------------------
-// retrivee shortlist Status
+// retrive shortlist Status
   Future<void> retrieveShortlistStatus(
       String jobId, String applicationId, String candidateId) async {
     print("*************************************************** " + candidateId);
