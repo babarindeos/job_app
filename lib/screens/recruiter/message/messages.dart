@@ -140,6 +140,7 @@ class _MessagesState extends State<Messages> {
                                       message: data['message'],
                                       myId: widget.senderId,
                                       myAvatar: widget.senderAvatar,
+                                      recipientAvatar: widget.candidateAvatar,
                                       date: data['date']);
                                 });
                       })
@@ -186,7 +187,7 @@ class _MessagesState extends State<Messages> {
 
 //------------------------------------------------------------------------------
 class MessagesItem extends StatefulWidget {
-  String docId, sender, recipient, message;
+  String docId, sender, recipient, recipientAvatar, message;
   String myId, myAvatar;
   Timestamp date;
   DocumentSnapshot documentSnapshot;
@@ -194,6 +195,7 @@ class MessagesItem extends StatefulWidget {
       {this.docId,
       this.sender,
       this.recipient,
+      this.recipientAvatar,
       this.message,
       this.date,
       this.documentSnapshot,
@@ -206,14 +208,22 @@ class MessagesItem extends StatefulWidget {
 
 class _MessagesItemState extends State<MessagesItem> {
   bool isMe = false;
+  String selectedSenderAvatar = '';
   @override
   Widget build(BuildContext context) {
     if (widget.sender == widget.myId) {
       isMe = true;
+      selectedSenderAvatar = widget.myAvatar;
       print(isMe);
     } else {
       isMe = false;
+      selectedSenderAvatar = widget.recipientAvatar;
     }
+
+    print("************** Selected Avatar : " +
+        widget.sender +
+        " -  " +
+        selectedSenderAvatar);
 
     DateTime msgDateTime = widget.date.toDate();
 
@@ -251,7 +261,8 @@ class _MessagesItemState extends State<MessagesItem> {
                                   ? Image(
                                       fit: BoxFit.cover,
                                       image: AssetImage(
-                                          'images/profile_avatar.jpg'))
+                                          'images/profile_avatar.jpg'),
+                                    )
                                   : Image.network(
                                       widget.myAvatar,
                                       fit: BoxFit.cover,
@@ -309,14 +320,14 @@ class _MessagesItemState extends State<MessagesItem> {
                             child: SizedBox(
                               width: 50,
                               height: 50,
-                              child: (widget.myAvatar == '' ||
-                                      widget.myAvatar == null)
+                              child: (widget.recipientAvatar == '' ||
+                                      widget.recipientAvatar == null)
                                   ? Image(
                                       fit: BoxFit.cover,
                                       image: AssetImage(
                                           'images/profile_avatar.jpg'))
                                   : Image.network(
-                                      widget.myAvatar,
+                                      widget.recipientAvatar,
                                       fit: BoxFit.cover,
                                     ),
                             ),

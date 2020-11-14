@@ -147,7 +147,7 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                               child: Column(
                                 children: <Widget>[
                                   Container(
-                                    height: 85.0,
+                                    height: 95.0,
                                     padding: EdgeInsets.all(7.0),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,

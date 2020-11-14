@@ -59,7 +59,7 @@ class _SearchJobItemState extends State<SearchJobItem> {
                     ),
                   ),
                   Expanded(
-                    flex: 3,
+                    flex: 4,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -75,9 +75,12 @@ class _SearchJobItemState extends State<SearchJobItem> {
                               size: 18.0,
                               color: Colors.blue,
                             ),
-                            Text(
-                              widget.location,
-                              style: TextStyle(fontSize: 12.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: Text(
+                                widget.location,
+                                style: TextStyle(fontSize: 12.0),
+                              ),
                             ),
                           ],
                         )
@@ -85,6 +88,7 @@ class _SearchJobItemState extends State<SearchJobItem> {
                     ),
                   ),
                   Expanded(
+                    flex: 1,
                     child: InkWell(
                       onTap: () {
                         data = JobPosted(

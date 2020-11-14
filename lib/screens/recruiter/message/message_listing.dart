@@ -77,6 +77,7 @@ class _MessageListingState extends State<MessageListing> {
     });
     print(chatList);
     print(chatListDocumentId);
+    print("List Length *************** " + chatList.length.toString());
   }
 
 //------------------------------------------------------------------------------
@@ -88,44 +89,57 @@ class _MessageListingState extends State<MessageListing> {
           title: Text('Messages'),
           centerTitle: true,
         ),
-        body: ListView(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 8.0),
-            children: <Widget>[
-              chatList.isNotEmpty
-                  ? StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("Messages")
-                          .where("uid", whereIn: chatListUid)
-                          .orderBy("date", descending: true)
-                          .snapshots(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        return !snapshot.hasData
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.documents.length,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshot data =
-                                      snapshot.data.documents[index];
-                                  return MessageListingItem(
-                                    documentSnapshot: data,
-                                    docId: data.documentID,
-                                    chatId: data['chat_id'],
-                                    candidateId: data['sender'],
-                                    message: data['message'],
-                                    date: data['date'],
-                                    myUserId: currentUserId,
-                                  );
-                                });
-                      })
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    ),
-            ]),
+        body: chatList.length == 0
+            ? Container(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Image.asset('images/no-message-100.png'),
+                    SizedBox(height: 10.0),
+                    Text('No Messages'),
+                  ],
+                ))
+            : ListView(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 8.0),
+                children: <Widget>[
+                    chatList.length > 0
+                        ? StreamBuilder(
+                            stream: Firestore.instance
+                                .collection("Messages")
+                                .where("uid", whereIn: chatListUid)
+                                .orderBy("date", descending: true)
+                                .snapshots(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              return !snapshot.hasData
+                                  ? Center(
+                                      child: Text('No Messages'),
+                                    )
+                                  : ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.vertical,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: snapshot.data.documents.length,
+                                      itemBuilder: (context, index) {
+                                        DocumentSnapshot data =
+                                            snapshot.data.documents[index];
+                                        return MessageListingItem(
+                                          documentSnapshot: data,
+                                          docId: data.documentID,
+                                          chatId: data['chat_id'],
+                                          candidateId: data['sender'],
+                                          message: data['message'],
+                                          date: data['date'],
+                                          myUserId: currentUserId,
+                                        );
+                                      });
+                            })
+                        : Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                  ]),
       ),
     );
   }
@@ -193,6 +207,14 @@ class _MessageListingItemState extends State<MessageListingItem> {
     _getMyInfo(widget.myUserId);
 
     return Container(
+      padding: const EdgeInsets.only(top: 5.0, bottom: 10.0),
+      decoration: BoxDecoration(
+          border: Border(
+        bottom: BorderSide(
+          width: 1.0,
+          color: Colors.grey.shade300,
+        ),
+      )),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: Colors.blue,
@@ -224,10 +246,18 @@ class _MessageListingItemState extends State<MessageListingItem> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(DateFormat.yMMMd()
-                    .add_jm()
-                    .format(widget.date.toDate())
-                    .toString()),
+                Text(
+                  DateFormat.yMMMd()
+                      .add_jm()
+                      .format(widget.date.toDate())
+                      .toString(),
+                  style: TextStyle(
+                    fontSize: 11.0,
+                  ),
+                ),
+                SizedBox(
+                  height: 4.0,
+                ),
                 Text(
                   widget.message,
                   overflow: TextOverflow.ellipsis,

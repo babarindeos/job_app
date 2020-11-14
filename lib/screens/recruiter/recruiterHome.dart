@@ -8,6 +8,7 @@ import 'package:job_app/custom/app_flow.dart';
 import 'package:job_app/custom/bottom_navigation_tab.dart';
 import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/home/your_jobs_applied.dart';
 import 'package:job_app/screens/recruiter/jobs/jobs_tracker.dart';
 import 'package:job_app/screens/recruiter/menu_options.dart';
@@ -28,6 +29,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
   String myAvatar = '';
   String myName = '';
   String myId = '';
+  String msg = '';
 
 //------------------------------------------------------------------------------
   Future<void> getUserId() async {
@@ -82,6 +84,41 @@ class _RecruiterHomeState extends State<RecruiterHome> {
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
+
+  //----------------------------------------------------------------------------
+  // Sign out
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      await _auth.signOut().then((_) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SignIn()),
+          ModalRoute.withName('/'),
+        );
+      });
+    } catch (e) {
+      msg = e.message.toString();
+      print(msg);
+      showInSnackBar(msg, context);
+    }
+  }
+
+  //----------------------------------------------------------------------------
+  // SnackBar
+  // Snackbar function
+  void showInSnackBar(String value, BuildContext context) {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Colors.black,
+      ),
+    );
+  }
 
   //----------------------------------------------------------------------------
 
@@ -152,7 +189,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(15.0, 5.0, 5.0, 8.0),
+                padding: EdgeInsets.fromLTRB(15.0, 2.0, 5.0, 8.0),
                 child: Text(
                   'Profile',
                   style: TextStyle(
@@ -164,7 +201,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
               ),
               Container(
                 margin: EdgeInsets.only(
-                  bottom: 8.0,
+                  bottom: 5.0,
                   top: 5.0,
                   left: 15.0,
                   right: 5.0,
@@ -234,7 +271,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(15.0, 15.0, 5.0, 8.0),
+                padding: EdgeInsets.fromLTRB(15.0, 10.0, 5.0, 8.0),
                 child: Text(
                   'Friends',
                   style: TextStyle(
@@ -246,7 +283,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
               ),
               Container(
                 margin: EdgeInsets.only(
-                  bottom: 8.0,
+                  bottom: 5.0,
                   top: 5.0,
                   left: 15.0,
                   right: 5.0,
@@ -286,6 +323,34 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       'My friends',
                       style: TextStyle(
                           fontWeight: FontWeight.w500, fontSize: 15.0),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(
+                  bottom: 8.0,
+                  top: 15.0,
+                  left: 15.0,
+                  right: 5.0,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.exit_to_app,
+                      color: Colors.black45,
+                      size: 30.0,
+                    ),
+                    SizedBox(width: 27.0),
+                    InkWell(
+                      onTap: () {
+                        _signOut(context);
+                      },
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 15.0),
+                      ),
                     ),
                   ],
                 ),

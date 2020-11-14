@@ -26,6 +26,7 @@ class _CandidateListState extends State<CandidateList>
   Widget build(BuildContext context) {
     final currentUserId = Provider.of<User>(context);
     companyId = currentUserId.uid.toString();
+    print(companyId);
 
     return Scaffold(
       appBar: AppBar(
@@ -115,6 +116,7 @@ class _CandidateListState extends State<CandidateList>
                 StreamBuilder(
                     stream: Firestore.instance
                         .collection("Interview_Schedule")
+                        .where("company_docid", isEqualTo: companyId)
                         .orderBy("schedule_date_dtfmt", descending: true)
                         .snapshots(),
                     builder: (context, snapshot) {
