@@ -63,7 +63,7 @@ class _CompanyInformationState extends State<CompanyInformation> {
             ? Center(child: CircularProgressIndicator())
             : ListView(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 10.0, horizontal: 10.0),
+                    vertical: 10.0, horizontal: 12.0),
                 children: <Widget>[
                   Container(
                     child: Row(
@@ -102,7 +102,7 @@ class _CompanyInformationState extends State<CompanyInformation> {
                   ),
                   SizedBox(height: 5.0),
                   Text(sector),
-                  SizedBox(height: 15.0),
+                  SizedBox(height: 20.0),
                   Text(
                     "Location",
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -113,14 +113,14 @@ class _CompanyInformationState extends State<CompanyInformation> {
                   Text(
                     address,
                   ),
-                  SizedBox(height: 15.0),
+                  SizedBox(height: 20.0),
                   Text(
                     'Email',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 5.0),
                   Text(email),
-                  SizedBox(height: 15.0),
+                  SizedBox(height: 20.0),
                   Text(
                     'Phone No.',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -128,7 +128,7 @@ class _CompanyInformationState extends State<CompanyInformation> {
                   SizedBox(height: 5.0),
                   Text(phone),
                   SizedBox(
-                    height: 15.0,
+                    height: 20.0,
                   ),
                   Text(
                     "About Company",

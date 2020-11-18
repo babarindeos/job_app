@@ -33,9 +33,12 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     border: Border.all(color: Colors.blue),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                    ),
                   ),
                   padding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                   child: Text(
                     'Applied',
                     style: TextStyle(
@@ -44,27 +47,29 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                 ),
                 Container(
                   padding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.blue),
+                    border: Border(
+                      top: BorderSide(color: Colors.blue),
+                      bottom: BorderSide(color: Colors.blue),
+                    ),
                   ),
                   child: Text(
-                    'Saved',
+                    'Shortlisted',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
                 Container(
                     padding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
                     decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Colors.blue),
-                        bottom: BorderSide(color: Colors.blue),
-                        right: BorderSide(color: Colors.blue),
+                      border: Border.all(color: Colors.blue),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.0),
                       ),
                     ),
                     child: Text(
-                      'Skipped',
+                      'Interviews',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ))
               ],

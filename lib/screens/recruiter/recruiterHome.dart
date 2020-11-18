@@ -55,8 +55,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
   @override
   void initState() {
     // TODO: implement initState
-    getUserId().then((_) => getUserBioDataInfo());
-    ;
+
     super.initState();
   }
 
@@ -238,7 +237,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                     ),
                     SizedBox(width: 27.0),
                     Text(
-                      'Career Details',
+                      'Company Info',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 15.0,
