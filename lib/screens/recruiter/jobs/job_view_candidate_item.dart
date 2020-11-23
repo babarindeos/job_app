@@ -3,11 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:job_app/screens/recruiter/jobs/ApplicantsInformation.dart';
 
 class JobViewCandidateItem extends StatefulWidget {
-  final String userId, docId, jobId, dateApplied;
+  final String userId, jobUid, docId, jobId;
+  Timestamp dateApplied;
   final DocumentSnapshot documentSnapshot;
 
   JobViewCandidateItem(
       {@required this.userId,
+      @required this.jobUid,
       @required this.docId,
       @required this.jobId,
       @required this.documentSnapshot,
@@ -133,6 +135,7 @@ class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
                     builder: (context) => ApplicantsInformation(
                         userId: widget.userId,
                         jobId: widget.jobId,
+                        jobUid: widget.jobUid,
                         docId: widget.docId,
                         documentSnapshot: widget.documentSnapshot,
                         dateApplied: widget.dateApplied),

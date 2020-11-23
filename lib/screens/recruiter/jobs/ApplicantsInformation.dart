@@ -20,11 +20,13 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 class ApplicantsInformation extends StatefulWidget {
-  String userId, jobId, docId, dateApplied;
+  String userId, jobUid, jobId, docId;
+  Timestamp dateApplied;
   DocumentSnapshot documentSnapshot;
 
   ApplicantsInformation(
       {this.userId,
+      this.jobUid,
       this.jobId,
       this.docId,
       this.dateApplied,
@@ -219,7 +221,9 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
         DateTime now = DateTime.now();
         Map<String, dynamic> data = {
           "uid": uid,
+          "job_uid": widget.jobUid,
           "job_id": jobId,
+          "job_docId": jobId,
           "application_id": appId,
           "candidate_id": candidateId,
           "company_id": companyId,
@@ -360,6 +364,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
   @override
   Widget build(BuildContext context) {
     final myCompanyId = Provider.of<User>(context).uid;
+    print(widget.jobUid);
 
     return isLoading
         ? Center(child: CircularProgressIndicator())

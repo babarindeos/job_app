@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:job_app/models/jobposted.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/home/company/company_information.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class JobDetails extends StatefulWidget {
   JobPosted data;
@@ -89,13 +91,17 @@ class _JobDetailsState extends State<JobDetails> {
   //---------------------------------------------------------------------------
   Future<void> _applyForJob(
       BuildContext context, String userId, String jobId) async {
+    var uuid = Uuid();
+    String uid = uuid.v4();
     DocumentReference docReference =
         Firestore.instance.collection("Job_Applications").document();
 
     Map<String, dynamic> application = {
+      'uid': uid,
       'job_id': jobId,
+      'job_uid': widget.data.uid,
       'user_id': userId,
-      'date_applied': DateTime.now().toString(),
+      'date_applied': DateTime.now(),
     };
     await docReference.setData(application).whenComplete(() {
       processOutcome = 'Your application has been submitted for this Job';
@@ -297,6 +303,20 @@ class _JobDetailsState extends State<JobDetails> {
             height: 5.0,
           ),
           Text(widget.data.description),
+          SizedBox(height: 20.0),
+          Text(
+            'Closing Date',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5.0),
+          Text(widget.data.expiration),
+          SizedBox(height: 20.0),
+          Text(
+            'Date Posted',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 5.0),
+          Text(DateFormat.yMMMEd().format(DateTime.parse(widget.data.posted))),
         ],
       ),
     );

@@ -167,6 +167,7 @@ class _JobViewState extends State<JobView> {
                               docId: data.documentID,
                               userId: data['user_id'],
                               jobId: data['job_id'],
+                              jobUid: widget.data.uid,
                               dateApplied: data['date_applied'],
                             );
                           });

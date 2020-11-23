@@ -78,7 +78,8 @@ class _JobPostState extends State<JobPost> {
         "payment": _paymentController.text,
         "expiration": _expiryController.text,
         "posted": strToday,
-        "postedFmt": strToday_fmt
+        "postedFmt": strToday_fmt,
+        "date_posted": dtToday,
       };
 
       await docReference.setData(jobData).whenComplete(() {

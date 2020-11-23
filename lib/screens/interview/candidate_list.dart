@@ -254,7 +254,7 @@ class _ShortlistedItemState extends State<ShortlistedItem> {
                   userId: widget.candidateId,
                   jobId: widget.jobId,
                   docId: widget.applicationId,
-                  dateApplied: widget.dateApplied.toString(),
+                  dateApplied: widget.dateApplied,
                   documentSnapshot: widget.documentSnapshot,
                 ),
               ),

@@ -154,8 +154,7 @@ class _SignInState extends State<SignIn> {
                                   print(result);
                                   if (result == null) {
                                     setState(() {
-                                      error =
-                                          'Could not signin with those credentials.';
+                                      error = _auth.aErrMsg;
                                       loading = false;
                                     });
                                   }

@@ -14,6 +14,7 @@ class JobDetails extends StatefulWidget {
 class _JobDetailsState extends State<JobDetails> {
   @override
   Widget build(BuildContext context) {
+    print(widget.data.location);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -98,10 +99,13 @@ class _JobDetailsState extends State<JobDetails> {
             SizedBox(height: 4.0),
             Text(widget.data.payment),
             SizedBox(height: 20.0),
-            Text('Description/ Responsibilities',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              'Description/ Responsibilities',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 4.0),
             Text(widget.data.description),
+            SizedBox(height: 20.0),
           ],
         ),
       ),

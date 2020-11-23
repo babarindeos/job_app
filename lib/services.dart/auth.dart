@@ -54,6 +54,8 @@ class AuthService {
       return _userFromFireBaseUser(user);
     } catch (e) {
       print(e.toString());
+      aErrMsg = e.message.toString();
+
       return null;
     }
   }

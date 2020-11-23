@@ -18,6 +18,7 @@ class _MessageListingState extends State<MessageListing> {
   String recipient = '';
   String currentUserId;
   DocumentReference docRef;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -78,6 +79,9 @@ class _MessageListingState extends State<MessageListing> {
     print(chatList);
     print(chatListDocumentId);
     print("List Length *************** " + chatList.length.toString());
+    setState(() {
+      isLoading = false;
+    });
   }
 
 //------------------------------------------------------------------------------
@@ -89,44 +93,49 @@ class _MessageListingState extends State<MessageListing> {
           title: Text('Messages'),
           centerTitle: true,
         ),
-        body: ListView(
-            padding: const EdgeInsets.only(top: 10.0, bottom: 8.0),
-            children: <Widget>[
-              chatList.length > 0
-                  ? StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("Messages")
-                          .where("uid", whereIn: chatListUid)
-                          .orderBy("date", descending: true)
-                          .snapshots(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        return !snapshot.hasData
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.documents.length,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshot data =
-                                      snapshot.data.documents[index];
-                                  return MessageListingItem(
-                                    documentSnapshot: data,
-                                    docId: data.documentID,
-                                    chatId: data['chat_id'],
-                                    candidateId: data['sender'],
-                                    message: data['message'],
-                                    date: data['date'],
-                                    myUserId: currentUserId,
-                                  );
-                                });
-                      })
-                  : Center(
-                      child: CircularProgressIndicator(),
-                    ),
-            ]),
+        body: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView(
+                padding: const EdgeInsets.only(top: 10.0, bottom: 8.0),
+                children: <Widget>[
+                    chatList.length > 0
+                        ? StreamBuilder(
+                            stream: Firestore.instance
+                                .collection("Messages")
+                                .where("uid", whereIn: chatListUid)
+                                .orderBy("date", descending: true)
+                                .snapshots(),
+                            builder:
+                                (BuildContext context, AsyncSnapshot snapshot) {
+                              return !snapshot.hasData
+                                  ? Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : ListView.builder(
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.vertical,
+                                      physics: NeverScrollableScrollPhysics(),
+                                      itemCount: snapshot.data.documents.length,
+                                      itemBuilder: (context, index) {
+                                        DocumentSnapshot data =
+                                            snapshot.data.documents[index];
+                                        return MessageListingItem(
+                                          documentSnapshot: data,
+                                          docId: data.documentID,
+                                          chatId: data['chat_id'],
+                                          candidateId: data['sender'],
+                                          message: data['message'],
+                                          date: data['date'],
+                                          myUserId: currentUserId,
+                                        );
+                                      });
+                            })
+                        : Center(
+                            child: Text(''),
+                          ),
+                  ]),
       ),
     );
   }

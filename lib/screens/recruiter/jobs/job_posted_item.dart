@@ -59,10 +59,12 @@ class _JobPostedItemState extends State<JobPostedItem> {
 //------------------------------------------------------------------------------
 
   Future _getApplicationCount() async {
-    return Firestore.instance
+    var query = Firestore.instance
         .collection("Job_Applications")
-        .where("job_id", isEqualTo: widget.docId)
-        .getDocuments();
+        .where("job_id", isEqualTo: widget.docId.trim());
+    var querySnapshot = await query.getDocuments();
+    var totalDocument = querySnapshot.documents.length;
+    return totalDocument;
   }
 
 //------------------------------------------------------------------------------
@@ -130,6 +132,7 @@ class _JobPostedItemState extends State<JobPostedItem> {
   Widget build(BuildContext context) {
     //_newformat = DateFormat("MMM. d, yyyy");
     //posted = DateFormat("MMM. d, yyyy").parse((widget.posted));
+    print(widget.docId);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(10.0, 5.0, 5.0, 5.0),
@@ -197,8 +200,7 @@ class _JobPostedItemState extends State<JobPostedItem> {
                         if (snapshot.hasData) {
                           return Container(
                             alignment: Alignment.centerRight,
-                            child:
-                                Text(snapshot.data.documents.length.toString()),
+                            child: Text(snapshot.data.toString()),
                           );
                         } else {
                           return Text('');
