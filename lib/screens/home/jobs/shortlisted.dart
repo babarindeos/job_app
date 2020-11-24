@@ -136,7 +136,7 @@ class _ShortedListedState extends State<ShortedListed> {
                 alignment: Alignment.center,
                 child: TextFormField(
                   decoration: searchTextInputDecoration.copyWith(
-                      labelText: 'Search for Applications',
+                      labelText: 'Search for Shortlisted',
                       prefixIcon: Icon(Icons.search)),
                 ),
               ),
@@ -262,7 +262,7 @@ class _ShortListedItemState extends State<ShortListedItem> {
     querySnapshot.documents.forEach((element) {
       date_applied = element.data['date'];
       result = date_applied.toDate();
-      formattedDate = DateFormat.yMMMMEEEEd().format(result);
+      formattedDate = DateFormat.yMMMEd().format(result);
       //formattedDate = DateFormat.yMMMd().format(result.toDate());
       //date_applied = DateTime.fromMillisecondsSinceEpoch(result);
     });
@@ -401,16 +401,11 @@ class _ShortListedItemState extends State<ShortListedItem> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     Expanded(
-                      flex: 1,
-                      child: Container(
-                        alignment: Alignment.bottomLeft,
-                        child: FutureBuilder(
-                            future: _checkInterviewStatus(),
-                            builder: (context, AsyncSnapshot snapshot) {}),
-                      ),
+                      flex: 2,
+                      child: Container(),
                     ),
                     Expanded(
-                      flex: 4,
+                      flex: 2,
                       child: Container(
                         alignment: Alignment.centerRight,
                         child: FutureBuilder(

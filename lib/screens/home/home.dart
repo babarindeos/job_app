@@ -2,6 +2,7 @@ import 'package:custom_navigator/custom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/models/profile.dart';
+import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/home/notification/notifications.dart';
 import 'package:job_app/screens/home/search_jobs.dart';
 import 'package:job_app/screens/home/search_jobs/search_test.dart';
@@ -57,6 +58,48 @@ class _HomeState extends State<Home> {
   }
 
 //----------------------------------------------------------------------------
+
+  Future<void> _signOut(BuildContext context) async {
+    await FirebaseAuth.instance.signOut().then((_) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SignIn()),
+          ModalRoute.withName('/'));
+    });
+
+    // Other Alternatives
+    //1. Navigator.of(context).popUntil(ModalRoute.withName('/SignIn'));
+    //2. Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+    //LoginScreen()), (Route<dynamic> route) => false),
+    //3. Navigator.of(context).popUntil(ModalRoute.withName('/root'));
+    /*
+          Navigator.pushAndRemoveUntil(
+          context,   
+          MaterialPageRoute(builder: (BuildContext context) => Login()), 
+          ModalRoute.withName('/'));
+
+          ----------------------------------------------
+          Navigator.pushAndRemoveUntil(context,
+                  MaterialPageRoute(builder: (BuildContext context) => SingleShowPage()),
+                  (Route<dynamic> route) => route is HomePage
+              );
+
+          ----------------------------------------------
+          SchedulerBinding.instance.addPostFrameCallback((_) async {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/login',
+                                  (Route<dynamic> route) => false);
+                            });
+          ----------------------------------------------
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic> route) => false);
+
+          //--------------------------------------------
+
+
+    */
+  }
+
+//-----------------------------------------------------------------------------
 
   final AuthService _auth = AuthService();
   final List<Widget> _children = [
@@ -295,7 +338,7 @@ class _HomeState extends State<Home> {
                       SizedBox(width: 27.0),
                       InkWell(
                         onTap: () {
-                          //_signOut(context);
+                          _signOut(context);
                         },
                         child: Text(
                           'Logout',

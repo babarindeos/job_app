@@ -27,7 +27,8 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
   List appliedJobsUid = [];
   List visibleApplicationList = [];
   AuthService _auth;
-  JobPosted jobPosted;
+  JobPosted jobsApplied;
+  List jobsAppliedName = [];
 
 //------------------------------------------------------------------------------
   Future<void> _getCurrentUserInfo() async {
@@ -46,8 +47,6 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
       //querySnapshot
       querySnapshot.documents.forEach((element) async {
         if (element.exists) {
-          jobPosted = JobPosted();
-
           applicationList.add(element.documentID);
           appliedJobList.add(element['job_id']);
           await _getAppliedJobUid(element['job_id']);
@@ -175,6 +174,9 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                 decoration: searchTextInputDecoration.copyWith(
                     labelText: 'Search for Applications',
                     prefixIcon: Icon(Icons.search)),
+                onChanged: (value) {
+                  jobsAppliedName = jobsAppliedName.toSet().toList();
+                },
               ),
             ),
             SizedBox(
@@ -206,7 +208,7 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                               shrinkWrap: true,
                               scrollDirection: Axis.vertical,
                               physics: NeverScrollableScrollPhysics(),
-                              itemCount: visibleApplicationList.length,
+                              itemCount: snapshot.data.documents.length,
                               itemBuilder: (context, index) {
                                 DocumentSnapshot data =
                                     snapshot.data.documents[index];
@@ -225,6 +227,7 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                                   posted: data['posted'],
                                   postedFmt: data['postedFmt'],
                                   datePosted: data['date_posted'],
+                                  jobsAppliedName: jobsAppliedName,
                                 );
                               });
                     })
@@ -251,6 +254,7 @@ class YourJobsAppliedItem extends StatefulWidget {
       expiration,
       posted,
       postedFmt;
+  List jobsAppliedName;
 
   DocumentSnapshot documentSnapshot;
   Timestamp datePosted;
@@ -269,6 +273,7 @@ class YourJobsAppliedItem extends StatefulWidget {
     this.postedFmt,
     this.datePosted,
     this.documentSnapshot,
+    this.jobsAppliedName,
   });
 
   @override
@@ -284,6 +289,9 @@ class _YourJobsAppliedItemState extends State<YourJobsAppliedItem> {
 
   //------------------------------------------------------------------------------
   Future _getCompanyInfo(String companyId) async {
+    widget.jobsAppliedName.add(widget.position);
+    widget.jobsAppliedName = widget.jobsAppliedName.toSet().toList();
+    print(widget.jobsAppliedName);
     return Firestore.instance
         .collection("Company")
         .document(companyId)
@@ -327,6 +335,7 @@ class _YourJobsAppliedItemState extends State<YourJobsAppliedItem> {
     //print(widget.jobUid);
     //print(widget.currentUserId);
     //print(widget.owner);
+
     return Container(
       child: Card(
         elevation: 7.0,
