@@ -19,7 +19,8 @@ final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
 class UploadPdfCV extends StatefulWidget {
-  UploadPdfCV({Key key}) : super(key: key);
+  String pageState;
+  UploadPdfCV({Key key, this.pageState}) : super(key: key);
 
   @override
   _UploadPdfCVState createState() => _UploadPdfCVState();
@@ -199,14 +200,18 @@ class _UploadPdfCVState extends State<UploadPdfCV> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Container(
-                      margin:
-                          EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-                      child: Image(
-                        image: AssetImage('images/step-2-mini.png'),
-                        width: 150.0,
-                      ),
-                    ),
+                    widget.pageState.isEmpty
+                        ? Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
+                            child: Image(
+                              image: AssetImage('images/step-2-mini.png'),
+                              width: 150.0,
+                            ),
+                          )
+                        : Container(
+                            padding: const EdgeInsets.only(top: 10.0),
+                          ),
                     Text(
                       'Career Details',
                       style: TextStyle(

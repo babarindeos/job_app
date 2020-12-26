@@ -202,7 +202,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
 //------------------------------------------------------------------------------
   @override
   void dispose() {
-    videoPlayerController.dispose();
+    //videoPlayerController.dispose();
     // TODO: implement dispose
     super.dispose();
   }

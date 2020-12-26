@@ -7,7 +7,8 @@ import 'education_add.dart';
 import 'education_item.dart';
 
 class Education extends StatefulWidget {
-  Education({Key key}) : super(key: key);
+  final String pageState;
+  Education({Key key, this.pageState}) : super(key: key);
   @override
   _EducationState createState() => _EducationState();
 }
@@ -36,14 +37,18 @@ class _EducationState extends State<Education> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -84,6 +89,10 @@ class _EducationState extends State<Education> {
                                     ),
                                   ),
                                 ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Container(),
+                                )
                               ],
                             ),
                           ),
@@ -106,18 +115,20 @@ class _EducationState extends State<Education> {
                                         DocumentSnapshot data =
                                             snapshot.data.documents[index];
                                         return EducationItem(
-                                            documentSnapshot: data,
-                                            docId: data.documentID,
-                                            uuid: data['id'],
-                                            owner: data['owner'],
-                                            dateStarted: data['date_started'],
-                                            dateEnded: data['date_ended'],
-                                            institution: data['institution'],
-                                            courseOfStudy:
-                                                data['course_of_study'],
-                                            level: data['level'],
-                                            classOfDegree:
-                                                data['class_of_degree']);
+                                          documentSnapshot: data,
+                                          docId: data.documentID,
+                                          uuid: data['id'],
+                                          owner: data['owner'],
+                                          dateStarted: data['date_started'],
+                                          dateEnded: data['date_ended'],
+                                          institution: data['institution'],
+                                          courseOfStudy:
+                                              data['course_of_study'],
+                                          level: data['level'],
+                                          classOfDegree:
+                                              data['class_of_degree'],
+                                          pageState: widget.pageState,
+                                        );
                                       });
                             },
                           ),
@@ -133,8 +144,12 @@ class _EducationState extends State<Education> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => EducationAdd()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EducationAdd(pageState: widget.pageState),
+              ),
+            );
           },
           child: Icon(Icons.add),
         ),

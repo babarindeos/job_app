@@ -13,6 +13,7 @@ class ExperienceItem extends StatefulWidget {
   final String organisation;
   final String position;
   final String duties;
+  final String pageState;
   final DocumentSnapshot documentSnapshot;
 
   ExperienceItem(
@@ -24,6 +25,7 @@ class ExperienceItem extends StatefulWidget {
       @required this.organisation,
       @required this.position,
       @required this.duties,
+      this.pageState,
       @required this.documentSnapshot});
 
   @override
@@ -108,8 +110,8 @@ class _ExperienceItemState extends State<ExperienceItem> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                ExperienceDetails(data: data)));
+                            builder: (context) => ExperienceDetails(
+                                data: data, pageState: widget.pageState)));
                   },
                   child: Icon(Icons.chevron_right)),
             ),

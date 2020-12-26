@@ -10,7 +10,8 @@ final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
 class SocialMediaPage extends StatefulWidget {
-  SocialMediaPage({Key key}) : super(key: key);
+  String pageState;
+  SocialMediaPage({Key key, this.pageState}) : super(key: key);
 
   @override
   _SocialMediaPageState createState() => _SocialMediaPageState();
@@ -104,14 +105,18 @@ class _SocialMediaPageState extends State<SocialMediaPage> {
                 child: Form(
                   child: Column(
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        child: Image(
-                          image: AssetImage('images/step-2-mini.png'),
-                          width: 150.0,
-                        ),
-                      ),
+                      widget.pageState.isEmpty
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 10.0),
+                              child: Image(
+                                image: AssetImage('images/step-2-mini.png'),
+                                width: 150.0,
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.only(top: 15.0),
+                            ),
                       Text(
                         'Career Details',
                         style: TextStyle(

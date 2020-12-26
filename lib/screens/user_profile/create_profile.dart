@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +23,8 @@ import 'package:uuid/uuid.dart';
 final StorageReference storageRef = FirebaseStorage.instance.ref();
 
 class CreateProfile extends StatefulWidget {
+  String pageState;
+  CreateProfile({this.pageState});
   //String userType;
   //CreateProfile({this.userType});
 
@@ -47,6 +50,7 @@ class _CreateProfileState extends State<CreateProfile> {
   String imageSource;
   String processOutcome;
   String userType;
+  String countryCodeSelection = 'US';
 
   String name, age, state, country, phone, gender, avatar;
 
@@ -90,6 +94,12 @@ class _CreateProfileState extends State<CreateProfile> {
           _stateController.text = (dataSnapshot.data['state']);
           _countryController.text = (dataSnapshot.data['country']);
           _phoneController.text = (dataSnapshot.data['phone']);
+          if (dataSnapshot.data['country_code'] != '' ||
+              dataSnapshot.data['country_code'] != null) {
+            countryCodeSelection = (dataSnapshot.data['country_code']);
+            print(countryCodeSelection);
+          }
+
           gender_option = (dataSnapshot.data['gender']);
           imageUrl = (dataSnapshot.data['avatar']);
           imageSource = "url";
@@ -180,7 +190,10 @@ class _CreateProfileState extends State<CreateProfile> {
     _profile.uName = _nameController.text;
     _profile.uAge = _ageController.text;
     _profile.uState = _stateController.text;
+
     _profile.uCountry = _countryController.text;
+    _countryCodeController.text = countryCodeSelection;
+    _profile.uCountryCode = _countryCodeController.text;
     _profile.uPhone = _phoneController.text;
     _profile.uGender = gender_option;
 
@@ -209,7 +222,14 @@ class _CreateProfileState extends State<CreateProfile> {
   // Next button navigation
   handleForwardButton(context) {
     if (userType == 'job_seeker') {
-      Navigator.pushNamed(context, '/careerDetails', arguments: userType);
+      //Navigator.pushNamed(context, '/careerDetails', arguments: userType);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              CareerDetails(userType: userType, pageState: ''),
+        ),
+      );
     } else {
       Navigator.pushNamed(context, '/aboutOrganisation', arguments: userType);
     }
@@ -221,6 +241,7 @@ class _CreateProfileState extends State<CreateProfile> {
   TextEditingController _ageController = TextEditingController();
   TextEditingController _stateController = TextEditingController();
   TextEditingController _countryController = TextEditingController();
+  TextEditingController _countryCodeController = TextEditingController();
   TextEditingController _phoneController = TextEditingController();
 
 //--------------------------------------------------------------------------
@@ -241,7 +262,11 @@ class _CreateProfileState extends State<CreateProfile> {
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
     String args = ModalRoute.of(context).settings.arguments;
+
     userType = args;
+
+    _profile.uCountry = 'United States';
+    _countryController.text = 'United States';
 
     // TODO: implement build
     return SafeArea(
@@ -264,14 +289,17 @@ class _CreateProfileState extends State<CreateProfile> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                  vertical: 5.0, horizontal: 10.0),
-                              child: Image(
-                                image: AssetImage('images/step-1-mini.png'),
-                                width: 150.0,
-                              ),
-                            ),
+                            widget.pageState != 'update'
+                                ? Container(
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 5.0, horizontal: 10.0),
+                                    child: Image(
+                                      image:
+                                          AssetImage('images/step-1-mini.png'),
+                                      width: 150.0,
+                                    ),
+                                  )
+                                : Container(),
                             Text(
                               'My Profile',
                               style: TextStyle(
@@ -388,37 +416,41 @@ class _CreateProfileState extends State<CreateProfile> {
                             Row(
                               children: <Widget>[
                                 Expanded(
-                                    flex: 3,
-                                    child: Container(
-                                      padding: EdgeInsets.only(right: 5.0),
-                                      child: TextFormField(
-                                        controller: _stateController,
-                                        keyboardType: TextInputType.text,
-                                        validator: (value) => value.isEmpty
-                                            ? 'State required'
-                                            : null,
-                                        decoration: profileTextInputDecoration
-                                            .copyWith(labelText: 'State'),
-                                        onChanged: (String state) {
-                                          state = _stateController.text;
-                                          _profile.uState = state;
-                                        },
-                                      ),
-                                    )),
+                                  flex: 3,
+                                  child: Container(
+                                    padding: EdgeInsets.only(right: 5.0),
+                                    child: TextFormField(
+                                      controller: _stateController,
+                                      keyboardType: TextInputType.text,
+                                      validator: (value) => value.isEmpty
+                                          ? 'State required'
+                                          : null,
+                                      decoration: profileTextInputDecoration
+                                          .copyWith(labelText: 'State'),
+                                      onChanged: (String state) {
+                                        state = _stateController.text;
+                                        _profile.uState = state;
+                                      },
+                                    ),
+                                  ),
+                                ),
                                 Expanded(
                                   flex: 2,
                                   child: Container(
-                                    child: TextFormField(
-                                      controller: _countryController,
-                                      keyboardType: TextInputType.text,
-                                      validator: (value) => value.isEmpty
-                                          ? 'Country required'
-                                          : null,
-                                      decoration: profileTextInputDecoration
-                                          .copyWith(labelText: 'Country'),
-                                      onChanged: (String country) {
-                                        country = _countryController.text;
-                                        _profile.uCountry = country;
+                                    child: CountryCodePicker(
+                                      initialSelection: countryCodeSelection,
+                                      showCountryOnly: true,
+                                      showOnlyCountryWhenClosed: true,
+                                      favorite: ['+1', 'US'],
+                                      onChanged: (value) {
+                                        countryCodeSelection = value.code;
+                                        _profile.uCountry = value.name;
+                                        _profile.uCountryCode =
+                                            countryCodeSelection;
+                                        _countryController.text = value.name;
+                                        _countryCodeController.text =
+                                            countryCodeSelection;
+                                        print(_countryCodeController.text);
                                       },
                                     ),
                                   ),
@@ -448,77 +480,84 @@ class _CreateProfileState extends State<CreateProfile> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
+                                widget.pageState != 'update'
+                                    ? Container(
+                                        child: Material(
+                                          color: Colors.grey[200],
+                                          shadowColor: Colors.lightGreen,
+                                          elevation: 7.0,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          ),
+                                          child: MaterialButton(
+                                            minWidth: 70,
+                                            height: 52,
+                                            child: Icon(
+                                              Icons.arrow_back_ios,
+                                              size: 29.0,
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pushNamed(
+                                                  context, '/userType');
+                                            },
+                                          ),
+                                        ),
+                                      )
+                                    : Container(),
                                 Container(
+                                  alignment: Alignment.center,
+                                  padding:
+                                      EdgeInsets.only(left: 5.0, right: 5.0),
+                                  width: 135.0,
                                   child: Material(
-                                      color: Colors.grey[200],
-                                      shadowColor: Colors.lightGreen,
-                                      elevation: 7.0,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5.0),
+                                    color: Colors.green,
+                                    shadowColor: Colors.lightGreen,
+                                    elevation: 7.0,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(5.0),
+                                    ),
+                                    child: MaterialButton(
+                                      minWidth: 135,
+                                      height: 52,
+                                      child: Text(
+                                        'SAVE',
+                                        style: TextStyle(color: Colors.white),
                                       ),
-                                      child: MaterialButton(
-                                        minWidth: 70,
-                                        height: 52,
-                                        child: Icon(
-                                          Icons.arrow_back_ios,
-                                          size: 29.0,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pushNamed(
-                                              context, '/userType');
-                                        },
-                                      )),
+                                      onPressed: () async {
+                                        if (_formKey.currentState.validate()) {
+                                          processForm(context, user.uid);
+                                        }
+                                      },
+                                    ),
+                                  ),
                                 ),
-                                Container(
-                                    alignment: Alignment.center,
-                                    padding:
-                                        EdgeInsets.only(left: 5.0, right: 5.0),
-                                    width: 135.0,
-                                    child: Material(
-                                      color: Colors.green,
-                                      shadowColor: Colors.lightGreen,
-                                      elevation: 7.0,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5.0),
-                                      ),
-                                      child: MaterialButton(
-                                        minWidth: 135,
-                                        height: 52,
-                                        child: Text(
-                                          'SAVE',
-                                          style: TextStyle(color: Colors.white),
+                                widget.pageState != 'update'
+                                    ? Container(
+                                        child: Material(
+                                          color: Colors.grey[200],
+                                          shadowColor: Colors.lightGreen,
+                                          elevation: 7.0,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          ),
+                                          child: MaterialButton(
+                                            minWidth: 70,
+                                            height: 52,
+                                            child: Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 29.0,
+                                            ),
+                                            onPressed: _btnForwardEnable
+                                                ? () => {
+                                                      handleForwardButton(
+                                                          context)
+                                                      //moveToCareerDetails(context)
+                                                    }
+                                                : null,
+                                          ),
                                         ),
-                                        onPressed: () async {
-                                          if (_formKey.currentState
-                                              .validate()) {
-                                            processForm(context, user.uid);
-                                          }
-                                        },
-                                      ),
-                                    )),
-                                Container(
-                                  child: Material(
-                                      color: Colors.grey[200],
-                                      shadowColor: Colors.lightGreen,
-                                      elevation: 7.0,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5.0),
-                                      ),
-                                      child: MaterialButton(
-                                        minWidth: 70,
-                                        height: 52,
-                                        child: Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 29.0,
-                                        ),
-                                        onPressed: _btnForwardEnable
-                                            ? () => {
-                                                  handleForwardButton(context)
-                                                  //moveToCareerDetails(context)
-                                                }
-                                            : null,
-                                      )),
-                                ),
+                                      )
+                                    : Container(),
                               ],
                             )
                           ],

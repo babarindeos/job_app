@@ -195,7 +195,7 @@ class _ShortlistedItemState extends State<ShortlistedItem> {
       await docRef.get().then((dataSnapshot) {
         setState(() {
           jobPosition = dataSnapshot['position'];
-          jobPositionCaption = 'Applied  Job: $jobPosition';
+          jobPositionCaption = 'Applied  Job -  $jobPosition';
         });
       });
     } catch (e) {} finally {}

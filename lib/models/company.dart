@@ -9,6 +9,7 @@ class Company {
   String address;
   String phone;
   String email;
+  String logo;
   String updateStatus;
 
   Company(
@@ -20,6 +21,7 @@ class Company {
       this.address,
       this.phone,
       this.email,
+      this.logo,
       this.updateStatus});
 
   set uFile(File file) {
@@ -86,6 +88,14 @@ class Company {
     return this.email;
   }
 
+  set uLogo(String logo) {
+    this.logo = logo;
+  }
+
+  String get uLogo {
+    return this.logo;
+  }
+
   String get uUpdateStatus {
     return this.updateStatus;
   }
@@ -94,17 +104,29 @@ class Company {
     try {
       DocumentReference documentReference =
           Firestore.instance.collection("Company").document(userId);
+      Map<String, dynamic> companyData;
+      if (this.uLogo != '' || this.uLogo != null) {
+        companyData = {
+          "name": this.uCompanyName,
+          "sector": this.uSector,
+          "about": this.uAboutCompany,
+          "address": this.uAddress,
+          "phone": this.uPhone,
+          "email": this.uEmail,
+          "logo": this.uLogo,
+        };
+      } else {
+        companyData = {
+          "name": this.uCompanyName,
+          "sector": this.uSector,
+          "about": this.uAboutCompany,
+          "address": this.uAddress,
+          "phone": this.uPhone,
+          "email": this.uEmail,
+        };
+      }
 
-      Map<String, dynamic> companyData = {
-        "name": this.uCompanyName,
-        "sector": this.uSector,
-        "about": this.uAboutCompany,
-        "address": this.uAddress,
-        "phone": this.uPhone,
-        "email": this.uEmail,
-      };
-
-      await documentReference.setData(companyData).whenComplete(() {
+      await documentReference.updateData(companyData).whenComplete(() {
         this.updateStatus = "success";
         return "success";
       });
@@ -114,4 +136,68 @@ class Company {
       return null;
     }
   }
+
+//------------------------------------------------------------------------------
+  Future updateAboutCompanyInfo(String userId, String aboutInfo) async {
+    try {
+      DocumentReference docRef =
+          Firestore.instance.collection("Company").document(userId);
+      Map<String, dynamic> data = {
+        'about': aboutInfo,
+      };
+      await docRef.updateData(data).whenComplete(() {
+        this.updateStatus = "Company information has been updated";
+        return 'success';
+      });
+    } catch (e) {
+      this.updateStatus = e.message;
+      return e.message;
+    } finally {}
+  }
+//------------------------------------------------------------------------------
+
+  Future updateCompanyContactInfo(
+      String userId, String website, String phone, String fax) async {
+    try {
+      DocumentReference docRef =
+          Firestore.instance.collection("Company").document(userId);
+      Map<String, dynamic> data = {
+        'website': website,
+        'phone': phone,
+        'fax': fax,
+      };
+      await docRef.updateData(data).whenComplete(() {
+        this.updateStatus = "Company information has been updated.";
+        return 'success';
+      });
+    } catch (e) {
+      this.updateStatus = e.message;
+      return e.message;
+    } finally {}
+  }
+
+//------------------------------------------------------------------------------
+  Future updateCompanySocialMediaInfo(String userId, String facebook,
+      String twitter, String linkedIn, String instagram) async {
+    try {
+      DocumentReference docRef =
+          Firestore.instance.collection("Company").document(userId);
+      Map<String, dynamic> data = {
+        'facebook': facebook,
+        'twitter': twitter,
+        'linkedin': linkedIn,
+        'instagram': instagram
+      };
+      await docRef.updateData(data).whenComplete(() {
+        this.updateStatus = "Company information has been updated.";
+        return 'success';
+      });
+    } catch (e) {
+      this.updateStatus = e.message;
+      return e.message;
+    } finally {}
+  }
+
+//------------------------------------------------------------------------------
+
 }

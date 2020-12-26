@@ -9,7 +9,8 @@ import 'package:uuid/uuid.dart';
 
 class EducationEdit extends StatefulWidget {
   final Education data;
-  EducationEdit({this.data});
+  final String pageState;
+  EducationEdit({this.data, this.pageState});
   @override
   _EducationEditState createState() => _EducationEditState();
 }
@@ -129,14 +130,18 @@ class _EducationEditState extends State<EducationEdit> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(

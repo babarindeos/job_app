@@ -1,100 +1,116 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:job_app/models/career.dart';
+import 'package:job_app/models/company.dart';
 import 'package:job_app/models/user.dart';
-import 'package:job_app/shared/constants.dart';
+import 'package:job_app/screens/user_profile/career_details.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
+import 'package:job_app/shared/constants.dart';
 
-class AdditionalInfoPortfolioAdd extends StatefulWidget {
-  final String pageState;
-  AdditionalInfoPortfolioAdd({Key key, this.pageState}) : super(key: key);
+class AdditionalCompanyAbout extends StatefulWidget {
+  String pageState;
+  AdditionalCompanyAbout({this.pageState});
   @override
-  _AdditionalInfoPortfolioAddState createState() =>
-      _AdditionalInfoPortfolioAddState();
+  _AdditionalCompanyAboutState createState() => _AdditionalCompanyAboutState();
 }
 
-class _AdditionalInfoPortfolioAddState
-    extends State<AdditionalInfoPortfolioAdd> {
+class _AdditionalCompanyAboutState extends State<AdditionalCompanyAbout> {
+  @override
   bool isloading = false;
-  String year;
-  String title;
-  String description;
-  dynamic processOutcome;
+  dynamic result;
+  String processOutcome = '';
+
+  Career _career = Career();
+  Company _company = Company();
 
   final _formKey = GlobalKey<FormState>();
 
-  //----------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+  void updateAddCompanyAbout(String userId, BuildContext context) async {
+    print(userId.toString());
 
-  TextEditingController _yearController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-
-  //---------------------------------------------------------------------------------------
-
-  void addPortfolio(userId, context) async {
-    var uuid = Uuid();
-    var docId = uuid.v4();
-    year = _yearController.text;
-    title = _titleController.text;
-    description = _descriptionController.text;
-
-    try {
-      DocumentReference documentRef =
-          Firestore.instance.collection("Portfolio").document();
-      Map<String, dynamic> portfolioData = {
-        'id': docId,
-        'owner': userId,
-        'year': year,
-        'title': title,
-        'description': description
-      };
-      await documentRef.setData(portfolioData).whenComplete(() {
-        processOutcome = 'New portfolio has been added.';
-        _yearController.clear();
-        _titleController.clear();
-        _descriptionController.clear();
-      });
-    } catch (e) {
-      processOutcome = e.toString();
-      print(e.toString());
-    }
+    result = await _company.updateAboutCompanyInfo(userId, _bioController.text);
+    processOutcome = _company.updateStatus.toString();
+    showInSnackBar(processOutcome, context);
     setState(() {
       isloading = false;
     });
-    showInSnackBar(processOutcome, context);
-  } // end of addPortfolio
+  }
 
-//---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------
 
-  void showInSnackBar(String processOutcome, BuildContext context) {
-    Scaffold.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          processOutcome,
-          style: TextStyle(color: Colors.white),
+  Widget showLoader() {
+    return Center(
+      child: Container(
+        child: SpinKitChasingDots(
+          color: Colors.blueAccent,
         ),
-        backgroundColor: Colors.black,
-        duration: Duration(seconds: 6),
       ),
     );
   }
 
-//------------------------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
+
+  TextEditingController _bioController = TextEditingController();
+
+  //----------------------------------------------------------------------------
+  void showInSnackBar(String value, BuildContext context) {
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          value,
+          style: TextStyle(color: Colors.white),
+        ),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  //----------------------------------------------------------------------------
+
+  Future<void> retrieveAboutCompanyInfo() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    dynamic _currentUser = await _auth.currentUser().then((value) => value.uid);
+
+    DocumentReference documentRef =
+        Firestore.instance.collection("Company").document(_currentUser);
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        _bioController.text = (dataSnapshot).data['about'];
+        print(dataSnapshot.data['bio']);
+      }
+    });
+
+    setState(() {
+      isloading = false;
+    });
+  }
+
+  //----------------------------------------------------------------------------
+
   @override
+  void initState() {
+    isloading = true;
+    retrieveAboutCompanyInfo();
+    super.initState();
+  }
+
+  //----------------------------------------------------------------------------
+
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-
     return SafeArea(
       child: Scaffold(
-        body: Builder(
-          builder: (BuildContext context) {
-            return ListView(children: <Widget>[
-              isloading ? LinearProgressIndicator() : Container(),
-              Container(
-                alignment: Alignment.center,
-                padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
-                child: Stack(children: <Widget>[
+        body: Builder(builder: (BuildContext context) {
+          return ListView(children: <Widget>[
+            isloading ? LinearProgressIndicator() : Container(),
+            Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(vertical: 1.0, horizontal: 20.0),
+              child: Stack(
+                children: <Widget>[
                   Form(
                     key: _formKey,
                     child: Column(
@@ -111,9 +127,7 @@ class _AdditionalInfoPortfolioAddState
                                   ),
                                 )
                               : Container(
-                                  padding: const EdgeInsets.only(
-                                    top: 20.0,
-                                  ),
+                                  padding: const EdgeInsets.only(top: 30.0),
                                 ),
                           Text(
                             'Additional Information',
@@ -123,7 +137,7 @@ class _AdditionalInfoPortfolioAddState
                                 fontFamily: 'SourceSansPro'),
                           ),
                           Text(
-                            'Add Portfolio',
+                            'About Organisation',
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
@@ -131,49 +145,14 @@ class _AdditionalInfoPortfolioAddState
                           ),
                           SizedBox(height: 10.0),
                           SizedBox(height: 20.0),
-                          Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 1,
-                                child: TextFormField(
-                                  controller: _yearController,
-                                  validator: (value) =>
-                                      value.isEmpty ? 'Year is required' : null,
-                                  decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Year'),
-                                  maxLength: 4,
-                                ),
-                              ),
-                              SizedBox(width: 1.0),
-                              Expanded(
-                                flex: 3,
-                                child: TextFormField(
-                                  controller: _titleController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
-                                  decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Title'),
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(100),
-                                  ],
-                                  maxLength: 100,
-                                ),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
                           TextFormField(
-                            controller: _descriptionController,
-                            validator: (value) => value.isEmpty
-                                ? 'Description is required'
-                                : null,
-                            maxLines: 7,
-                            keyboardType: TextInputType.text,
+                            controller: _bioController,
+                            validator: (value) =>
+                                value.isEmpty ? 'Bio-Data is required' : null,
+                            maxLines: 13,
+                            keyboardType: TextInputType.multiline,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Description'),
+                                labelText: 'Information About Organisation'),
                           ),
                           SizedBox(
                             height: 15.0,
@@ -217,7 +196,8 @@ class _AdditionalInfoPortfolioAddState
                                           isloading = true;
                                         });
 
-                                        addPortfolio(user.uid, context);
+                                        updateAddCompanyAbout(
+                                            user.uid, context);
                                       }
                                     },
                                     child: Text(
@@ -234,11 +214,11 @@ class _AdditionalInfoPortfolioAddState
                           )
                         ]),
                   ),
-                ]),
+                ],
               ),
-            ]);
-          },
-        ),
+            ),
+          ]);
+        }),
       ),
     );
   }

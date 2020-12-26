@@ -1,59 +1,76 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:job_app/models/portfolio.dart';
-import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio.dart';
-import 'package:job_app/screens/user_profile/portfolio/portfolio_details.dart';
+import 'package:job_app/models/experience.dart';
+import 'package:job_app/models/user.dart';
 import 'package:job_app/shared/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
-class PortfolioEdit extends StatefulWidget {
-  final Portfolio data;
+class ExperienceEdit extends StatefulWidget {
+  final Experience data;
   final String pageState;
-  PortfolioEdit({this.data, this.pageState});
+  ExperienceEdit({Key key, this.data, this.pageState}) : super(key: key);
   @override
-  _PortfolioEditState createState() => _PortfolioEditState();
+  _ExperienceEditState createState() => _ExperienceEditState();
 }
 
-class _PortfolioEditState extends State<PortfolioEdit> {
+class _ExperienceEditState extends State<ExperienceEdit> {
   bool isloading = false;
-  String year;
-  String title;
-  String description;
+  String fromDate, toDate;
+  String organisation, position;
+  String duties;
   dynamic processOutcome;
 
   final _formKey = GlobalKey<FormState>();
 
   //----------------------------------------------------------------------------------------
 
-  TextEditingController _yearController = TextEditingController();
-  TextEditingController _titleController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _fromDateController = TextEditingController();
+  TextEditingController _toDateController = TextEditingController();
+  TextEditingController _organisationController = TextEditingController();
+  TextEditingController _positionController = TextEditingController();
+  TextEditingController _dutiesController = TextEditingController();
 
   //---------------------------------------------------------------------------------------
 
-  void updatePortfolio(String docId, BuildContext context) async {
-    print(docId);
-    DocumentReference docRef =
-        Firestore.instance.collection("Portfolio").document(docId);
+  void updateExperience(userId, context) async {
+    //var uuidFactory = Uuid();
+    //var uuid = uuidFactory.v4();
+    fromDate = _fromDateController.text;
+    toDate = _toDateController.text;
+    organisation = _organisationController.text;
+    position = _positionController.text;
+    duties = _dutiesController.text;
 
-    Map<String, dynamic> editedData = {
-      "Id": widget.data.itemId,
-      "description": _descriptionController.text,
-      "owner": widget.data.owner,
-      "title": _titleController.text,
-      "year": _yearController.text,
-    };
+    try {
+      DocumentReference documentRef = Firestore.instance
+          .collection("Experience")
+          .document(widget.data.docId);
+      Map<String, dynamic> experienceData = {
+        //'uuid': uuid,
+        //'owner': userId,
+        'from_date': _fromDateController.text,
+        'to_date': _toDateController.text,
+        'organisation': _organisationController.text,
+        'position': _positionController.text,
+        'duties': _dutiesController.text,
+      };
 
-    await docRef.setData(editedData).whenComplete(() {
-      processOutcome = "Portfolio has been updated.";
-      showInSnackBar(processOutcome, context);
-      setState(() {
-        isloading = false;
+      await documentRef.updateData(experienceData).whenComplete(() {
+        processOutcome = 'Experience has been updated.';
       });
+    } catch (e) {
+      processOutcome = e.toString();
+      print(e.toString());
+    }
+    setState(() {
+      isloading = false;
     });
-  }
+    showInSnackBar(processOutcome, context);
+  } // end of addPortfolio
 
-  //---------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------
 
   void showInSnackBar(String processOutcome, BuildContext context) {
     Scaffold.of(context).showSnackBar(
@@ -69,24 +86,28 @@ class _PortfolioEditState extends State<PortfolioEdit> {
   }
 
 //------------------------------------------------------------------------------------------
-  void retrieveData() {
-    _yearController.text = widget.data.year;
-    _titleController.text = widget.data.title;
-    _descriptionController.text = widget.data.description;
+  void retrieveExperienceItem() {
+    _fromDateController.text = widget.data.fromDate;
+    _toDateController.text = widget.data.toDate;
+    _organisationController.text = widget.data.organisation;
+    _positionController.text = widget.data.position;
+    _dutiesController.text = widget.data.duties;
   }
 
-//---------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------
 
   @override
   void initState() {
-    retrieveData();
-    super.initState();
+    print(widget.data.docId);
+    retrieveExperienceItem();
+    // TODO: implement initState
   }
 
 //-----------------------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<User>(context);
+
     return SafeArea(
       child: Scaffold(
         body: Builder(
@@ -125,57 +146,82 @@ class _PortfolioEditState extends State<PortfolioEdit> {
                                 fontFamily: 'SourceSansPro'),
                           ),
                           Text(
-                            'Edit Portfolio',
+                            'Edit Experience',
                             style: TextStyle(
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SourceSansPro'),
                           ),
-                          SizedBox(height: 10.0),
                           SizedBox(height: 20.0),
                           Row(
                             children: <Widget>[
                               Expanded(
-                                flex: 1,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _yearController,
+                                  controller: _fromDateController,
                                   validator: (value) =>
-                                      value.isEmpty ? 'Year is required' : null,
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Year'),
-                                  maxLength: 4,
+                                      .copyWith(labelText: 'From Date'),
+                                  inputFormatters: [
+                                    LengthLimitingTextInputFormatter(20)
+                                  ],
+                                  //maxLength: 4,
                                 ),
                               ),
-                              SizedBox(width: 1.0),
+                              SizedBox(width: 3.0),
                               Expanded(
-                                flex: 3,
+                                flex: 2,
                                 child: TextFormField(
-                                  controller: _titleController,
-                                  validator: (value) => value.isEmpty
-                                      ? 'Title is required'
-                                      : null,
+                                  controller: _toDateController,
+                                  validator: (value) =>
+                                      value.isEmpty ? 'Date is required' : null,
                                   decoration: profileTextInputDecoration
-                                      .copyWith(labelText: 'Title'),
+                                      .copyWith(labelText: 'To Date'),
                                   inputFormatters: [
-                                    LengthLimitingTextInputFormatter(100),
+                                    LengthLimitingTextInputFormatter(20),
                                   ],
-                                  maxLength: 100,
+                                  //maxLength: 100,
                                 ),
                               )
                             ],
                           ),
                           SizedBox(
-                            height: 10.0,
+                            height: 6.0,
                           ),
                           TextFormField(
-                            controller: _descriptionController,
+                            controller: _organisationController,
                             validator: (value) => value.isEmpty
-                                ? 'Description is required'
+                                ? 'Organisation is required'
                                 : null,
-                            maxLines: 7,
-                            keyboardType: TextInputType.multiline,
                             decoration: profileTextInputDecoration.copyWith(
-                                labelText: 'Description'),
+                                labelText: 'Organisation'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _positionController,
+                            validator: (value) =>
+                                value.isEmpty ? 'Position is required' : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Position'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(150)
+                            ],
+                          ),
+                          SizedBox(height: 6.0),
+                          TextFormField(
+                            controller: _dutiesController,
+                            maxLines: 4,
+                            validator: (value) =>
+                                value.isEmpty ? 'Duties is required' : null,
+                            decoration: profileTextInputDecoration.copyWith(
+                                labelText: 'Duties & Responsibilities'),
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(50),
+                            ],
                           ),
                           SizedBox(
                             height: 15.0,
@@ -219,8 +265,7 @@ class _PortfolioEditState extends State<PortfolioEdit> {
                                           isloading = true;
                                         });
 
-                                        updatePortfolio(
-                                            widget.data.id, context);
+                                        updateExperience(user.uid, context);
                                       }
                                     },
                                     child: Text(

@@ -7,7 +7,8 @@ import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 
 class AdditionalInfoPortfolio extends StatefulWidget {
-  AdditionalInfoPortfolio({Key key}) : super(key: key);
+  String pageState;
+  AdditionalInfoPortfolio({Key key, this.pageState}) : super(key: key);
   @override
   _AdditionalInfoPortfolioState createState() =>
       _AdditionalInfoPortfolioState();
@@ -17,6 +18,7 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
   bool isloading = false;
 
   final _formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,7 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
 
     return SafeArea(
       child: Scaffold(
+        key: _scaffoldKey,
         body: Builder(
           builder: (BuildContext context) {
             return ListView(children: <Widget>[
@@ -38,14 +41,18 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -118,6 +125,7 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
                                           owner: data['owner'],
                                           title: data['title'],
                                           year: data['year'],
+                                          pageState: widget.pageState,
                                         );
                                       });
                             },
@@ -135,9 +143,12 @@ class _AdditionalInfoPortfolioState extends State<AdditionalInfoPortfolio> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AdditionalInfoPortfolioAdd()));
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    AdditionalInfoPortfolioAdd(pageState: widget.pageState),
+              ),
+            );
           },
           child: Icon(Icons.add),
         ),

@@ -9,6 +9,8 @@ import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
 
 class Experience extends StatefulWidget {
+  final String pageState;
+  Experience({this.pageState});
   @override
   _ExperienceState createState() => _ExperienceState();
 }
@@ -37,14 +39,18 @@ class _ExperienceState extends State<Experience> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -119,6 +125,7 @@ class _ExperienceState extends State<Experience> {
                                           organisation: data['organisation'],
                                           position: data['position'],
                                           duties: data['duties'],
+                                          pageState: widget.pageState,
                                         );
                                       });
                             },
@@ -135,8 +142,13 @@ class _ExperienceState extends State<Experience> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ExperienceAdd()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ExperienceAdd(pageState: widget.pageState),
+              ),
+            );
           },
           child: Icon(Icons.add),
         ),

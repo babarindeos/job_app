@@ -66,7 +66,10 @@ class _SearchJobsState extends State<SearchJobs> {
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : SafeArea(
+        : WillPopScope(
+            onWillPop: () {
+              print("am here");
+            },
             child: Scaffold(
               body: Container(
                 padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:job_app/models/jobposted.dart';
+import 'package:job_app/screens/home/jobs/user_interviews.dart';
 import 'package:job_app/screens/home/your_jobs_applied.dart';
 import 'package:job_app/shared/constants.dart';
 
@@ -16,26 +17,69 @@ class ShortedListed extends StatefulWidget {
 
 class _ShortedListedState extends State<ShortedListed> {
   List shortListedList = [];
-  List shortListedJobsInfo = [];
+  List shortListedJobList = [];
   bool isLoading = true;
+  JobPosted job;
+  List visibleShortList = [];
 
 //------------------------------------------------------------------------------
   Future<void> _getShortListedList() async {
     print("-----ShortListed------");
-    Query collectionReference = Firestore.instance
-        .collection("Shortlist")
-        .where("candidate_id", isEqualTo: widget.currentUserId);
-    await collectionReference.getDocuments().then((querySnapshot) {
-      querySnapshot.documents.forEach((element) async {
-        if (element.exists) {
-          shortListedList.add(element.data['job_uid']);
-        }
+    try {
+      Query collectionReference = Firestore.instance
+          .collection("Shortlist")
+          .where("candidate_id", isEqualTo: widget.currentUserId);
+      await collectionReference.getDocuments().then((querySnapshot) {
+        querySnapshot.documents.forEach((element) async {
+          if (element.exists) {
+            shortListedList.add(element.data['job_uid']);
+            await _getShortedJobInfo(element['job_docId']);
+          }
+        });
       });
-    });
 
-    // turn isLoading false
-    setState(() {
-      isLoading = false;
+      // turn isLoading false
+      setState(() {
+        isLoading = false;
+        visibleShortList = shortListedJobList;
+      });
+    } catch (e) {
+      print(e.code);
+      print(e.message);
+    } finally {
+      // turn isLoading false
+      setState(() {
+        isLoading = false;
+        visibleShortList = shortListedJobList;
+      });
+    }
+  }
+
+//------------------------------------------------------------------------------
+  Future<void> _getShortedJobInfo(String jobDocId) async {
+    DocumentReference docRef =
+        Firestore.instance.collection("Job_Postings").document(jobDocId);
+    await docRef.get().then((dataSnapshot) {
+      print(dataSnapshot.documentID);
+      job = JobPosted(
+        uid: dataSnapshot['uid'],
+        docId: dataSnapshot.documentID,
+        area: dataSnapshot['area'],
+        description: dataSnapshot['description'],
+        location: dataSnapshot['location'],
+        owner: dataSnapshot['owner'],
+        position: dataSnapshot['position'],
+        payment: dataSnapshot['payment'],
+        expiration: dataSnapshot['expiration'],
+        posted: dataSnapshot['posted'],
+        postedFmt: dataSnapshot['postedFmt'],
+      );
+
+      //----------------------------------------
+      setState(() {
+        shortListedJobList.add(job);
+      });
+      //----------------------------------------
     });
   }
 
@@ -72,11 +116,12 @@ class _ShortedListedState extends State<ShortedListed> {
                   InkWell(
                     onTap: () {
                       Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => YourJobsApplied(),
-                          ),
-                          ModalRoute.withName('/'));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => YourJobsApplied(),
+                        ),
+                        ModalRoute.withName('/'),
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -115,18 +160,33 @@ class _ShortedListedState extends State<ShortedListed> {
                     ),
                   ),
                   Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 10.0, horizontal: 15.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.blue),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(15.0),
-                        ),
+                    padding:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue),
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.0),
                       ),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserInterviews(
+                                  currentUserId: widget.currentUserId),
+                            ),
+                            ModalRoute.withName('/'),
+                          );
+                        }
+                      },
                       child: Text(
                         'Interviews',
                         style: TextStyle(fontWeight: FontWeight.bold),
-                      ))
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(
@@ -136,8 +196,18 @@ class _ShortedListedState extends State<ShortedListed> {
                 alignment: Alignment.center,
                 child: TextFormField(
                   decoration: searchTextInputDecoration.copyWith(
-                      labelText: 'Search for Shortlisted',
+                      labelText: 'Search Shortlisted Jobs',
                       prefixIcon: Icon(Icons.search)),
+                  onChanged: (value) {
+                    visibleShortList = shortListedJobList
+                        .where(
+                          (element) => element.position.toLowerCase().contains(
+                                value.toLowerCase(),
+                              ),
+                        )
+                        .toList();
+                    setState(() {});
+                  },
                 ),
               ),
               SizedBox(
@@ -152,46 +222,37 @@ class _ShortedListedState extends State<ShortedListed> {
                         child: CircularProgressIndicator(),
                       )
                     : Text(
-                        'No of Shortlisted Jobs: ${shortListedList.length.toString()}'),
+                        'No of Shortlisted Jobs: ${visibleShortList.length.toString()}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
-              shortListedList.length > 0
-                  ? StreamBuilder(
-                      stream: Firestore.instance
-                          .collection("Job_Postings")
-                          .where("uid", whereIn: shortListedList)
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        return !snapshot.hasData
-                            ? Center(
-                                child: CircularProgressIndicator(),
-                              )
-                            : ListView.builder(
-                                shrinkWrap: true,
-                                scrollDirection: Axis.vertical,
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data.documents.length,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshot data =
-                                      snapshot.data.documents[index];
-                                  return ShortListedItem(
-                                    currentUserId: widget.currentUserId,
-                                    documentSnapshot: data,
-                                    shortListedDocId: data.documentID,
-                                    jobDocId: data['job_docId'],
-                                    jobUid: data['uid'],
-                                    area: data['area'],
-                                    description: data['description'],
-                                    expiration: data['expiration'],
-                                    location: data['location'],
-                                    owner: data['owner'],
-                                    payment: data['payment'],
-                                    position: data['position'],
-                                    posted: data['posted'],
-                                    postedFmt: data['postedFmt'],
-                                  );
-                                });
+              !isLoading
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: visibleShortList.length,
+                      itemBuilder: (context, index) {
+                        return ShortListedItem(
+                          currentUserId: widget.currentUserId,
+                          jobDocId: shortListedJobList[index].docId,
+                          jobUid: shortListedJobList[index].uid,
+                          area: shortListedJobList[index].area,
+                          description: shortListedJobList[index].description,
+                          expiration: shortListedJobList[index].expiration,
+                          location: shortListedJobList[index].location,
+                          owner: shortListedJobList[index].owner,
+                          payment: shortListedJobList[index].payment,
+                          position: shortListedJobList[index].position,
+                          posted: shortListedJobList[index].posted,
+                          postedFmt: shortListedJobList[index].postedFmt,
+                        );
                       })
-                  : Text('')
+                  : Center(
+                      child: LinearProgressIndicator(),
+                    ),
             ]),
       ),
     );
@@ -214,22 +275,22 @@ class ShortListedItem extends StatefulWidget {
       position,
       posted,
       postedFmt;
-  DocumentSnapshot documentSnapshot;
-  ShortListedItem(
-      {this.currentUserId,
-      this.shortListedDocId,
-      this.jobDocId,
-      this.jobUid,
-      this.area,
-      this.description,
-      this.expiration,
-      this.location,
-      this.owner,
-      this.payment,
-      this.position,
-      this.posted,
-      this.postedFmt,
-      this.documentSnapshot});
+
+  ShortListedItem({
+    this.currentUserId,
+    this.shortListedDocId,
+    this.jobDocId,
+    this.jobUid,
+    this.area,
+    this.description,
+    this.expiration,
+    this.location,
+    this.owner,
+    this.payment,
+    this.position,
+    this.posted,
+    this.postedFmt,
+  });
   @override
   _ShortListedItemState createState() => _ShortListedItemState();
 }
@@ -272,13 +333,22 @@ class _ShortListedItemState extends State<ShortListedItem> {
 
 //------------------------------------------------------------------------------
   Future _checkInterviewStatus() async {
-    //var query = Firestore.instance.collection("Shor")
+    var query = Firestore.instance
+        .collection("Interview_Schedule")
+        .where("candidate_docid", isEqualTo: widget.currentUserId)
+        .where("job_docid", isEqualTo: widget.jobDocId);
+    var querySnapshot = await query.getDocuments().then((value) => value);
+    print(
+        "Documents Length ----- " + querySnapshot.documents.length.toString());
+    return querySnapshot.documents.length;
   }
 //-------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    print(widget.jobUid);
+    print("------ Job Uid ---" + widget.jobDocId);
+    print("Current User---------------" + widget.currentUserId);
+    print(widget.shortListedDocId);
     return Container(
       child: Card(
         elevation: 7.0,
@@ -402,7 +472,28 @@ class _ShortListedItemState extends State<ShortListedItem> {
                   children: <Widget>[
                     Expanded(
                       flex: 2,
-                      child: Container(),
+                      child: FutureBuilder(
+                          future: _checkInterviewStatus(),
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              return snapshot.data > 0
+                                  ? Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.chat,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                          'Interview',
+                                          style: TextStyle(fontSize: 12.0),
+                                        ),
+                                      ],
+                                    )
+                                  : Text('No Data');
+                            } else {
+                              return Text('');
+                            }
+                          }),
                     ),
                     Expanded(
                       flex: 2,

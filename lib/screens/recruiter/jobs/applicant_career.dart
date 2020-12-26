@@ -10,6 +10,11 @@ class ApplicantCareer extends StatefulWidget {
 }
 
 class _ApplicantCareerState extends State<ApplicantCareer> {
+  String facebookUrl = '';
+  String instagramUrl = '';
+  String linkedinUrl = '';
+  String snapchatUrl = '';
+  bool isLoadingSocialMediaUrls = true;
 //------------------------------------------------------------------------------
 // launch Facebook Url
   _launchUrl(BuildContext context, String url) async {
@@ -42,6 +47,26 @@ class _ApplicantCareerState extends State<ApplicantCareer> {
                 )
               ]);
         });
+  }
+
+//------------------------------------------------------------------------------
+  Future _getSocialMedia(String userId) async {
+    print("User Id -------------- " + userId.toString());
+    DocumentReference docRef =
+        Firestore.instance.collection("SocialMedia").document(userId);
+    await docRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        setState(() {
+          facebookUrl = dataSnapshot['facebook'];
+          instagramUrl = dataSnapshot['instagram'];
+          linkedinUrl = dataSnapshot['linkedin'];
+          snapchatUrl = dataSnapshot['snapchat'];
+        });
+      }
+    });
+    isLoadingSocialMediaUrls = false;
+    setState(() {});
+    return;
   }
 
 //------------------------------------------------------------------------------
@@ -104,125 +129,160 @@ class _ApplicantCareerState extends State<ApplicantCareer> {
           SizedBox(
             height: 15.0,
           ),
-          StreamBuilder(
-              stream: Firestore.instance
-                  .collection("SocialMedia")
-                  .document(widget.userId)
-                  .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-                return !snapshot.hasData
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : Container(
-                        alignment: Alignment.centerLeft,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              'Facebook',
+          Container(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              'Facebook',
+              style: TextStyle(
+                fontFamily: 'SourceSansPro',
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 5.0,
+          ),
+          FutureBuilder(
+              future: _getSocialMedia(widget.userId),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (!isLoadingSocialMediaUrls) {
+                  return Container(
+                    alignment: Alignment.topLeft,
+                    child: facebookUrl.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              _launchUrl(context, facebookUrl);
+                            },
+                            child: Text(
+                              facebookUrl,
                               style: TextStyle(
-                                fontFamily: 'SourceSansPro',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
+                                  decoration: TextDecoration.none,
+                                  color: Colors.blue),
                             ),
-                            SizedBox(
-                              height: 5.0,
-                            ),
-                            snapshot.data['facebook'].toString().isEmpty
-                                ? Text('')
-                                : InkWell(
-                                    onTap: () {
-                                      _launchUrl(
-                                          context, snapshot.data['facebook']);
-                                    },
-                                    child: Text(
-                                      snapshot.data['facebook'].toString(),
-                                      style: TextStyle(
-                                        decoration: TextDecoration.none,
-                                        color: Colors.blue,
-                                      ),
-                                    ),
-                                  ),
-                            SizedBox(height: 15.0),
-                            Text(
-                              'Instagram',
+                          )
+                        : Container(),
+                  );
+                } else {
+                  return Container(
+                    child: LinearProgressIndicator(),
+                  );
+                }
+              }),
+          SizedBox(height: 15.0),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Instagram',
+              style: TextStyle(
+                  fontFamily: 'SourceSansPro',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+          SizedBox(height: 5.0),
+          FutureBuilder(
+              future: _getSocialMedia(widget.userId),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (!isLoadingSocialMediaUrls) {
+                  return Container(
+                    alignment: Alignment.topLeft,
+                    child: instagramUrl.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              _launchUrl(context, instagramUrl);
+                            },
+                            child: Text(
+                              instagramUrl,
                               style: TextStyle(
-                                  fontFamily: 'SourceSansPro',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.0),
+                                  decoration: TextDecoration.none,
+                                  color: Colors.blue),
                             ),
-                            snapshot.data['instagram'].toString().isEmpty
-                                ? Text('')
-                                : InkWell(
-                                    onTap: () {
-                                      _launchUrl(
-                                          context, snapshot.data['instagram']);
-                                    },
-                                    child: Text(
-                                      snapshot.data['instagram'].toString(),
-                                      style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          color: Colors.blue),
-                                    ),
-                                  ),
-                            SizedBox(height: 15.0),
-                            Text(
-                              'LinkedIn',
+                          )
+                        : Container(),
+                  );
+                } else {
+                  return Container(
+                    child: LinearProgressIndicator(),
+                  );
+                }
+              }),
+          SizedBox(height: 15.0),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'LinkedIn',
+              style: TextStyle(
+                  fontFamily: 'SourceSansPro',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+          SizedBox(height: 5.0),
+          FutureBuilder(
+              future: _getSocialMedia(widget.userId),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (!isLoadingSocialMediaUrls) {
+                  return Container(
+                    alignment: Alignment.topLeft,
+                    child: instagramUrl.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              _launchUrl(context, linkedinUrl);
+                            },
+                            child: Text(
+                              linkedinUrl,
                               style: TextStyle(
-                                fontFamily: 'SourceSansPro',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0,
-                              ),
+                                  decoration: TextDecoration.none,
+                                  color: Colors.blue),
                             ),
-                            SizedBox(
-                              height: 5.0,
-                            ),
-                            snapshot.data['linkedin'].toString().isEmpty
-                                ? Text('')
-                                : InkWell(
-                                    onTap: () {
-                                      _launchUrl(context,
-                                          snapshot.data['linkedin'].toString());
-                                    },
-                                    child: Text(
-                                      snapshot.data['linkedin'].toString(),
-                                      style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          color: Colors.blue),
-                                    ),
-                                  ),
-                            SizedBox(
-                              height: 15.0,
-                            ),
-                            Text(
-                              'Snapchat',
+                          )
+                        : Container(),
+                  );
+                } else {
+                  return Container(
+                    child: LinearProgressIndicator(),
+                  );
+                }
+              }),
+          SizedBox(height: 15.0),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'Snapchat',
+              style: TextStyle(
+                  fontFamily: 'SourceSansPro',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16.0),
+            ),
+          ),
+          SizedBox(height: 5.0),
+          FutureBuilder(
+              future: _getSocialMedia(widget.userId),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (!isLoadingSocialMediaUrls) {
+                  return Container(
+                    alignment: Alignment.topLeft,
+                    child: instagramUrl.isNotEmpty
+                        ? InkWell(
+                            onTap: () {
+                              _launchUrl(context, snapchatUrl);
+                            },
+                            child: Text(
+                              snapchatUrl,
                               style: TextStyle(
-                                  fontFamily: 'SourceSansPro',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16.0),
+                                  decoration: TextDecoration.none,
+                                  color: Colors.blue),
                             ),
-                            SizedBox(height: 5.0),
-                            snapshot.data['snapchat'].toString().isEmpty
-                                ? Text('')
-                                : InkWell(
-                                    onTap: () {
-                                      _launchUrl(
-                                          context, snapshot.data['snapchat']);
-                                    },
-                                    child: Text(
-                                      snapshot.data['snapchat'].toString(),
-                                      style: TextStyle(
-                                          decoration: TextDecoration.none,
-                                          color: Colors.blue),
-                                    ),
-                                  ),
-                          ],
-                        ),
-                      );
-              })
+                          )
+                        : Container(),
+                  );
+                } else {
+                  return Container(
+                    child: LinearProgressIndicator(),
+                  );
+                }
+              }),
         ],
       ),
     );

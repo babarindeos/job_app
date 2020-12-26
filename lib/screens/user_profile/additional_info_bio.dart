@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:job_app/shared/constants.dart';
 
 class AdditionalInfoBio extends StatefulWidget {
+  String pageState;
+  AdditionalInfoBio({this.pageState});
   @override
   _AdditionalInfoBioState createState() => _AdditionalInfoBioState();
 }
@@ -114,14 +116,18 @@ class _AdditionalInfoBioState extends State<AdditionalInfoBio> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 30.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(

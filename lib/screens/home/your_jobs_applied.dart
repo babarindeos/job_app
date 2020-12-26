@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:job_app/models/jobposted.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/home/jobs/shortlisted.dart';
+import 'package:job_app/screens/home/jobs/user_interviews.dart';
 import 'package:job_app/services.dart/auth.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,9 @@ import 'package:simple_tooltip/simple_tooltip.dart';
 import 'jobs/job_details.dart';
 
 class YourJobsApplied extends StatefulWidget {
-  YourJobsApplied({Key key}) : super(key: key);
+  String currentUserId;
+
+  YourJobsApplied({Key key, this.currentUserId}) : super(key: key);
 
   @override
   _YourJobsAppliedState createState() => _YourJobsAppliedState();
@@ -40,24 +43,71 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
   Future<void> _getApplicationList() async {
     final FirebaseUser _user = await FirebaseAuth.instance.currentUser();
     currentUserId = _user.uid;
-    Query collectionRef = Firestore.instance
-        .collection("Job_Applications")
-        .where("user_id", isEqualTo: currentUserId);
-    await collectionRef.getDocuments().then((querySnapshot) {
-      //querySnapshot
-      querySnapshot.documents.forEach((element) async {
-        if (element.exists) {
-          applicationList.add(element.documentID);
-          appliedJobList.add(element['job_id']);
-          await _getAppliedJobUid(element['job_id']);
-          //print(appliedJobsUid);
-          setState(() {
-            visibleApplicationList = applicationList;
-            isLoading = false;
-          });
-        }
+    try {
+      Query collectionRef = Firestore.instance
+          .collection("Job_Applications")
+          .where("user_id", isEqualTo: currentUserId);
+      await collectionRef.getDocuments().then((querySnapshot) {
+        //--------------querySnapshot -------------------
+        querySnapshot.documents.forEach((element) async {
+          if (element.exists) {
+            applicationList.add(element.documentID);
+            //appliedJobList.add(element['job_id']);
+            appliedJobsUid.add(element['job_uid']);
+            await _getAppliedJobModel(element['job_id']);
+            //await _getAppliedJobUid(element['job_id']);
+            //print(appliedJobsUid);
+            //-----------------------------------------------------------------------
+            setState(() {
+              visibleApplicationList = appliedJobList;
+              print(visibleApplicationList);
+              isLoading = false;
+              print(isLoading);
+            });
+            //-----------------------------------------------------------------------
+
+          }
+        });
+        //------  end of querySnapshot  ------------------------
       });
-      //end of querySnapshot
+    } catch (e) {
+      print(e.code);
+      print(e.message);
+    } finally {
+      setState(() {
+        visibleApplicationList = appliedJobList;
+        print(visibleApplicationList);
+        isLoading = false;
+        print(isLoading);
+      });
+    }
+  }
+
+//------------------------------------------------------------------------------
+  Future<void> _getAppliedJobModel(String jobDocId) async {
+    DocumentReference documentRef =
+        Firestore.instance.collection("Job_Postings").document(jobDocId);
+    await documentRef.get().then((dataSnapshot) {
+      if (dataSnapshot.exists) {
+        print('Model');
+        jobsApplied = JobPosted(
+          uid: dataSnapshot['uid'],
+          docId: dataSnapshot.documentID,
+          owner: dataSnapshot['owner'],
+          position: dataSnapshot['position'],
+          area: dataSnapshot['area'],
+          description: dataSnapshot['description'],
+          location: dataSnapshot['location'],
+          payment: dataSnapshot['payment'],
+          expiration: dataSnapshot['expiration'],
+          posted: dataSnapshot['posted'],
+          postedFmt: dataSnapshot['postedFmt'],
+        );
+        setState(() {
+          appliedJobList.add(jobsApplied);
+          print(appliedJobList);
+        });
+      }
     });
   }
 
@@ -150,19 +200,31 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                     ),
                   ),
                 ),
-                Container(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.blue),
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(15.0),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserInterviews(
+                            currentUserId: currentUserId,
+                          ),
+                        ),
+                        ModalRoute.withName('/'));
+                  },
+                  child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 15.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.blue),
+                        borderRadius: BorderRadius.only(
+                          topRight: Radius.circular(15.0),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      'Interviews',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ))
+                      child: Text(
+                        'Interviews',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      )),
+                )
               ],
             ),
             SizedBox(
@@ -172,10 +234,16 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
               alignment: Alignment.center,
               child: TextFormField(
                 decoration: searchTextInputDecoration.copyWith(
-                    labelText: 'Search for Applications',
+                    labelText: 'Search Applications',
                     prefixIcon: Icon(Icons.search)),
                 onChanged: (value) {
-                  jobsAppliedName = jobsAppliedName.toSet().toList();
+                  //jobsAppliedName = jobsAppliedName.toSet().toList();
+                  visibleApplicationList = appliedJobList
+                      .where((element) => element.position
+                          .toLowerCase()
+                          .contains(value.toLowerCase()))
+                      .toList();
+                  setState(() {});
                 },
               ),
             ),
@@ -191,47 +259,37 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                       child: CircularProgressIndicator(),
                     )
                   : Text(
-                      'No of Applications: ${applicationList.length.toString()}'),
+                      'No of Applications: ${visibleApplicationList.length.toString()}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
             ),
-            appliedJobList.length > 0
-                ? StreamBuilder(
-                    stream: Firestore.instance
-                        .collection("Job_Postings")
-                        .where("uid", whereIn: appliedJobsUid)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      return !snapshot.hasData
-                          ? Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : ListView.builder(
-                              shrinkWrap: true,
-                              scrollDirection: Axis.vertical,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data.documents.length,
-                              itemBuilder: (context, index) {
-                                DocumentSnapshot data =
-                                    snapshot.data.documents[index];
-                                return YourJobsAppliedItem(
-                                  currentUserId: currentUserId,
-                                  documentSnapshot: data,
-                                  docId: data.documentID,
-                                  jobUid: data['job_uid'],
-                                  applicationUid: data['uid'],
-                                  position: data['position'],
-                                  area: data['area'],
-                                  location: data['location'],
-                                  owner: data['owner'],
-                                  payment: data['payment'],
-                                  expiration: data['expiration'],
-                                  posted: data['posted'],
-                                  postedFmt: data['postedFmt'],
-                                  datePosted: data['date_posted'],
-                                  jobsAppliedName: jobsAppliedName,
-                                );
-                              });
+            !isLoading
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemCount: visibleApplicationList.length,
+                    itemBuilder: (context, index) {
+                      return YourJobsAppliedItem(
+                        currentUserId: currentUserId,
+                        docId: visibleApplicationList[index].docId,
+                        jobUid: visibleApplicationList[index].uid,
+                        position: visibleApplicationList[index].position,
+                        area: visibleApplicationList[index].area,
+                        location: visibleApplicationList[index].location,
+                        owner: visibleApplicationList[index].owner,
+                        payment: visibleApplicationList[index].payment,
+                        expiration: visibleApplicationList[index].expiration,
+                        posted: visibleApplicationList[index].posted,
+                        postedFmt: visibleApplicationList[index].postedFmt,
+                        jobsAppliedName: jobsAppliedName,
+                      );
                     })
-                : Text(''),
+                : Container(
+                    child: LinearProgressIndicator(),
+                  ),
           ],
         ),
       ),
@@ -245,7 +303,6 @@ class YourJobsAppliedItem extends StatefulWidget {
   String currentUserId,
       docId,
       jobUid,
-      applicationUid,
       position,
       area,
       location,
@@ -256,13 +313,12 @@ class YourJobsAppliedItem extends StatefulWidget {
       postedFmt;
   List jobsAppliedName;
 
-  DocumentSnapshot documentSnapshot;
+  //DocumentSnapshot documentSnapshot;
   Timestamp datePosted;
   YourJobsAppliedItem({
     this.currentUserId,
     this.docId,
     this.jobUid,
-    this.applicationUid,
     this.position,
     this.area,
     this.location,
@@ -271,8 +327,6 @@ class YourJobsAppliedItem extends StatefulWidget {
     this.expiration,
     this.posted,
     this.postedFmt,
-    this.datePosted,
-    this.documentSnapshot,
     this.jobsAppliedName,
   });
 
@@ -303,14 +357,16 @@ class _YourJobsAppliedItemState extends State<YourJobsAppliedItem> {
 // Get Application Date
 
   Future _getApplicationDate() async {
+    print("JobUID --" + widget.jobUid);
     var query = Firestore.instance
         .collection("Job_Applications")
-        .where("uid", isEqualTo: widget.jobUid);
+        .where("job_uid", isEqualTo: widget.jobUid);
     var querySnapshot = await query.getDocuments().then((value) => value);
     querySnapshot.documents.forEach((element) {
       date_applied = element.data['date_applied'];
       result = date_applied.toDate();
       formattedDate = DateFormat.yMMMEd().format(result);
+      print(formattedDate.toString());
       //formattedDate = DateFormat.yMMMd().format(result.toDate());
       //date_applied = DateTime.fromMillisecondsSinceEpoch(result);
     });

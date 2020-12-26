@@ -6,6 +6,7 @@ class Profile {
   String age;
   String state;
   String country;
+  String countryCode;
   String phone;
   String avatarUrl;
 
@@ -18,6 +19,7 @@ class Profile {
       this.age,
       this.state,
       this.country,
+      this.countryCode,
       this.phone,
       this.avatarUrl});
 
@@ -61,6 +63,14 @@ class Profile {
     return country;
   }
 
+  set uCountryCode(String countryCode) {
+    this.countryCode = countryCode;
+  }
+
+  String get uCountryCode {
+    return countryCode;
+  }
+
   set uPhone(String phone) {
     this.phone = phone;
   }
@@ -91,6 +101,7 @@ class Profile {
         'age': age,
         'state': state,
         'country': country,
+        'country_code': countryCode,
         'phone': phone,
       };
 
@@ -101,6 +112,7 @@ class Profile {
         'age': age,
         'state': state,
         'country': country,
+        'country_code': countryCode,
         'phone': phone,
         'avatar': avatarUrl
       };

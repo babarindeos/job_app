@@ -10,6 +10,8 @@ import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/home/your_jobs_applied.dart';
+import 'package:job_app/screens/recruiter/about_organisation.dart';
+import 'package:job_app/screens/recruiter/additional_company_info.dart';
 import 'package:job_app/screens/recruiter/jobs/jobs_tracker.dart';
 import 'package:job_app/screens/recruiter/menu_options.dart';
 import 'package:job_app/screens/recruiter/message/message_listing.dart';
@@ -37,16 +39,19 @@ class _RecruiterHomeState extends State<RecruiterHome> {
     setState(() {
       myId = _user.uid;
     });
+    getUserBioDataInfo();
   }
 
 //------------------------------------------------------------------------------
   Future<void> getUserBioDataInfo() async {
+    print("======== My ID : " + myId.toString());
     DocumentReference docRef =
         Firestore.instance.collection("BioData").document(myId);
     await docRef.get().then((dataSnapshot) {
       setState(() {
         myAvatar = dataSnapshot['avatar'];
         myName = dataSnapshot['name'];
+        print(myAvatar.toString());
       });
     });
   }
@@ -55,7 +60,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
   @override
   void initState() {
     // TODO: implement initState
-
+    getUserId();
     super.initState();
   }
 
@@ -123,10 +128,7 @@ class _RecruiterHomeState extends State<RecruiterHome> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        print("am here");
-      },
+    return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
         drawer: Drawer(
@@ -152,12 +154,12 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                         backgroundColor: Colors.blue,
                         child: CircleAvatar(
                           radius: 44.0,
-                          backgroundColor: Colors.blue,
+                          backgroundColor: Colors.white,
                           child: ClipOval(
                             child: SizedBox(
                               width: 100,
                               height: 180,
-                              child: myAvatar == null
+                              child: myAvatar == '' || myAvatar == null
                                   ? Image(
                                       fit: BoxFit.cover,
                                       image: AssetImage(
@@ -213,10 +215,22 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       size: 30.0,
                     ),
                     SizedBox(width: 27.0),
-                    Text(
-                      'BioData Info',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15.0),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateProfile(
+                              pageState: 'update',
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'BioData Info',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 15.0),
+                      ),
                     ),
                   ],
                 ),
@@ -236,11 +250,22 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       size: 30.0,
                     ),
                     SizedBox(width: 27.0),
-                    Text(
-                      'Company Info',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15.0,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AboutOrganisation(pageState: 'update'),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Company Info',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15.0,
+                        ),
                       ),
                     ),
                   ],
@@ -261,10 +286,19 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       size: 30.0,
                     ),
                     SizedBox(width: 27.0),
-                    Text(
-                      'Additional Info',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15.0),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AdditionalCompanyInfo(
+                                    pageState: 'update')));
+                      },
+                      child: Text(
+                        'Additional Info',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 15.0),
+                      ),
                     ),
                   ],
                 ),

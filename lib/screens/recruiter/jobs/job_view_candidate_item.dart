@@ -20,6 +20,8 @@ class JobViewCandidateItem extends StatefulWidget {
 }
 
 class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
+  String avatarUrl = '';
+
   Future _getBioData(String userId) async {
     return Firestore.instance
         .collection("BioData")
@@ -30,11 +32,14 @@ class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
   //-----------------------------------------------------------------------------
 
   Future _getUserAvatar(String userId) async {
-    return Firestore.instance
-        .collection("BioData")
-        .document(userId)
-        .get()
-        .then((value) => value['avatar']);
+    DocumentReference docRef =
+        Firestore.instance.collection("BioData").document(userId);
+    await docRef.get().then((dataSnapshot) {
+      setState(() {
+        avatarUrl = dataSnapshot['avatar'];
+      });
+    });
+    return true;
   }
 
   //-----------------------------------------------------------------------------
@@ -52,103 +57,114 @@ class _JobViewCandidateItemState extends State<JobViewCandidateItem> {
   Widget build(BuildContext context) {
     //print(widget.userId);
     return Container(
-        padding: const EdgeInsets.fromLTRB(8.0, 5.0, 5.0, 9.0),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              width: 1.0,
-              color: Colors.grey[300],
-            ),
+      padding: const EdgeInsets.fromLTRB(8.0, 5.0, 5.0, 9.0),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            width: 1.0,
+            color: Colors.grey[300],
           ),
         ),
-        child: Row(
-          children: <Widget>[
-            CircleAvatar(
-              radius: 31.0,
-              backgroundColor: Colors.blue,
-              child: CircleAvatar(
-                radius: 30.0,
-                backgroundColor: Colors.white,
-                child: ClipOval(
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: FutureBuilder(
-                      future: _getUserAvatar(widget.userId),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        return Image.network(snapshot.data.toString(),
-                            fit: BoxFit.cover);
-                      },
-                    ),
+      ),
+      child: Row(
+        children: <Widget>[
+          CircleAvatar(
+            radius: 31.0,
+            backgroundColor: Colors.blue,
+            child: CircleAvatar(
+              radius: 30.0,
+              backgroundColor: Colors.white,
+              child: ClipOval(
+                child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: FutureBuilder(
+                    future: _getUserAvatar(widget.userId),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        if (avatarUrl != null) {
+                          return Image.network(avatarUrl, fit: BoxFit.cover);
+                        } else {
+                          return Image.asset(
+                            "images/profile_avatar.jpg",
+                            fit: BoxFit.cover,
+                          );
+                        }
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
                   ),
                 ),
               ),
             ),
-            SizedBox(
-              width: 4.0,
-            ),
-            Expanded(
-              flex: 2,
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: FutureBuilder(
-                      future: _getBioData(widget.userId),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(
-                            snapshot.data.toString(),
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          );
-                        } else {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
-                    ),
+          ),
+          SizedBox(
+            width: 4.0,
+          ),
+          Expanded(
+            flex: 2,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: FutureBuilder(
+                    future: _getBioData(widget.userId),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          snapshot.data.toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        );
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
                   ),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    child: FutureBuilder(
-                      future: _getProfession(widget.userId),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(snapshot.data.toString());
-                        } else {
-                          return Center(
-                            child: Text(''),
-                          );
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ApplicantsInformation(
-                        userId: widget.userId,
-                        jobId: widget.jobId,
-                        jobUid: widget.jobUid,
-                        docId: widget.docId,
-                        documentSnapshot: widget.documentSnapshot,
-                        dateApplied: widget.dateApplied),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  child: FutureBuilder(
+                    future: _getProfession(widget.userId),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(snapshot.data.toString());
+                      } else {
+                        return Center(
+                          child: Text(''),
+                        );
+                      }
+                    },
                   ),
-                );
-              },
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 7.0),
-                child: Icon(Icons.chevron_right),
-              ),
+                )
+              ],
             ),
-          ],
-        ));
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ApplicantsInformation(
+                      userId: widget.userId,
+                      jobId: widget.jobId,
+                      jobUid: widget.jobUid,
+                      docId: widget.docId,
+                      documentSnapshot: widget.documentSnapshot,
+                      dateApplied: widget.dateApplied),
+                ),
+              );
+            },
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 7.0),
+              child: Icon(Icons.chevron_right),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

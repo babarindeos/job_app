@@ -22,7 +22,8 @@ final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
 class UploadVideoCV extends StatefulWidget {
-  UploadVideoCV({Key key}) : super(key: key);
+  String pageState;
+  UploadVideoCV({Key key, this.pageState}) : super(key: key);
 
   @override
   _UploadVideoCVState createState() => _UploadVideoCVState();
@@ -241,14 +242,18 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        child: Image(
-                          image: AssetImage('images/step-2-mini.png'),
-                          width: 150.0,
-                        ),
-                      ),
+                      widget.pageState.isEmpty
+                          ? Container(
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 10.0),
+                              child: Image(
+                                image: AssetImage('images/step-2-mini.png'),
+                                width: 150.0,
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.only(top: 14.0),
+                            ),
                       Text(
                         'Career Details',
                         style: TextStyle(

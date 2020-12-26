@@ -21,6 +21,8 @@ final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
 class AdditionalInfo extends StatefulWidget {
+  String pageState;
+  AdditionalInfo({this.pageState});
   @override
   _AdditionalInfoState createState() => _AdditionalInfoState();
 }
@@ -28,6 +30,7 @@ class AdditionalInfo extends StatefulWidget {
 class _AdditionalInfoState extends State<AdditionalInfo> {
   bool isloading = false;
   String _fullNames = '';
+  String userAvatar = '';
   dynamic _currentUser;
   String _profession = '';
   bool isfetching = false;
@@ -62,11 +65,14 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
       if (dataSnapshot.exists) {
         setState(() {
           _fullNames = (dataSnapshot).data['name'];
+          userAvatar = (dataSnapshot).data['avatar'];
           print(_fullNames);
+          print(userAvatar);
         });
       } else {
         setState(() {
           _fullNames = '';
+          userAvatar = '';
         });
       }
     });
@@ -125,14 +131,18 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState != 'update'
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 30.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -140,7 +150,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'SourceSansPro'),
                           ),
-                          SizedBox(height: 10.0),
+                          SizedBox(height: 15.0),
                           SizedBox(height: 20.0),
                           Card(
                             elevation: 5.0,
@@ -161,8 +171,12 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                             fontSize: 22.0,
                                             fontFamily: 'Pacifico-Regular',
                                           ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        Text(_profession)
+                                        Text(
+                                          _profession,
+                                          overflow: TextOverflow.ellipsis,
+                                        )
                                       ],
                                     ),
                                   ),
@@ -171,22 +185,26 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdditionalInfoBio()),
+                                          builder: (context) =>
+                                              AdditionalInfoBio(
+                                                  pageState: widget.pageState),
+                                        ),
                                       );
                                     },
                                     child: Container(
                                       padding: EdgeInsets.all(7.0),
                                       decoration: BoxDecoration(
-                                          border: Border(
-                                              bottom: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade300,
-                                              ),
-                                              top: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade300,
-                                              ))),
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey.shade300,
+                                          ),
+                                          top: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey.shade300,
+                                          ),
+                                        ),
+                                      ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             top: 5.0, bottom: 5.0),
@@ -224,8 +242,10 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdditionalInfoPortfolio()),
+                                          builder: (context) =>
+                                              AdditionalInfoPortfolio(
+                                                  pageState: widget.pageState),
+                                        ),
                                       );
                                     },
                                     child: Container(
@@ -270,7 +290,7 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                       ),
                                     ),
                                   ),
-                                  InkWell(
+                                  /* InkWell(
                                     onTap: () {},
                                     child: Container(
                                       padding: EdgeInsets.only(
@@ -312,13 +332,14 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                         ),
                                       ),
                                     ),
-                                  ),
+                                  ), */
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => Education(),
+                                          builder: (context) => Education(
+                                              pageState: widget.pageState),
                                         ),
                                       );
                                     },
@@ -366,10 +387,12 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Experience()));
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Experience(
+                                              pageState: widget.pageState),
+                                        ),
+                                      );
                                     },
                                     child: Container(
                                       padding: EdgeInsets.only(
@@ -434,12 +457,16 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                               child: SizedBox(
                                 width: 100,
                                 height: 180,
-                                child: Image(
-                                  fit: BoxFit.cover,
-                                  image: AssetImage(
-                                    'images/henry_smith.jpg',
-                                  ),
-                                ),
+                                child: userAvatar == null || userAvatar == ''
+                                    ? Image(
+                                        fit: BoxFit.cover,
+                                        image: AssetImage(
+                                            'images/profile_avatar.jpg'),
+                                      )
+                                    : Image.network(
+                                        userAvatar,
+                                        fit: BoxFit.cover,
+                                      ),
                               ),
                             ),
                           ),
@@ -449,58 +476,61 @@ class _AdditionalInfoState extends State<AdditionalInfo> {
                   ],
                 ),
               ),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Material(
-                      color: Colors.grey[400],
-                      shadowColor: Colors.lightGreen,
-                      elevation: 7.0,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(6.0),
-                      ),
-                      child: MaterialButton(
-                          child: Icon(
-                            Icons.chevron_left,
-                            size: 40.0,
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context, '/careerDetails');
-                          },
-                          minWidth: 70.0,
-                          height: 52.0),
-                    ),
-                    SizedBox(
-                      width: 6.0,
-                    ),
-                    Material(
-                      color: Colors.green,
-                      shadowColor: Colors.lightGreen,
-                      elevation: 7.0,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(6.0),
-                      ),
-                      child: MaterialButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Home(),
+              widget.pageState.isEmpty
+                  ? Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Material(
+                            color: Colors.grey[400],
+                            shadowColor: Colors.lightGreen,
+                            elevation: 7.0,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(6.0),
                             ),
-                          );
-                        },
-                        child: Text(
-                          'SKIP',
-                          style: TextStyle(color: Colors.white, fontSize: 16.0),
-                        ),
-                        minWidth: 120.0,
-                        height: 52.0,
+                            child: MaterialButton(
+                                child: Icon(
+                                  Icons.chevron_left,
+                                  size: 40.0,
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context, '/careerDetails');
+                                },
+                                minWidth: 70.0,
+                                height: 52.0),
+                          ),
+                          SizedBox(
+                            width: 6.0,
+                          ),
+                          Material(
+                            color: Colors.green,
+                            shadowColor: Colors.lightGreen,
+                            elevation: 7.0,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(6.0),
+                            ),
+                            child: MaterialButton(
+                              onPressed: () {
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => Home(),
+                                    ),
+                                    ModalRoute.withName('/login'));
+                              },
+                              child: Text(
+                                'SKIP',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16.0),
+                              ),
+                              minWidth: 120.0,
+                              height: 52.0,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              )
+                    )
+                  : Container()
             ]),
     ));
   }

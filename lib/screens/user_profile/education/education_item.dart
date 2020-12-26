@@ -14,6 +14,7 @@ class EducationItem extends StatefulWidget {
   final String courseOfStudy;
   final String level;
   final String classOfDegree;
+  final String pageState;
   final DocumentSnapshot documentSnapshot;
 
   EducationItem(
@@ -26,6 +27,7 @@ class EducationItem extends StatefulWidget {
       @required this.courseOfStudy,
       @required this.level,
       @required this.classOfDegree,
+      this.pageState,
       @required this.documentSnapshot});
 
   @override
@@ -46,8 +48,10 @@ class _EducationItemState extends State<EducationItem> {
     return Container(
       padding: const EdgeInsets.all(0.0),
       decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(width: 1.0, color: Colors.grey.shade300))),
+        border: Border(
+          bottom: BorderSide(width: 1.0, color: Colors.grey.shade300),
+        ),
+      ),
       child: Container(
         alignment: Alignment.centerLeft,
         width: double.infinity,
@@ -109,10 +113,12 @@ class _EducationItemState extends State<EducationItem> {
                         classOfDegree: widget.classOfDegree);
 
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                EducationDetails(data: data)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EducationDetails(
+                            data: data, pageState: widget.pageState),
+                      ),
+                    );
                   },
                   child: Icon(Icons.chevron_right)),
             ),

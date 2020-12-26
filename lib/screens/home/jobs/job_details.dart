@@ -218,7 +218,10 @@ class _JobDetailsState extends State<JobDetails> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Text(companyName),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.65,
+                  child: Text(companyName),
+                ),
                 Expanded(
                   child: companyInfoLoaded
                       ? InkWell(

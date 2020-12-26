@@ -7,7 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class EducationAdd extends StatefulWidget {
-  EducationAdd({Key key}) : super(key: key);
+  final String pageState;
+  EducationAdd({Key key, this.pageState}) : super(key: key);
   @override
   _EducationAddState createState() => _EducationAddState();
 }
@@ -111,14 +112,20 @@ class _EducationAddState extends State<EducationAdd> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(
+                                    top: 20.0,
+                                  ),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(

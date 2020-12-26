@@ -5,7 +5,8 @@ import 'package:job_app/screens/user_profile/portfolio/portfolio_edit.dart';
 
 class PortfolioDetails extends StatefulWidget {
   final Portfolio data;
-  PortfolioDetails({this.data});
+  final String pageState;
+  PortfolioDetails({this.data, this.pageState});
   @override
   _PortfolioDetailsState createState() => _PortfolioDetailsState();
 }
@@ -32,14 +33,20 @@ class _PortfolioDetailsState extends State<PortfolioDetails> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10.0),
-                          child: Image(
-                            image: AssetImage('images/step-3-mini.png'),
-                            width: 150.0,
-                          ),
-                        ),
+                        widget.pageState.isEmpty
+                            ? Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5.0, horizontal: 8.0),
+                                child: Image(
+                                  image: AssetImage('images/step-3-mini.png'),
+                                  width: 150.0,
+                                ),
+                              )
+                            : Container(
+                                padding: const EdgeInsets.only(
+                                  top: 25.0,
+                                ),
+                              ),
                         Text(
                           'Additional Information',
                           style: TextStyle(
@@ -86,8 +93,9 @@ class _PortfolioDetailsState extends State<PortfolioDetails> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              PortfolioEdit(data: widget.data),
+                                          builder: (context) => PortfolioEdit(
+                                              data: widget.data,
+                                              pageState: widget.pageState),
                                         ));
                                   },
                                   child: Container(

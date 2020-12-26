@@ -57,7 +57,10 @@ class _MenuOptionsState extends State<MenuOptions> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return WillPopScope(
+      onWillPop: () {
+        print("am here");
+      },
       child: Scaffold(
         body: isfetching
             ? Center(
@@ -90,28 +93,42 @@ class _MenuOptionsState extends State<MenuOptions> {
                                       builder: (context) => JobTracker()),
                                 );
                               },
-                              child: Container(
-                                alignment: Alignment.center,
-                                width: 130.0,
-                                height: 120.0,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image:
-                                        AssetImage('images/jobs_tracker1.jpg'),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: 130.0,
+                                    height: 120.0,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            'images/jobs_tracker1.jpg'),
+                                      ),
+                                      border: Border.all(color: Colors.blue),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 5,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                  border: Border.all(color: Colors.blue),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 5,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    )
-                                  ],
-                                ),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Jobs',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'SourceSansPro',
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             SizedBox(width: 10.0),
@@ -124,28 +141,42 @@ class _MenuOptionsState extends State<MenuOptions> {
                                   ),
                                 );
                               },
-                              child: Container(
-                                alignment: Alignment.center,
-                                width: 130.0,
-                                height: 120.0,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: AssetImage('images/interviews.jpg'),
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: 130.0,
+                                    height: 120.0,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image:
+                                            AssetImage('images/interviews.jpg'),
+                                      ),
+                                      border: Border.all(color: Colors.blue),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20.0)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.5),
+                                          spreadRadius: 5,
+                                          blurRadius: 5,
+                                          offset: Offset(0,
+                                              3), // changes position of shadow
+                                        )
+                                      ],
+                                    ),
+                                    //child: Text('Manage Interviews'),
                                   ),
-                                  border: Border.all(color: Colors.blue),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(20.0)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 5,
-                                      blurRadius: 5,
-                                      offset: Offset(
-                                          0, 3), // changes position of shadow
-                                    )
-                                  ],
-                                ),
-                                //child: Text('Manage Interviews'),
+                                  Container(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Interviews',
+                                      style: TextStyle(
+                                          fontFamily: 'SourceSansPro',
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -156,53 +187,79 @@ class _MenuOptionsState extends State<MenuOptions> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Container(
-                              alignment: Alignment.center,
-                              width: 130.0,
-                              height: 120.0,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage('images/manage_cvs.jpg'),
-                                  fit: BoxFit.cover,
+                            Column(
+                              children: <Widget>[
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: 130.0,
+                                  height: 120.0,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                      image:
+                                          AssetImage('images/manage_cvs.jpg'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                    border: Border.all(color: Colors.blue),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 5,
+                                        offset: Offset(
+                                            0, 3), // changes position of shadow
+                                      )
+                                    ],
+                                  ),
+                                  //child: Text('Manage CVs'),
                                 ),
-                                border: Border.all(color: Colors.blue),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 5,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  )
-                                ],
-                              ),
-                              //child: Text('Manage CVs'),
+                                Container(
+                                  child: Text(
+                                    'CVs',
+                                    style: TextStyle(
+                                      fontFamily: 'SourceSansPro',
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(width: 10.0),
-                            Container(
-                              alignment: Alignment.center,
-                              width: 130.0,
-                              height: 120.0,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage('images/search.jpg'),
-                                    fit: BoxFit.cover),
-                                border: Border.all(color: Colors.blue),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 5,
-                                    offset: Offset(
-                                        0, 3), // changes position of shadow
-                                  )
-                                ],
-                              ),
-                              //child: Text('Manage Interviews'),
+                            Column(
+                              children: <Widget>[
+                                Container(
+                                  alignment: Alignment.center,
+                                  width: 130.0,
+                                  height: 120.0,
+                                  decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage('images/search.jpg'),
+                                        fit: BoxFit.cover),
+                                    border: Border.all(color: Colors.blue),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 5,
+                                        offset: Offset(
+                                            0, 3), // changes position of shadow
+                                      )
+                                    ],
+                                  ),
+                                  //child: Text('Manage Interviews'),
+                                ),
+                                Container(
+                                  child: Text(
+                                    'Search',
+                                    style: TextStyle(
+                                        fontFamily: 'SourceSansPro',
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )
+                              ],
                             ),
                           ],
                         ),

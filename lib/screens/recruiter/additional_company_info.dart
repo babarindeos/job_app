@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:job_app/models/education.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/recruiter/additional_company_about.dart';
+import 'package:job_app/screens/recruiter/additional_company_contact.dart';
+import 'package:job_app/screens/recruiter/additional_company_socialmedia.dart';
 import 'package:job_app/screens/user_profile/additional_info_bio.dart';
 import 'package:job_app/screens/user_profile/experience/additional_info_experience.dart';
 import 'package:job_app/screens/user_profile/portfolio/additional_info_portfolio.dart';
@@ -19,6 +22,8 @@ final GlobalKey<FormState> _formKey =
     new GlobalKey<FormState>(debugLabel: '_loginFormKey');
 
 class AdditionalCompanyInfo extends StatefulWidget {
+  String pageState;
+  AdditionalCompanyInfo({this.pageState});
   @override
   _AdditionalCompanyInfoState createState() => _AdditionalCompanyInfoState();
 }
@@ -29,6 +34,7 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
   String _companyName = '';
   dynamic _currentUser;
   String _profession = '';
+  String _companyLogo = '';
 
 //------------------------------------------------------------------------------
   Widget showLoader() {
@@ -60,6 +66,7 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
       if (dataSnapshot.exists) {
         setState(() {
           _companyName = (dataSnapshot).data['name'];
+          _companyLogo = (dataSnapshot).data['logo'];
           print(_companyName);
         });
       } else {
@@ -123,14 +130,17 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState != 'update'
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 30.0)),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -152,17 +162,25 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: <Widget>[
-                                        Text(
-                                          _companyName,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 22.0,
-                                            fontFamily: 'SourceSansPro',
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(top: 35.0),
+                                          child: Text(
+                                            _companyName,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20.0,
+                                              fontFamily: 'SourceSansPro',
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                         Text('')
                                       ],
                                     ),
+                                  ),
+                                  SizedBox(
+                                    height: 5.0,
                                   ),
                                   InkWell(
                                     onTap: () {
@@ -170,21 +188,25 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                AdditionalInfoBio()),
+                                                AdditionalCompanyAbout(
+                                                  pageState: widget.pageState,
+                                                )),
                                       );
                                     },
                                     child: Container(
                                       padding: EdgeInsets.all(7.0),
                                       decoration: BoxDecoration(
-                                          border: Border(
-                                              bottom: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade300,
-                                              ),
-                                              top: BorderSide(
-                                                width: 1.0,
-                                                color: Colors.grey.shade300,
-                                              ))),
+                                        border: Border(
+                                          bottom: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey.shade300,
+                                          ),
+                                          top: BorderSide(
+                                            width: 1.0,
+                                            color: Colors.grey.shade300,
+                                          ),
+                                        ),
+                                      ),
                                       child: Padding(
                                         padding: const EdgeInsets.only(
                                             top: 5.0, bottom: 5.0),
@@ -222,8 +244,11 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>
-                                                AdditionalInfoPortfolio()),
+                                          builder: (context) =>
+                                              AdditionalCompanyContact(
+                                            pageState: widget.pageState,
+                                          ),
+                                        ),
                                       );
                                     },
                                     child: Container(
@@ -269,7 +294,17 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                                     ),
                                   ),
                                   InkWell(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              AdditionalCompanySocialMedia(
+                                            pageState: widget.pageState,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                     child: Container(
                                       padding: EdgeInsets.only(
                                           top: 5.0, bottom: 5.0),
@@ -335,12 +370,18 @@ class _AdditionalCompanyInfoState extends State<AdditionalCompanyInfo> {
                                 child: SizedBox(
                                   width: 100,
                                   height: 180,
-                                  child: Image(
-                                    fit: BoxFit.cover,
-                                    image: AssetImage(
-                                      'images/company_logo.jpg',
-                                    ),
-                                  ),
+                                  child: _companyLogo.isEmpty ||
+                                          _companyLogo == null
+                                      ? Image(
+                                          fit: BoxFit.cover,
+                                          image: AssetImage(
+                                            'images/company_logo.jpg',
+                                          ),
+                                        )
+                                      : Image.network(
+                                          _companyLogo,
+                                          fit: BoxFit.cover,
+                                        ),
                                 ),
                               ),
                             ),

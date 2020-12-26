@@ -10,6 +10,7 @@ import 'package:job_app/models/career.dart';
 import 'package:job_app/models/company.dart';
 import 'package:job_app/models/storage.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/recruiter/additional_company_info.dart';
 import 'package:job_app/screens/user_profile/socialmedia_page.dart';
 import 'package:job_app/screens/user_profile/upload_pdf_cv.dart';
 import 'package:job_app/screens/user_profile/upload_video_cv.dart';
@@ -29,8 +30,8 @@ class FormKeys {
 final _formKey = GlobalKey<FormState>();
 
 class AboutOrganisation extends StatefulWidget {
-  String userType;
-  AboutOrganisation({this.userType});
+  String userType, pageState;
+  AboutOrganisation({this.userType, this.pageState});
   @override
   _AboutOrganisationState createState() => _AboutOrganisationState();
 }
@@ -41,9 +42,12 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
   bool isloading = false;
   bool isfetching = false;
   bool isbtnForwardEnabled = false;
+  bool fileUploadFlag = false;
   String imageSource;
   String imageUrl;
+  String mediaUrl;
   String processOutcome;
+  String currentUserId;
 
   final Storage _storage = Storage();
   final Company _company = Company();
@@ -59,12 +63,25 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
   //-----------------------------------------------------------------------------------------
 
   void processForm(String userId, BuildContext context) async {
+    // called storage class: uploadAvatar method
+    if (_image != null && fileUploadFlag == true) {
+      mediaUrl = await _storage.uploadAvatar(userId, 'logo');
+    } else if (fileUploadFlag == false && imageSource == 'url') {
+      mediaUrl = imageUrl;
+    } else {
+      mediaUrl = null;
+    }
+
     _company.uCompanyName = _companyNameController.text;
     _company.uSector = _sectorController.text;
     _company.uAboutCompany = _aboutCompanyController.text;
     _company.uAddress = _addressController.text;
     _company.uPhone = _phoneController.text;
     _company.uEmail = _emailController.text;
+
+    if (mediaUrl != '' || mediaUrl != null) {
+      _company.uLogo = mediaUrl;
+    }
 
     //dynamic result = await _career.updateCareerDetails(userId);
     dynamic result = await _company.updateCompanyInfo(userId);
@@ -106,16 +123,18 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
 //-----------------------------------------------------------------------------------------------
 
   Widget showUploadedLogo() {
-    if (imageSource == 'file' && imageUrl != null) {
+    print("************************ IMAGE SOURCE " + imageSource);
+    if (imageSource == 'file') {
       return Image.file(_image, fit: BoxFit.fill);
     } else if (imageSource == 'url' && imageUrl != null) {
       print(imageUrl);
+      mediaUrl = imageUrl;
       return Image.network(imageUrl, fit: BoxFit.fill);
+    } else if (imageSource == '' || imageUrl == null) {
+      return Image(
+        image: AssetImage('images/company_logo.jpg'),
+      );
     }
-
-    return Image(
-      image: AssetImage('images/company_logo.jpg'),
-    );
   }
 
 //-----------------------------------------------------------------------------------------------
@@ -125,9 +144,14 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
       _image = image;
       _storage.pFile = image;
       imageSource = 'file';
+      fileUploadFlag = true;
+      print("----------------- Image path --- $_image");
     });
   }
-//-----------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
 
   // Snackbar function
   void showInSnackBar(String value, BuildContext context) {
@@ -145,6 +169,7 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
   Future<void> retrieveCompanyInfo() async {
     FirebaseAuth _auth = FirebaseAuth.instance;
     dynamic user = await _auth.currentUser().then((value) => value.uid);
+    currentUserId = user;
     print(user.toString());
 
     DocumentReference docReference =
@@ -158,6 +183,8 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
           _addressController.text = dataSnapshot.data['address'];
           // _phoneController.text = dataSnapshot.data['phone'];
           _emailController.text = dataSnapshot.data['email'];
+          imageSource = 'url';
+          imageUrl = dataSnapshot.data['logo'];
 
           isbtnForwardEnabled = true;
         });
@@ -201,14 +228,18 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-2-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState != 'update'
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-2-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 15.0),
+                                ),
                           Text(
                             'About Company',
                             style: TextStyle(
@@ -302,28 +333,30 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Container(
-                                child: Material(
-                                    color: Colors.grey[200],
-                                    shadowColor: Colors.lightGreen,
-                                    elevation: 7.0,
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(5.0),
-                                    ),
-                                    child: MaterialButton(
-                                      minWidth: 70,
-                                      height: 52,
-                                      child: Icon(
-                                        Icons.arrow_back_ios,
-                                        size: 29.0,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.popAndPushNamed(
-                                            context, '/profile');
-                                        //moveToCareerDetails(context);
-                                      },
-                                    )),
-                              ),
+                              widget.pageState != 'update'
+                                  ? Container(
+                                      child: Material(
+                                          color: Colors.grey[200],
+                                          shadowColor: Colors.lightGreen,
+                                          elevation: 7.0,
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(5.0),
+                                          ),
+                                          child: MaterialButton(
+                                            minWidth: 70,
+                                            height: 52,
+                                            child: Icon(
+                                              Icons.arrow_back_ios,
+                                              size: 29.0,
+                                            ),
+                                            onPressed: () {
+                                              Navigator.popAndPushNamed(
+                                                  context, '/profile');
+                                              //moveToCareerDetails(context);
+                                            },
+                                          )),
+                                    )
+                                  : Container(),
                               Container(
                                   alignment: Alignment.center,
                                   padding:
@@ -353,29 +386,39 @@ class _AboutOrganisationState extends State<AboutOrganisation> {
                                       },
                                     ),
                                   )),
-                              Container(
-                                child: Material(
-                                  color: Colors.grey[200],
-                                  shadowColor: Colors.lightGreen,
-                                  elevation: 7.0,
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(5.0),
-                                  ),
-                                  child: MaterialButton(
-                                      minWidth: 70,
-                                      height: 52,
-                                      child: Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 29.0,
+                              widget.pageState != 'update'
+                                  ? Container(
+                                      child: Material(
+                                        color: Colors.grey[200],
+                                        shadowColor: Colors.lightGreen,
+                                        elevation: 7.0,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0),
+                                        ),
+                                        child: MaterialButton(
+                                            minWidth: 70,
+                                            height: 52,
+                                            child: Icon(
+                                              Icons.arrow_forward_ios,
+                                              size: 29.0,
+                                            ),
+                                            onPressed: isbtnForwardEnabled
+                                                ? () {
+                                                    //Navigator.pushNamed(context,'/additionalCompanyInfo');
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (contetxt) =>
+                                                            AdditionalCompanyInfo(
+                                                          pageState: '',
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                : null),
                                       ),
-                                      onPressed: isbtnForwardEnabled
-                                          ? () {
-                                              Navigator.pushNamed(context,
-                                                  '/additionalCompanyInfo');
-                                            }
-                                          : null),
-                                ),
-                              ),
+                                    )
+                                  : Container(),
                             ],
                           )
                         ],

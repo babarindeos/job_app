@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:job_app/models/career.dart';
 import 'package:job_app/models/user.dart';
+import 'package:job_app/screens/user_profile/additional_info.dart';
 import 'package:job_app/screens/user_profile/create_profile.dart';
 import 'package:job_app/screens/user_profile/socialmedia_page.dart';
 import 'package:job_app/screens/user_profile/upload_pdf_cv.dart';
@@ -23,8 +24,8 @@ class FormKeys {
 final _formKeyCareer = GlobalKey<FormState>();
 
 class CareerDetails extends StatefulWidget {
-  String userType;
-  CareerDetails({this.userType});
+  String userType, pageState;
+  CareerDetails({this.userType, this.pageState});
   @override
   _CareerDetailsState createState() => _CareerDetailsState();
 }
@@ -134,7 +135,9 @@ class _CareerDetailsState extends State<CareerDetails> {
   void loadSocialMediaPage(BuildContext ctx) {
     Navigator.push(
       ctx,
-      MaterialPageRoute(builder: (ctx) => SocialMediaPage()),
+      MaterialPageRoute(
+        builder: (ctx) => SocialMediaPage(pageState: widget.pageState),
+      ),
     );
   }
 
@@ -171,8 +174,9 @@ class _CareerDetailsState extends State<CareerDetails> {
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    String args = ModalRoute.of(context).settings.arguments;
-    userType = args;
+    //String args = ModalRoute.of(context).settings.arguments;
+    //userType = args['userType'];
+    userType = widget.userType;
 
     return SafeArea(
       child: Scaffold(
@@ -193,14 +197,17 @@ class _CareerDetailsState extends State<CareerDetails> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 5.0, horizontal: 10.0),
-                                child: Image(
-                                  image: AssetImage('images/step-2-mini.png'),
-                                  width: 150.0,
-                                ),
-                              ),
+                              widget.pageState.isEmpty
+                                  ? Container(
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 5.0, horizontal: 10.0),
+                                      child: Image(
+                                        image: AssetImage(
+                                            'images/step-2-mini.png'),
+                                        width: 150.0,
+                                      ),
+                                    )
+                                  : Container(),
                               Text(
                                 'Career Details',
                                 style: TextStyle(
@@ -287,10 +294,12 @@ class _CareerDetailsState extends State<CareerDetails> {
                                       InkWell(
                                         onTap: () {
                                           Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      UploadPdfCV()));
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => UploadPdfCV(
+                                                  pageState: widget.pageState),
+                                            ),
+                                          );
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(7.0),
@@ -330,7 +339,9 @@ class _CareerDetailsState extends State<CareerDetails> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      UploadVideoCV()));
+                                                      UploadVideoCV(
+                                                          pageState: widget
+                                                              .pageState)));
                                         },
                                         child: Container(
                                           padding: EdgeInsets.all(7.0),
@@ -505,28 +516,31 @@ class _CareerDetailsState extends State<CareerDetails> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Container(
-                                    child: Material(
-                                        color: Colors.grey[200],
-                                        shadowColor: Colors.lightGreen,
-                                        elevation: 7.0,
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0),
-                                        ),
-                                        child: MaterialButton(
-                                          minWidth: 70,
-                                          height: 52,
-                                          child: Icon(
-                                            Icons.arrow_back_ios,
-                                            size: 29.0,
+                                  widget.pageState.isEmpty
+                                      ? Container(
+                                          child: Material(
+                                            color: Colors.grey[200],
+                                            shadowColor: Colors.lightGreen,
+                                            elevation: 7.0,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0),
+                                            ),
+                                            child: MaterialButton(
+                                              minWidth: 70,
+                                              height: 52,
+                                              child: Icon(
+                                                Icons.arrow_back_ios,
+                                                size: 29.0,
+                                              ),
+                                              onPressed: () {
+                                                //Navigator.pushNamed(context, '/profile');
+                                                //moveToCareerDetails(context);
+                                                moveToProfile(context);
+                                              },
+                                            ),
                                           ),
-                                          onPressed: () {
-                                            //Navigator.pushNamed(context, '/profile');
-                                            //moveToCareerDetails(context);
-                                            moveToProfile(context);
-                                          },
-                                        )),
-                                  ),
+                                        )
+                                      : Container(),
                                   Container(
                                       alignment: Alignment.center,
                                       padding: EdgeInsets.only(
@@ -558,29 +572,42 @@ class _CareerDetailsState extends State<CareerDetails> {
                                           },
                                         ),
                                       )),
-                                  Container(
-                                    child: Material(
-                                      color: Colors.grey[200],
-                                      shadowColor: Colors.lightGreen,
-                                      elevation: 7.0,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(5.0),
-                                      ),
-                                      child: MaterialButton(
-                                          minWidth: 70,
-                                          height: 52,
-                                          child: Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 29.0,
+                                  widget.pageState.isEmpty
+                                      ? Container(
+                                          child: Material(
+                                            color: Colors.grey[200],
+                                            shadowColor: Colors.lightGreen,
+                                            elevation: 7.0,
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(5.0),
+                                            ),
+                                            child: MaterialButton(
+                                                minWidth: 70,
+                                                height: 52,
+                                                child: Icon(
+                                                  Icons.arrow_forward_ios,
+                                                  size: 29.0,
+                                                ),
+                                                onPressed: isbtnForwardEnabled
+                                                    ? () {
+                                                        // Navigator.pushNamed(
+                                                        //     context,
+                                                        //     '/additionalInfo');
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                AdditionalInfo(
+                                                                    pageState:
+                                                                        widget
+                                                                            .pageState),
+                                                          ),
+                                                        );
+                                                      }
+                                                    : null),
                                           ),
-                                          onPressed: isbtnForwardEnabled
-                                              ? () {
-                                                  Navigator.pushNamed(context,
-                                                      '/additionalInfo');
-                                                }
-                                              : null),
-                                    ),
-                                  ),
+                                        )
+                                      : Container(),
                                 ],
                               )
                             ],

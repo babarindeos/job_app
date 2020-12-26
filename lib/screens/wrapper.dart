@@ -34,6 +34,7 @@ class _WrapperState extends State<Wrapper> {
     if (_user.iUserType == null) {
       Navigator.pushNamed(context, '/userType');
     } else {
+      //Navigator.pushNamed(context, '/userType');
       checkIfBioDataExist(userId, context);
     }
   }

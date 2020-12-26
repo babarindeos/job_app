@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:job_app/models/education.dart';
 import 'package:job_app/screens/user_profile/education/education_edit.dart';
 import 'package:job_app/models/experience.dart';
+import 'package:job_app/screens/user_profile/experience/experience_edit.dart';
 
 class ExperienceDetails extends StatefulWidget {
   final Experience data;
-  ExperienceDetails({this.data});
+  final String pageState;
+  ExperienceDetails({this.data, this.pageState});
 
   @override
   _ExperienceDetailsState createState() => _ExperienceDetailsState();
@@ -34,14 +36,18 @@ class _ExperienceDetailsState extends State<ExperienceDetails> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 10.0),
-                            child: Image(
-                              image: AssetImage('images/step-3-mini.png'),
-                              width: 150.0,
-                            ),
-                          ),
+                          widget.pageState.isEmpty
+                              ? Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 5.0, horizontal: 10.0),
+                                  child: Image(
+                                    image: AssetImage('images/step-3-mini.png'),
+                                    width: 150.0,
+                                  ),
+                                )
+                              : Container(
+                                  padding: const EdgeInsets.only(top: 20.0),
+                                ),
                           Text(
                             'Additional Information',
                             style: TextStyle(
@@ -74,7 +80,7 @@ class _ExperienceDetailsState extends State<ExperienceDetails> {
                                   child: Container(
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Education Details',
+                                      'Experience Details',
                                       style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
@@ -84,7 +90,17 @@ class _ExperienceDetailsState extends State<ExperienceDetails> {
                                 ),
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ExperienceEdit(
+                                            data: widget.data,
+                                            pageState: widget.pageState,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                     child: Container(
                                       child:
                                           Icon(Icons.edit, color: Colors.blue),

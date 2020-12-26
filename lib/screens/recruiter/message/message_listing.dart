@@ -173,10 +173,12 @@ class _MessageListingItemState extends State<MessageListingItem> {
       DocumentReference docRef =
           Firestore.instance.collection("BioData").document(candidateId);
       await docRef.get().then((dataSnapshot) {
-        setState(() {
-          candidateAvatar = dataSnapshot['avatar'];
-          candidateName = dataSnapshot['name'];
-        });
+        if (mounted) {
+          setState(() {
+            candidateAvatar = dataSnapshot['avatar'];
+            candidateName = dataSnapshot['name'];
+          });
+        }
       });
     } catch (e) {}
   }
