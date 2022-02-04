@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:job_app/screens/friend/view_user_profile_page.dart';
 import 'package:job_app/shared/constants.dart';
 import 'package:job_app/models/person.dart';
 import 'package:uuid/uuid.dart';
@@ -168,12 +169,31 @@ class AddFriendItem extends StatefulWidget {
 class _AddFriendItemState extends State<AddFriendItem> {
   bool isFriend = false;
   String message = '';
+  String friendshipUid = '';
+  bool isLoading = true;
   //ActivityFeed _activityFeed = new ActivityFeed();
 
+//------------------- FriendshipIdentifier Generator----------------------------
+  Future<String> generateFriendshipIdentifier(String userId) async {
+    int strDeterminer = widget.currentUserId.compareTo(userId);
+    if (strDeterminer == 1) {
+      friendshipUid = widget.currentUserId.toString() + '-' + userId.toString();
+    } else {
+      friendshipUid = userId.toString() + '-' + widget.currentUserId.toString();
+    }
+    return friendshipUid;
+  }
+
+//------------------ End of FriendshipIdentifier Generator----------------------
 //------------------------------------------------------------------------------
   Future<void> _addFriend(String userId, String nameOfUser) async {
     //print(widget.currentUserId);
     //print(userId);
+    //--------- Get friendship_uid from generator -------------------------------
+
+    friendshipUid = await generateFriendshipIdentifier(userId);
+    //---------End of get friendship from generator ----------------------------
+
     try {
       var uuid = Uuid();
       var docId = uuid.v4();
@@ -182,6 +202,7 @@ class _AddFriendItemState extends State<AddFriendItem> {
           Firestore.instance.collection("Friends").document();
       Map<String, dynamic> data = {
         'uid': docId,
+        'friendship_uid': friendshipUid,
         'user_id': widget.currentUserId,
         'friend_id': userId,
         'status': 'pending',
@@ -239,21 +260,25 @@ class _AddFriendItemState extends State<AddFriendItem> {
 
 //------------------------------------------------------------------------------
   Future<bool> _getFriendStatus(String userId) async {
+    //--------- Get friendship_uid from generator -----------------------------
+    friendshipUid = await generateFriendshipIdentifier(userId);
+    //---------End of get friendship from generator ----------------------------
     var query = Firestore.instance
         .collection("Friends")
-        .where("user_id", isEqualTo: widget.currentUserId)
-        .where("friend_id", isEqualTo: userId);
+        .where("friendship_uid", isEqualTo: friendshipUid);
     await query.getDocuments().then((dataSnapshot) {
       if (dataSnapshot.documents.length > 0) {
-        if (mounted) {
+        if (this.mounted) {
           setState(() {
             isFriend = true;
+            isLoading = false;
           });
         }
       } else {
-        if (mounted) {
+        if (this.mounted) {
           setState(() {
             isFriend = false;
+            isLoading = false;
           });
         }
       }
@@ -262,12 +287,24 @@ class _AddFriendItemState extends State<AddFriendItem> {
   }
 
 //------------------------------------------------------------------------------
+//------------------- Dispose --------------------------------------------------
+  @override
+  void dispose() {
+    // TODO: implement dispose
+
+    super.dispose();
+  }
+//------------------- End of dispose -------------------------------------------
+
+//------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     //--------------------------------------------------------------------------
+
     _getFriendStatus(widget.uid);
-    //print(isFriend.toString());
+
+    //print("isFriend Status: " + isFriend.toString());
     //--------------------------------------------------------------------------
 
     return Container(
@@ -296,21 +333,33 @@ class _AddFriendItemState extends State<AddFriendItem> {
             ),
           ),
         ),
-        title: Text(
-          widget.name,
-          style: TextStyle(
-            color: Colors.blue,
+        title: InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ViewUserProfilePage(userId: widget.uid),
+              ),
+            );
+          },
+          child: Text(
+            widget.name,
+            style: TextStyle(
+              color: Colors.blue,
+            ),
           ),
         ),
         subtitle: Text('${widget.state}${', '}${widget.country}'),
-        trailing: isFriend
-            ? Icon(Icons.check, color: Colors.green)
-            : InkWell(
-                onTap: () async {
-                  await _addFriend(widget.uid, widget.name);
-                },
-                child: Icon(Icons.person_add),
-              ),
+        trailing: isLoading
+            ? CircularProgressIndicator()
+            : isFriend
+                ? Icon(Icons.check, color: Colors.green)
+                : InkWell(
+                    onTap: () async {
+                      await _addFriend(widget.uid, widget.name);
+                    },
+                    child: Icon(Icons.person_add),
+                  ),
       ),
     );
   }
@@ -345,11 +394,13 @@ class _FriendRequestItemState extends State<FriendRequestItem> {
         Firestore.instance.collection("BioData").document(requestSender);
     await docRef.get().then((dataSnapshot) {
       if (dataSnapshot.exists) {
-        setState(() {
-          nameOfUser = dataSnapshot['name'];
-          avatar = dataSnapshot['avatar'];
-          location = dataSnapshot['state'] + ', ' + dataSnapshot['country'];
-        });
+        if (mounted) {
+          setState(() {
+            nameOfUser = dataSnapshot['name'];
+            avatar = dataSnapshot['avatar'];
+            location = dataSnapshot['state'] + ', ' + dataSnapshot['country'];
+          });
+        }
       }
     });
   }
@@ -375,7 +426,10 @@ class _FriendRequestItemState extends State<FriendRequestItem> {
     Map<String, dynamic> data = {
       'status': 'active',
     };
-    await docRef.updateData(data).then((value) => {});
+    await docRef.updateData(data).then((value) async {
+      await addActivityToFeed(
+          'friend_request_accepted', widget.recipient, widget.owner);
+    });
   }
 
 //------------------------------------------------------------------------------
@@ -388,6 +442,29 @@ class _FriendRequestItemState extends State<FriendRequestItem> {
       'status': 'decline',
     };
     await docRef.updateData(data).then((value) => {});
+  }
+
+//------------------------------------------------------------------------------
+//--------- Add to ActivityFeed ------------------------------------------------
+  Future<void> addActivityToFeed(
+      String type, String owner, String recipient) async {
+    try {
+      var uuid = Uuid();
+      String uid = uuid.v4();
+
+      DocumentReference docRef =
+          Firestore.instance.collection("ActivityFeeds").document();
+      Map<String, dynamic> data = {
+        'uid': uid,
+        'type': type,
+        'owner': owner,
+        'recipient': recipient,
+        'date': DateTime.now()
+      };
+      await docRef.setData(data).whenComplete(() {});
+    } catch (e) {
+      print(e.toString());
+    } finally {}
   }
 
 //------------------------------------------------------------------------------
@@ -438,11 +515,22 @@ class _FriendRequestItemState extends State<FriendRequestItem> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Container(
-                          child: Text(
-                            nameOfUser,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ViewUserProfilePage(userId: widget.owner),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              nameOfUser,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                              ),
                             ),
                           ),
                         ),

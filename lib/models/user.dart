@@ -81,4 +81,8 @@ class User {
       return null;
     }
   }
+
+  Future<bool> logout() async{
+    return false;
+  }
 }

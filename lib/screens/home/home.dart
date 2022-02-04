@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:custom_navigator/custom_navigation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,7 @@ import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/authenticate/sign_in.dart';
 import 'package:job_app/screens/friend/add_friend.dart';
+import 'package:job_app/screens/friend/friends.dart';
 import 'package:job_app/screens/home/notification/notifications.dart';
 import 'package:job_app/screens/home/search_jobs.dart';
 import 'package:job_app/screens/home/search_jobs/search_test.dart';
@@ -27,6 +30,7 @@ class _HomeState extends State<Home> {
   String myName = '';
   String myId = '';
   String msg = '';
+
   //----------------------------------------------------------------------------
 
   //----------------------------------------------------------------------------
@@ -46,6 +50,7 @@ class _HomeState extends State<Home> {
         myAvatar = dataSnapshot['avatar'];
         myName = dataSnapshot['name'];
       });
+      print(myName);
     });
   }
 
@@ -82,7 +87,7 @@ class _HomeState extends State<Home> {
           Navigator.pushAndRemoveUntil(
           context,   
           MaterialPageRoute(builder: (BuildContext context) => Login()), 
-          ModalRoute.withName('/'));
+          ModalRoute.withName ('/'));
 
           ----------------------------------------------
           Navigator.pushAndRemoveUntil(context,
@@ -124,6 +129,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    print("home");
     return Scaffold(
       key: _scaffoldKey,
       drawer: Drawer(
@@ -154,7 +160,7 @@ class _HomeState extends State<Home> {
                           child: SizedBox(
                             width: 100,
                             height: 180,
-                            child: myAvatar == null
+                            child: myAvatar == null || myAvatar == ''
                                 ? Image(
                                     fit: BoxFit.cover,
                                     image:
@@ -361,10 +367,22 @@ class _HomeState extends State<Home> {
                     size: 30.0,
                   ),
                   SizedBox(width: 27.0),
-                  Text(
-                    'My friends',
-                    style:
-                        TextStyle(fontWeight: FontWeight.w500, fontSize: 15.0),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Friends(
+                            currentUserId: myId,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'My friends',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 15.0),
+                    ),
                   ),
                 ],
               ),
@@ -386,6 +404,9 @@ class _HomeState extends State<Home> {
                   SizedBox(width: 27.0),
                   InkWell(
                     onTap: () async {
+                      final _user = Provider.of<User>(context, listen: false);
+                      await _user.logout();
+
                       await _auth.signOut().then((value) {
                         if (value == null) {
                           Navigator.of(context).pop();
@@ -412,7 +433,8 @@ class _HomeState extends State<Home> {
           if (index == 4) {
             _openDrawer();
           } else {
-            navigatorKey.currentState.maybePop();
+            navigatorKey.currentState
+                .maybePop(); // comment it out because of 'Failed assertion: boolean expression must not be null' exception in Flutter in the logcat
             setState(() => _page = _children[index]);
           } // end of check
 

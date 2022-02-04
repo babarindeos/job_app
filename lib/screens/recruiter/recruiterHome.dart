@@ -9,6 +9,8 @@ import 'package:job_app/custom/bottom_navigation_tab.dart';
 import 'package:job_app/models/profile.dart';
 import 'package:job_app/models/user.dart';
 import 'package:job_app/screens/authenticate/sign_in.dart';
+import 'package:job_app/screens/friend/add_friend.dart';
+import 'package:job_app/screens/friend/friends.dart';
 import 'package:job_app/screens/home/your_jobs_applied.dart';
 import 'package:job_app/screens/recruiter/about_organisation.dart';
 import 'package:job_app/screens/recruiter/additional_company_info.dart';
@@ -329,10 +331,21 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       size: 30.0,
                     ),
                     SizedBox(width: 27.0),
-                    Text(
-                      'Add friends',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15.0),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddFriend(currentUserId: myId),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Add friends',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 15.0),
+                      ),
                     ),
                   ],
                 ),
@@ -352,10 +365,32 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                       size: 30.0,
                     ),
                     SizedBox(width: 27.0),
-                    Text(
-                      'My friends',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 15.0),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Friends(currentUserId: myId),
+                          ),
+                        );
+                      },
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Friends(
+                                currentUserId: myId,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'My friends',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, fontSize: 15.0),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -376,8 +411,16 @@ class _RecruiterHomeState extends State<RecruiterHome> {
                     ),
                     SizedBox(width: 27.0),
                     InkWell(
-                      onTap: () {
-                        _signOut(context);
+                      onTap: () async {
+                        final _user = Provider.of<User>(context, listen: false);
+                        _user.logout();
+
+                        await _auth.signOut().then((value) {
+                          if (value == null) {
+                            Navigator.of(context).pop();
+                            Navigator.of(context).pushReplacementNamed('/');
+                          }
+                        });
                       },
                       child: Text(
                         'Logout',

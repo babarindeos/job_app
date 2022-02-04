@@ -94,6 +94,7 @@ class _ShortedListedState extends State<ShortedListed> {
 //------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    print("Current User " + widget.currentUserId);
     return SafeArea(
       child: Scaffold(
         body: ListView(
@@ -347,8 +348,8 @@ class _ShortListedItemState extends State<ShortListedItem> {
   @override
   Widget build(BuildContext context) {
     print("------ Job Uid ---" + widget.jobDocId);
-    print("Current User---------------" + widget.currentUserId);
-    print(widget.shortListedDocId);
+    //print("Current User---------------" + widget.currentUserId);
+    //print(widget.shortListedDocId);
     return Container(
       child: Card(
         elevation: 7.0,
@@ -489,7 +490,7 @@ class _ShortListedItemState extends State<ShortListedItem> {
                                         ),
                                       ],
                                     )
-                                  : Text('No Data');
+                                  : Text('');
                             } else {
                               return Text('');
                             }

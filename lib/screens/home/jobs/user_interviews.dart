@@ -109,6 +109,7 @@ class _UserInterviewsState extends State<UserInterviews> {
 //------------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    print(widget.currentUserId);
     return SafeArea(
       child: Scaffold(
         body: ListView(
@@ -130,13 +131,13 @@ class _UserInterviewsState extends State<UserInterviews> {
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => YourJobsApplied(
-                                currentUserId: widget.currentUserId),
-                          ),
-                          ModalRoute.withName('/'));
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => YourJobsApplied(
+                              currentUserId: widget.currentUserId),
+                        ),
+                      );
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -156,13 +157,12 @@ class _UserInterviewsState extends State<UserInterviews> {
                   ),
                   InkWell(
                     onTap: () {
-                      Navigator.pushAndRemoveUntil(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ShortedListed(
                               currentUserId: widget.currentUserId),
                         ),
-                        ModalRoute.withName('/'),
                       );
                     },
                     child: Container(
@@ -324,7 +324,7 @@ class _UserInterviewItemState extends State<UserInterviewItem> {
                     child: Text(
                       widget.jobPosition,
                       style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: 15.0,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue),
                     ),
@@ -334,6 +334,7 @@ class _UserInterviewItemState extends State<UserInterviewItem> {
               Row(
                 children: <Widget>[
                   Container(
+                    margin: const EdgeInsets.only(top: 5.0),
                     width: MediaQuery.of(context).size.width * 0.8,
                     padding: const EdgeInsets.fromLTRB(2.0, 0.0, 3.0, 10.0),
                     child: Text(
@@ -401,24 +402,6 @@ class _UserInterviewItemState extends State<UserInterviewItem> {
                 ],
               ),
               SizedBox(height: 6.0),
-              Container(
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.blue,
-                  ),
-                  borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                  color: Colors.white,
-                ),
-                height: 30.0,
-                child: Text(
-                  'Launch Interview Room',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               SizedBox(height: 7.0),
               // Container(
               //   padding: const EdgeInsets.fromLTRB(12.0, 10.0, 3.0, 2.0),

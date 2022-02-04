@@ -39,6 +39,7 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
   File videoFile;
   String videoURL;
   String videoSource;
+  dynamic videoPlayerController;
 
 //-------------------------------------------------------------------------------
   Career _career = Career();
@@ -205,6 +206,7 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
   void dispose() {
     //videoPlayerController.dispose();
     //chewieController.dispose();
+    videoPlayerController.pause();
     super.dispose();
   }
   //--------------------------------------------------------------------------
@@ -297,10 +299,13 @@ class _UploadVideoCVState extends State<UploadVideoCV> {
                                               controller: ChewieController(
                                                 videoPlayerController:
                                                     videoSource == 'file'
-                                                        ? VideoPlayerController
-                                                            .file(videoFile)
-                                                        : VideoPlayerController
-                                                            .network(videoURL),
+                                                        ? videoPlayerController =
+                                                            VideoPlayerController
+                                                                .file(videoFile)
+                                                        : videoPlayerController =
+                                                            VideoPlayerController
+                                                                .network(
+                                                                    videoURL),
                                                 aspectRatio: 5 / 4,
                                                 autoPlay: true,
                                                 looping: false,

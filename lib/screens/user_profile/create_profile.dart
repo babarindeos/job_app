@@ -185,7 +185,7 @@ class _CreateProfileState extends State<CreateProfile> {
       mediaUrl = null;
     }
 
-    // print(mediaUrl);
+    // print(mediaUrl); 
     // update the fields
     _profile.uName = _nameController.text;
     _profile.uAge = _ageController.text;

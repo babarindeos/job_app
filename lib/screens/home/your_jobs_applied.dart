@@ -103,10 +103,12 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
           posted: dataSnapshot['posted'],
           postedFmt: dataSnapshot['postedFmt'],
         );
-        setState(() {
-          appliedJobList.add(jobsApplied);
-          print(appliedJobList);
-        });
+        if (mounted) {
+          setState(() {
+            appliedJobList.add(jobsApplied);
+            print(appliedJobList);
+          });
+        }
       }
     });
   }
@@ -178,12 +180,14 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                 InkWell(
                   onTap: () {
                     Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ShortedListed(currentUserId: currentUserId),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShortedListed(
+                          currentUserId: currentUserId,
                         ),
-                        ModalRoute.withName('/'));
+                      ),
+                      ModalRoute.withName('/'),
+                    );
                   },
                   child: Container(
                     padding:
@@ -203,13 +207,14 @@ class _YourJobsAppliedState extends State<YourJobsApplied> {
                 InkWell(
                   onTap: () {
                     Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserInterviews(
-                            currentUserId: currentUserId,
-                          ),
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserInterviews(
+                          currentUserId: currentUserId,
                         ),
-                        ModalRoute.withName('/'));
+                      ),
+                      ModalRoute.withName('/'),
+                    );
                   },
                   child: Container(
                       padding: EdgeInsets.symmetric(

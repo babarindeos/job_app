@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chewie/chewie.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -19,24 +17,18 @@ import 'package:tabbar/tabbar.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
-class ApplicantsInformation extends StatefulWidget {
-  String userId, jobUid, jobId, docId;
-  Timestamp dateApplied;
-  DocumentSnapshot documentSnapshot;
+class ViewUserProfilePage extends StatefulWidget {
+  String userId;
 
-  ApplicantsInformation(
-      {this.userId,
-      this.jobUid,
-      this.jobId,
-      this.docId,
-      this.dateApplied,
-      this.documentSnapshot});
+  ViewUserProfilePage({
+    this.userId,
+  });
 
   @override
-  _ApplicantsInformationState createState() => _ApplicantsInformationState();
+  _ViewUserProfilePageState createState() => _ViewUserProfilePageState();
 }
 
-class _ApplicantsInformationState extends State<ApplicantsInformation> {
+class _ViewUserProfilePageState extends State<ViewUserProfilePage> {
   String videoSource;
   String videoURL;
   bool isLoading;
@@ -166,9 +158,6 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
     isLoading = true;
     super.initState();
 
-    // parameters
-    jobId = widget.jobId;
-    applicationId = widget.docId;
     candidateId = widget.userId;
 
     retrieveShortlistStatus(jobId, applicationId, candidateId);
@@ -199,85 +188,15 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
 //------------------------------------------------------------------------------
 
   final controller = PageController();
+
 //------------------------------------------------------------------------------
   @override
   void dispose() {
-    //videoPlayerController.dispose();
     videoPlayerController.pause();
+
     // TODO: implement dispose
     super.dispose();
   }
-
-//------------------------------------------------------------------------------
-//_shortlisting function
-  Future<void> _shortlisting(BuildContext context, String companyId,
-      String candidateId, String jobId, String appId) async {
-    // -------------- Not Shortlisted ------------------------------
-    if (shortlisted == false) {
-      try {
-        var uuid = Uuid();
-        var uid = uuid.v4();
-        DocumentReference docRef =
-            Firestore.instance.collection("Shortlist").document();
-        DateTime now = DateTime.now();
-        Map<String, dynamic> data = {
-          "uid": uid,
-          "job_uid": widget.jobUid,
-          "job_id": jobId,
-          "job_docId": jobId,
-          "application_id": appId,
-          "candidate_id": candidateId,
-          "company_id": companyId,
-          "date": now
-        };
-
-        await docRef.setData(data).whenComplete(() {
-          String message = "The Candidate has been Shortlisted";
-          showInSnackBar(message, context);
-          setState(() {
-            shortlisted = !(shortlisted);
-          });
-          String type = 'job_shortlisting';
-          String owner = recruiterId;
-          String recipient = candidateId;
-          String shortlistUid = uid;
-          String jobDocId = jobId;
-
-          addActivityToFeed(type, owner, recipient, shortlistUid, jobDocId);
-        });
-      } catch (e) {
-        String message = e.message.toString();
-        showInSnackBar(message, context);
-      }
-    }
-    //--------------------------------------------------------------------------
-  }
-
-//--------- Add to ActivityFeed ------------------------------------------------
-  Future<void> addActivityToFeed(String type, String owner, String recipient,
-      String shortlistUid, String jobDocId) async {
-    try {
-      var uuid = Uuid();
-      String uid = uuid.v4();
-
-      DocumentReference docRef =
-          Firestore.instance.collection("ActivityFeeds").document();
-      Map<String, dynamic> data = {
-        'uid': uid,
-        'type': type,
-        'owner': owner,
-        'recipient': recipient,
-        'shortlist_uid': shortlistUid,
-        'job_docid': jobDocId,
-        'date': DateTime.now()
-      };
-      await docRef.setData(data).whenComplete(() {});
-    } catch (e) {
-      print(e.toString());
-    } finally {}
-  }
-
-//--------- End of Add to ActivityFeed -----------------------------------------
 
 //------------------------------------------------------------------------------
 // Snackbar function
@@ -297,121 +216,7 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
 
 //------------------------------------------------------------------------------
 //
-//------------------------------------------------------------------------------
 
-  void confirmDelisting(BuildContext context, String companyId, String jobId,
-      String appId, candidateId) async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Delist Candidate'),
-            content: Text('Do you wish to remove the candidate from the list?'),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'Cancel',
-                  style: Theme.of(context).textTheme.caption.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.blue,
-                      ),
-                ),
-              ),
-              FlatButton(
-                  onPressed: () async {
-                    await _delistCandidate(
-                        context, companyId, jobId, appId, candidateId);
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    'Remove',
-                    style: Theme.of(context).textTheme.caption.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue,
-                        ),
-                  )),
-            ],
-          );
-        });
-  }
-
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// delistCandidate
-  Future<void> _delistCandidate(BuildContext context, String companyId,
-      String jobId, String appId, String candidateId) async {
-    try {
-      final Query collectionReference = Firestore.instance
-          .collection("Shortlist")
-          .where("company_id", isEqualTo: companyId)
-          .where("job_id", isEqualTo: jobId)
-          .where("application_id", isEqualTo: appId)
-          .where("candidate_id", isEqualTo: candidateId);
-
-      print("Company_id: " + companyId);
-      print("job_id: " + jobId);
-      print("job_id: " + jobId);
-
-      await collectionReference.getDocuments().then((dataSnapshot) {
-        dataSnapshot.documents.forEach((element) {
-          print(
-              "**************************** " + element.documentID.toString());
-          if (element.exists) {
-            String docId = element.documentID.toString();
-            String shortlistUid = element['uid'];
-            Firestore.instance
-                .collection("Shortlist")
-                .document(docId)
-                .delete()
-                .then((value) {
-              setState(() {
-                shortlisted = !(shortlisted);
-
-                // Remove item from ActivityFeed
-                removeActivityFromFeed(shortlistUid);
-              });
-              String message = "The candidate has been delisted";
-              showInSnackBar(message, context);
-            });
-          } else {
-            print('Does not exist');
-          }
-        });
-      });
-    } catch (e) {
-      String message = e.message.toString();
-      showInSnackBar(message, context);
-    }
-  }
-
-//------------------------------------------------------------------------------
-// ------- Remove Item from ActivityFeed ---------------------------------------
-  Future<void> removeActivityFromFeed(String shortlistUid) async {
-    try {
-      final Query collectionReference = Firestore.instance
-          .collection("ActivityFeeds")
-          .where("shortlist_uid", isEqualTo: shortlistUid);
-      await collectionReference.getDocuments().then((dataSnapshot) {
-        dataSnapshot.documents.forEach((element) {
-          if (element.exists) {
-            String docId = element.documentID.toString();
-            Firestore.instance
-                .collection("ActivityFeeds")
-                .document(docId)
-                .delete();
-          }
-        });
-      });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 // showPDFViewer
   void showPDFViewer(BuildContext context) {
@@ -426,9 +231,6 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
   @override
   Widget build(BuildContext context) {
     final myCompanyId = Provider.of<User>(context).uid;
-    print(widget.jobUid);
-    //print("Recruiter Id: " + recruiterId);
-    //print("Company Id: " + companyId);
 
     return isLoading
         ? Center(child: CircularProgressIndicator())
@@ -705,69 +507,6 @@ class _ApplicantsInformationState extends State<ApplicantsInformation> {
                           SizedBox(
                             width: 5.0,
                           ),
-                          shortlisted == true
-                              ? InkWell(
-                                  onTap: () {
-                                    confirmDelisting(
-                                        context,
-                                        myCompanyId,
-                                        widget.jobId,
-                                        widget.docId,
-                                        widget.userId);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5.0),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.green,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(50.0)),
-                                      color: Colors.green,
-                                    ),
-                                    height: 30.0,
-                                    width: 100.0,
-                                    child: Text(
-                                      'Shortlisted',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : InkWell(
-                                  onTap: () {
-                                    _shortlisting(
-                                        context,
-                                        myCompanyId,
-                                        widget.userId,
-                                        widget.jobId,
-                                        widget.docId);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(5.0),
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.blue,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(50.0)),
-                                      color: Colors.blue,
-                                    ),
-                                    height: 30.0,
-                                    width: 100.0,
-                                    child: Text(
-                                      'Shortlist',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
                         ],
                       ),
                       SizedBox(height: 15.0),
